@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(pnpm dlx:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm dev)",
+      "Bash(pnpm rebuild:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(cat:*)",
+      "Bash(taskkill /F /PID 23864)",
+      "Bash(taskkill //F //PID 23864)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "Bash(rm:*)",
+      "Bash(npx tsc:*)",
+      "Bash(claude /mcp)",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__execute_sql",
+      "Bash(git restore:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(taskkill /F /PID 39824)",
+      "Bash(taskkill //F //PID 39824)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
+}

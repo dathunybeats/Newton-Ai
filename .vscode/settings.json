@@ -1,0 +1,14 @@
+{
+  "cSpell.enableFiletypes": ["!md"],
+  "cSpell.files.ignorePaths": [
+    ".claude/**"
+  ],
+  "markdownlint.files.exclude": [
+    ".claude/**"
+  ],
+  "[markdown]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": null
+  }
+}
+
