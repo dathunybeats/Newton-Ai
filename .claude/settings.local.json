@@ -22,9 +22,14 @@
       "Bash(git restore:*)",
       "Bash(npm uninstall:*)",
       "Bash(taskkill /F /PID 39824)",
-      "Bash(taskkill //F //PID 39824)"
+      "Bash(taskkill //F //PID 39824)",
+      "Bash(dir:*)",
+      "Bash(taskkill:*)"
     ],
-    "deny": [],
+    "deny": [
+      "Bash(npm run dev)",
+      "Bash(npm run dev:*)"
+    ],
     "ask": []
   },
   "enableAllProjectMcpServers": true,

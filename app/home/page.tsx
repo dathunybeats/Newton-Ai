@@ -16,10 +16,15 @@ export default function HomePage() {
   const router = useRouter();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pricingOpen, setPricingOpen] = useState(false);
+  const [youtubeModalOpen, setYoutubeModalOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [youtubeLink, setYoutubeLink] = useState("");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isYearly, setIsYearly] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [textInput, setTextInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextInput(e.target.value);
@@ -45,6 +50,15 @@ export default function HomePage() {
       router.push("/");
     } catch (error) {
       console.error("Error signing out:", error);
+    }
+  };
+
+  const handleGenerateNote = () => {
+    if (youtubeLink.trim()) {
+      console.log("Generating note for YouTube link:", youtubeLink);
+      // Add your note generation logic here
+      setYoutubeLink("");
+      setYoutubeModalOpen(false);
     }
   };
 
@@ -379,6 +393,7 @@ export default function HomePage() {
               </div>
               <div className="w-full flex-1 sm:w-1/3">
                 <div
+                  onClick={() => setYoutubeModalOpen(true)}
                   className="border border-gray-200 text-card-foreground rounded-3xl group shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:dark:border-gray-300 bg-white dark:bg-white cursor-pointer transition-all duration-200 relative"
                   data-state="closed"
                 >
@@ -404,11 +419,11 @@ export default function HomePage() {
                       <div className="flex flex-col justify-center">
                         <div className="flex items-center gap-x-1">
                           <h3 className="font-medium text-sm sm:text-base text-left text-black group-hover:text-black transition-colors">
-                            Paste
+                            YouTube
                           </h3>
                         </div>
                         <p className="text-xs sm:text-sm text-left text-black transition-colors">
-                          YouTube, website, text
+                          Paste YouTube link
                         </p>
                       </div>
                     </div>
@@ -646,6 +661,82 @@ export default function HomePage() {
               </svg>
               <span>Logout</span>
             </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* YouTube Video Note Dialog */}
+      <Dialog open={youtubeModalOpen} onOpenChange={setYoutubeModalOpen}>
+        <DialogContent className="max-w-lg w-full p-6 bg-white">
+          <DialogHeader>
+            <DialogTitle className="scroll-m-20 text-2xl tracking-tight font-bold text-black text-center">
+              Youtube video note
+            </DialogTitle>
+          </DialogHeader>
+          <div className="w-full flex flex-col items-center pt-2">
+            <div className="flex flex-col w-full items-start gap-2">
+                <label
+                  htmlFor="youtubeLink"
+                  className="text-[16px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex flex-row items-center gap-1 text-black"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-link text-black"
+                  >
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                  Youtube link
+                </label>
+                <input
+                  id="youtubeLink"
+                  name="youtubeLink"
+                  type="text"
+                  value={youtubeLink}
+                  onChange={(e) => setYoutubeLink(e.target.value)}
+                  className="flex w-full rounded-2xl border border-gray-300 bg-transparent px-3 py-1 text-[15px]  transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-300 disabled:cursor-not-allowed disabled:opacity-50 h-12 text-black"
+                  placeholder="Ex. https://www.youtube.com/watch/example"
+                />
+            </div>
+          </div>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+            <button
+              onClick={handleGenerateNote}
+              disabled={!youtubeLink.trim()}
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 py-2 gap-2 mt-3 w-full ${
+                youtubeLink.trim()
+                  ? 'bg-black text-white hover:bg-black cursor-pointer'
+                  : 'bg-gray-200 text-black cursor-not-allowed opacity-50'
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-sparkles"
+              >
+                <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                <path d="M20 3v4"></path>
+                <path d="M22 5h-4"></path>
+                <path d="M4 17v2"></path>
+                <path d="M5 18H3"></path>
+              </svg>
+              Generate Notes
+                </button>
           </div>
         </DialogContent>
       </Dialog>
