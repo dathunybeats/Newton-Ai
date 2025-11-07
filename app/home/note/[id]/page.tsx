@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,6 +25,12 @@ interface Note {
 }
 
 type TabType = "note" | "quiz" | "flashcards" | "transcript";
+
+type TranscriptSegment = {
+  id: string;
+  timeLabel?: string;
+  text: string;
+};
 
 // Extract video ID from YouTube URL
 function getYouTubeVideoId(url: string): string | null {
@@ -53,6 +59,11 @@ export default function NotePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("note");
+
+  const transcriptSegments = useMemo(() => {
+    if (!note?.transcript) return [];
+    return formatTranscript(note.transcript ?? "");
+  }, [note?.transcript]);
 
   useEffect(() => {
     // Check if we have prefetched data for this note
@@ -371,148 +382,129 @@ export default function NotePage() {
                   <div className="flex flex-col mx-auto w-full max-w-2xl space-y-3 pt-5 max-[600px]:pt-0">
                     {activeTab === "note" && (
                       <div className="animate-in fade-in duration-300">
-                        {/* Hero Section */}
-                        <section id="hero">
-                          <div className="gap-2 flex justify-between">
-                            <div className="flex-col flex flex-1 space-y-1.5">
-                              <div className="flex">
-                                <span className="inline-block text-2xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                                  {note.title}
-                                </span>
-                              </div>
-                              {note.created_at && (
+                        <div className="flex flex-col space-y-8">
+                          {/* Hero Section */}
+                          <section id="hero">
+                            <div className="gap-2 flex justify-between">
+                              <div className="flex-col flex flex-1 space-y-1.5">
                                 <div className="flex">
-                                  <span className="inline-block max-w-[600px] md:text-lg text-gray-600">
-                                    {new Date(note.created_at).toLocaleDateString('en-US', {
-                                      day: 'numeric',
-                                      month: 'short',
-                                      year: 'numeric',
-                                      hour: '2-digit',
-                                      minute: '2-digit'
-                                    })}
+                                  <span className="inline-block text-2xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                                    {note.title}
                                   </span>
                                 </div>
-                              )}
-                            </div>
-                          </div>
-                        </section>
-
-                        {/* Action Bar */}
-                        <section>
-                          <div className="flex max-[600px]:flex-col max-[600px]:items-start justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                              <button className="justify-center whitespace-nowrap text-sm font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 h-9 px-3 flex items-center rounded-md min-w-[120px]">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                                  <path d="M12 10v6"></path>
-                                  <path d="M9 13h6"></path>
-                                  <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
-                                </svg>
-                                <small className="text-sm font-medium leading-none">Add folder</small>
-                              </button>
-                              {note.youtube_url && (
-                                <div className="flex items-center">
-                                  <svg className="mr-1" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill="red" d="M17 4H7C4 4 2 6 2 9v6c0 3 2 5 5 5h10c3 0 5-2 5-5V9c0-3-2-5-5-5zm-3.11 9.03l-2.47 1.48c-1 .6-1.82.14-1.82-1.03v-2.97c0-1.17.82-1.63 1.82-1.03l2.47 1.48c.95.58.95 1.5 0 2.07z"></path>
-                                  </svg>
-                                  <small className="text-sm font-medium leading-none">Youtube video</small>
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-red-500 hover:bg-red-600 text-white size-9">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M3 6h18"></path>
-                                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                                  <line x1="10" x2="10" y1="11" y2="17"></line>
-                                  <line x1="14" x2="14" y1="11" y2="17"></line>
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        </section>
-
-                        <div className="h-1"></div>
-
-                        {/* YouTube Video Embed */}
-                        {note.youtube_url && (() => {
-                          const videoId = getYouTubeVideoId(note.youtube_url);
-                          return videoId ? (
-                            <div className="w-full h-0 pb-[56.25%] relative">
-                              <iframe
-                                className="absolute top-0 left-0 w-full h-full rounded-lg bg-black/50"
-                                src={`https://www.youtube.com/embed/${videoId}`}
-                                title="YouTube video player"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                allowFullScreen
-                              />
-                            </div>
-                          ) : null;
-                        })()}
-
-                        <div className="h-1"></div>
-
-                        {/* Action Buttons */}
-                        <div className="flex items-center gap-2 justify-end">
-                          <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 h-11 rounded-md px-8 flex-1">
-                            <svg className="mr-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                              <path d="M7 8H4c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h3c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2ZM20.8 7h-3.6c-.66 0-1.2-.54-1.2-1.2V4.2c0-.66.54-1.2 1.2-1.2h3.6c.66 0 1.2.54 1.2 1.2v1.6c0 .66-.54 1.2-1.2 1.2Z"></path>
-                              <path d="M9 5h7M12.5 5v13c0 1.1.9 2 2 2H16M12.5 12.5H16"></path>
-                            </svg>
-                            View mind map
-                          </button>
-                          <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-colors bg-white text-gray-900 hover:bg-gray-100 border border-gray-300 h-11 rounded-md px-8 flex-1">
-                            <svg className="mr-2" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                              <path d="m19.06 18.67-2.14-4.27-2.14 4.27M15.17 17.91h3.52"></path>
-                              <path d="M16.92 22a5.08 5.08 0 1 1 .002-10.162A5.08 5.08 0 0 1 16.92 22Z"></path>
-                            </svg>
-                            Translate
-                          </button>
-                        </div>
-
-                        <div className="h-5"></div>
-
-                        {/* Note Content */}
-                        {note.content ? (
-                          <section id="note-content">
-                            <div className="prose prose-lg max-w-none text-gray-900">
-                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                {note.content}
-                              </ReactMarkdown>
+                                {note.created_at && (
+                                  <div className="flex">
+                                    <span className="inline-block max-w-[600px] md:text-lg text-gray-600">
+                                      {new Date(note.created_at).toLocaleDateString('en-US', {
+                                        day: 'numeric',
+                                        month: 'short',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                      })}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </section>
-                        ) : (
-                          <div className="text-center py-12">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="48"
-                              height="48"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="mx-auto text-gray-400 mb-4"
-                            >
-                              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
-                              <path d="M20 3v4"></path>
-                              <path d="M22 5h-4"></path>
-                              <path d="M4 17v2"></path>
-                              <path d="M5 18H3"></path>
-                            </svg>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                              No notes yet
-                            </h3>
-                            <p className="text-gray-600 mb-4">
-                              AI-generated notes will appear here
-                            </p>
-                            <button className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800">
-                              Generate Notes
-                            </button>
-                          </div>
-                        )}
+
+                          {/* Action Bar */}
+                          <section className="flex flex-col gap-3">
+                            <div className="flex max-[600px]:flex-col max-[600px]:items-start justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <button className="justify-center whitespace-nowrap text-sm font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 h-9 px-3 flex items-center rounded-md min-w-[120px]">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                                    <path d="M12 10v6"></path>
+                                    <path d="M9 13h6"></path>
+                                    <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
+                                  </svg>
+                                  <small className="text-sm font-medium leading-none">Add folder</small>
+                                </button>
+                                {note.youtube_url && (
+                                  <div className="flex items-center">
+                                    <svg className="mr-1" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                      <path fill="red" d="M17 4H7C4 4 2 6 2 9v6c0 3 2 5 5 5h10c3 0 5-2 5-5V9c0-3-2-5-5-5zm-3.11 9.03l-2.47 1.48c-1 .6-1.82.14-1.82-1.03v-2.97c0-1.17.82-1.63 1.82-1.03l2.47 1.48c.95.58.95 1.5 0 2.07z"></path>
+                                    </svg>
+                                    <small className="text-sm font-medium leading-none">Youtube video</small>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-red-500 hover:bg-red-600 text-white size-9">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M3 6h18"></path>
+                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                    <line x1="10" x2="10" y1="11" y2="17"></line>
+                                    <line x1="14" x2="14" y1="11" y2="17"></line>
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          </section>
+
+                          {/* YouTube Video Embed */}
+                          {note.youtube_url && (() => {
+                            const videoId = getYouTubeVideoId(note.youtube_url);
+                            return videoId ? (
+                              <section>
+                                <div className="relative w-full overflow-hidden rounded-xl bg-black aspect-video">
+                                  <iframe
+                                    className="absolute inset-0 h-full w-full"
+                                    src={`https://www.youtube.com/embed/${videoId}`}
+                                    title="YouTube video player"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowFullScreen
+                                    loading="lazy"
+                                  />
+                                </div>
+                              </section>
+                            ) : null;
+                          })()}
+
+                          {/* Note Content */}
+                          {note.content ? (
+                            <section id="note-content" className="space-y-4">
+                              <div className="prose prose-lg max-w-none text-gray-900">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                  {note.content}
+                                </ReactMarkdown>
+                              </div>
+                            </section>
+                          ) : (
+                            <div className="text-center py-12">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="48"
+                                height="48"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="mx-auto text-gray-400 mb-4"
+                              >
+                                <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                                <path d="M20 3v4"></path>
+                                <path d="M22 5h-4"></path>
+                                <path d="M4 17v2"></path>
+                                <path d="M5 18H3"></path>
+                              </svg>
+                              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                No notes yet
+                              </h3>
+                              <p className="text-gray-600 mb-4">
+                                AI-generated notes will appear here
+                              </p>
+                              <button className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800">
+                                Generate Notes
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
 
@@ -540,10 +532,41 @@ export default function NotePage() {
 
                     {activeTab === "transcript" && (
                       <div className="animate-in fade-in duration-300">
-                        {note.transcript ? (
-                          <div className="prose max-w-none">
-                            <div className="text-gray-700 whitespace-pre-wrap">
-                              {note.transcript}
+                        {transcriptSegments.length ? (
+                          <div className="flex flex-col mx-auto w-full max-w-2xl space-y-4">
+                            <div
+                              className="flex flex-col space-y-4"
+                              style={{
+                                opacity: 1,
+                                filter: "blur(0px)",
+                                willChange: "transform",
+                                transform: "translateY(-6px)",
+                              }}
+                            >
+                              <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                                Transcript
+                              </h3>
+                              <div className="flex flex-col space-y-6">
+                                {transcriptSegments.map((segment) => (
+                                  <div key={segment.id} className="space-y-2">
+                                    {segment.timeLabel && (
+                                      <span
+                                        id="subtitle-time"
+                                        style={{
+                                          color: "#c084fc",
+                                          fontSize: "small",
+                                          fontWeight: 700,
+                                        }}
+                                      >
+                                        {segment.timeLabel}
+                                      </span>
+                                    )}
+                                    <p className="whitespace-pre-line text-sm leading-7 text-zinc-800">
+                                      {segment.text}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         ) : (
@@ -569,4 +592,156 @@ export default function NotePage() {
       </div>
     </div>
   );
+}
+
+const WORDS_PER_SEGMENT = 80;
+const SECONDS_PER_WORD = 0.55;
+const DEFAULT_SEGMENT_DURATION = 20;
+
+function formatTranscript(rawTranscript: string): TranscriptSegment[] {
+  const trimmed = rawTranscript?.trim();
+  if (!trimmed) return [];
+
+  const fromJson = parseJsonTranscript(trimmed);
+  if (fromJson.length) return fromJson;
+
+  const fromParagraphs = parseParagraphTranscript(trimmed);
+  if (fromParagraphs.length) return fromParagraphs;
+
+  return chunkTranscript(trimmed);
+}
+
+function parseJsonTranscript(payload: string): TranscriptSegment[] {
+  try {
+    const parsed = JSON.parse(payload);
+    const segmentsArray = Array.isArray(parsed)
+      ? parsed
+      : Array.isArray(parsed?.segments)
+        ? parsed.segments
+        : [];
+
+    if (!segmentsArray.length) return [];
+
+    return segmentsArray
+      .map((segment: any, index: number) => {
+        const text = extractSegmentText(segment);
+        if (!text) return null;
+
+        const start =
+          typeof segment.start_time === "number"
+            ? segment.start_time
+            : typeof segment.start === "number"
+              ? segment.start
+              : typeof segment.offset_ms === "number"
+                ? segment.offset_ms / 1000
+                : index * DEFAULT_SEGMENT_DURATION;
+
+        const duration =
+          typeof segment.duration === "number"
+            ? segment.duration
+            : typeof segment.duration_ms === "number"
+              ? segment.duration_ms / 1000
+              : typeof segment.end === "number"
+                ? segment.end - start
+                : DEFAULT_SEGMENT_DURATION;
+
+        const end =
+          typeof segment.end === "number" ? segment.end : start + duration;
+
+        return {
+          id: `json-${index}`,
+          timeLabel: `${formatTime(start)} : ${formatTime(end)}`,
+          text,
+        };
+      })
+      .filter(Boolean) as TranscriptSegment[];
+  } catch {
+    return [];
+  }
+}
+
+function parseParagraphTranscript(payload: string): TranscriptSegment[] {
+  const paragraphs = payload
+    .split(/\n\s*\n/)
+    .map((chunk) => chunk.trim())
+    .filter(Boolean);
+
+  if (paragraphs.length <= 1) return [];
+
+  return paragraphs.map((paragraph, index) => {
+    const timeMatch = paragraph.match(
+      /^(\d{1,2}:\d{2}(?::\d{2})?)\s*(?:-|:)\s*(\d{1,2}:\d{2}(?::\d{2})?)/
+    );
+
+    return {
+      id: `paragraph-${index}`,
+      timeLabel: timeMatch
+        ? `${normalizeTimeLabel(timeMatch[1])} : ${normalizeTimeLabel(
+            timeMatch[2]
+          )}`
+        : undefined,
+      text: timeMatch ? paragraph.replace(timeMatch[0], "").trim() : paragraph,
+    };
+  });
+}
+
+function chunkTranscript(payload: string): TranscriptSegment[] {
+  const words = payload.split(/\s+/).filter(Boolean);
+  if (!words.length) return [];
+
+  const segments: TranscriptSegment[] = [];
+  let cursor = 0;
+  let startSeconds = 0;
+
+  while (cursor < words.length) {
+    const slice = words.slice(cursor, cursor + WORDS_PER_SEGMENT);
+    const durationSeconds = slice.length * SECONDS_PER_WORD;
+    const endSeconds = startSeconds + durationSeconds;
+
+    segments.push({
+      id: `chunk-${cursor}`,
+      timeLabel: `${formatTime(startSeconds)} : ${formatTime(endSeconds)}`,
+      text: slice.join(" "),
+    });
+
+    cursor += WORDS_PER_SEGMENT;
+    startSeconds = endSeconds;
+  }
+
+  return segments;
+}
+
+function extractSegmentText(segment: any): string {
+  if (!segment) return "";
+  if (typeof segment === "string") return segment.trim();
+  if (typeof segment.text === "string") return segment.text.trim();
+  if (typeof segment.snippet?.text === "string")
+    return String(segment.snippet.text).trim();
+  return "";
+}
+
+function formatTime(totalSeconds: number): string {
+  const safeSeconds = Math.max(0, Math.round(totalSeconds));
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const seconds = safeSeconds % 60;
+
+  if (hours > 0) {
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+      2,
+      "0"
+    )}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+    2,
+    "0"
+  )}`;
+}
+
+function normalizeTimeLabel(label: string): string {
+  const parts = label.split(":").map((part) => part.padStart(2, "0"));
+  if (parts.length === 2) return `${parts[0]}:${parts[1]}`;
+  if (parts.length === 3) return `${parts[0]}:${parts[1]}:${parts[2]}`;
+  return label;
 }

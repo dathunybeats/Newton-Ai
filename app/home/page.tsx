@@ -293,7 +293,7 @@ export default function HomePage() {
   return (
     <main className="flex-1 flex justify-center overflow-y-auto px-4 sm:px-10 lg:px-24 py-12 sm:py-20 bg-white">
       <div className="w-full flex flex-col items-center sm:gap-3 text-black">
-        <h2 className="text-center font-normal sm:text-3xl 2xl:text-4xl text-xl mb-3 text-black">
+        <h2 className="text-center font-medium sm:text-3xl 2xl:text-4xl text-xl mb-3 text-black">
           What do you want to learn?
         </h2>
         <div className="flex flex-col text-center 2xl:max-w-[672px] xl:max-w-[576px] md:max-w-[512px] w-full z-30">
@@ -518,7 +518,7 @@ export default function HomePage() {
             <div className="mb-11">
               <div className="text-left w-full flex justify-between items-center mb-4">
                 <div className="flex flex-col">
-                  <span className="text-base lg:text-lg font-medium text-gray-900">Recents</span>
+                  <span className="text-base lg:text-lg font-bold text-gray-900">Recents</span>
                 </div>
                 <Link href="/home" className="self-center">
                   <button className="inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 h-9 rounded-lg px-3 text-xs sm:text-sm font-medium text-gray-900 hover:text-gray-600">

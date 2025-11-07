@@ -78,7 +78,7 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
                 height={50}
                 className="object-contain"
               />
-              <h4 className="scroll-m-20 tracking-tight text-2xl font-black text-gray-900">
+              <h4 className="scroll-m-20 tracking-tight text-2xl font-bold text-gray-900">
                 Newton AI
               </h4>
             </Link>
@@ -308,7 +308,7 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
 
       {/* Settings Dialog */}
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <DialogContent className="max-w-4xl w-full px-10 py-10 bg-white">
+        <DialogContent className="max-w-4xl w-full px-10 py-10 bg-white border border-gray-200 shadow-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center text-sm font-bold text-gray-900">
               <svg
@@ -405,7 +405,7 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
 
       {/* Pricing Dialog - Content remains the same as in your original code */}
       <Dialog open={pricingOpen} onOpenChange={setPricingOpen}>
-        <DialogContent className="w-full max-w-5xl px-6 py-5 bg-white">
+        <DialogContent className="w-full max-w-5xl px-6 py-5 bg-white border border-gray-200 shadow-lg">
           <DialogHeader>
             <DialogTitle className="sr-only">Choose Your Plan</DialogTitle>
           </DialogHeader>

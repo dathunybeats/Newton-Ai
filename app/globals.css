@@ -12,11 +12,8 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  overflow-y: auto;
 }
 
 body {
@@ -27,26 +24,28 @@ body {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 0.5rem;
+  width: 0.35rem;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: #ffffff;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #d1d5db;
-  border-radius: 0.25rem;
+  border-radius: 999px;
+  border: 1px solid #ffffff;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: #bfc6d1;
 }
 
 /* Firefox scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db var(--background);
+  scrollbar-color: #d1d5db #ffffff;
 }
 
 /* Custom text selection color */
