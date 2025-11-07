@@ -6,8 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNoteContext } from "@/contexts/NoteContext";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import MarkdownPreview from "@uiw/react-markdown-preview";
 
 interface Note {
   id: string;
@@ -466,12 +465,14 @@ export default function NotePage() {
 
                           {/* Note Content */}
                           {note.content ? (
-                            <section id="note-content" className="space-y-4">
-                              <div className="prose prose-lg max-w-none text-gray-900">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                  {note.content}
-                                </ReactMarkdown>
-                              </div>
+                            <section id="note-content" data-color-mode="light">
+                              <MarkdownPreview
+                                source={note.content}
+                                className="wmde-markdown wmde-markdown-color markdown !bg-transparent"
+                                wrapperElement={{
+                                  "data-color-mode": "light"
+                                }}
+                              />
                             </section>
                           ) : (
                             <div className="text-center py-12">

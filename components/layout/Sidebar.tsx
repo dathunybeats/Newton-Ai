@@ -184,13 +184,13 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
           </div>
 
           {/* Separator */}
-          <div className="shrink-0 bg-gray-200 h-[1px] w-full mb-4 mt-2" />
+          <div className="shrink-0 bg-gray-200 height-[1px] w-full mb-4 mt-2" />
 
           {/* Upgrade Plan Card */}
           <div className="mx-4 mb-3">
             <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
               <div className="p-6 py-4 flex justify-center items-center flex-col px-3">
-                <Button onClick={() => setPricingOpen(true)} className=" group relative w-full gap-2 overflow-hidden text-lg font-semibold text-white hover:opacity-90 cursor-pointer active:scale-[0.98]" style={{ backgroundColor: '#171717' }}>
+                <Button onClick={() => setPricingOpen(true)} className=" group relative w-full rounded-[11px] gap-2 overflow-hidden text-lg font-semibold text-white hover:opacity-90 cursor-pointer active:scale-[0.98]" style={{ backgroundColor: '#171717' }}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
