@@ -15,6 +15,21 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  turbopack: {
+    resolveAlias: {
+      'pdfjs-dist/build/pdf': 'pdfjs-dist/legacy/build/pdf',
+      'pdfjs-dist/build/pdf.worker': 'pdfjs-dist/legacy/build/pdf.worker',
+    },
+  },
+  webpack: (config) => {
+    // Alias pdfjs-dist to use the legacy build for Node.js compatibility
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'pdfjs-dist/build/pdf': 'pdfjs-dist/legacy/build/pdf',
+      'pdfjs-dist/build/pdf.worker': 'pdfjs-dist/legacy/build/pdf.worker',
+    };
+    return config;
+  },
 };
 
 export default nextConfig;
