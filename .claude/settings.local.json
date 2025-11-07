@@ -30,7 +30,9 @@
       "Bash(npx supabase:*)",
       "WebFetch(domain:notewave.app)",
       "Bash(timeout /t 5 /nobreak)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(pnpm build:*)",
+      "Bash(git add:*)"
     ],
     "deny": [
       "Bash(npm run dev)",

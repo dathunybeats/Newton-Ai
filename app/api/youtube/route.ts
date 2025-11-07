@@ -3,9 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { YoutubeTranscript } from "youtube-transcript";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAIClient() {
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY || "",
+  });
+}
 
 // Extract video ID from YouTube URL
 function extractVideoId(url: string): string | null {
@@ -80,6 +82,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 6. Generate notes with AI
+    const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
