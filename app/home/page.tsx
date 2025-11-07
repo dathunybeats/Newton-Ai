@@ -120,7 +120,10 @@ export default function HomePage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to generate notes");
+        const errorMsg = data.details
+          ? `${data.error}\n\nDetails: ${data.details}`
+          : data.error || "Failed to generate notes";
+        throw new Error(errorMsg);
       }
 
       setProcessingMessage("Generating notes with AI...");

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { YoutubeTranscript } from "youtube-transcript";
+import { Innertube } from "youtubei.js";
 import OpenAI from "openai";
 
 function getOpenAIClient() {
@@ -57,31 +57,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Fetch transcript
-    let transcript;
+    // 4. Fetch transcript using youtubei.js
+    let transcriptText = "";
+
     try {
-      transcript = await YoutubeTranscript.fetchTranscript(videoId);
-    } catch (error) {
+      console.log("Initializing YouTube client...");
+      const youtube = await Innertube.create();
+
+      console.log("Fetching video info...");
+      const info = await youtube.getInfo(videoId);
+
+      console.log("Getting transcript...");
+      const transcriptData = await info.getTranscript();
+
+      if (!transcriptData || !transcriptData.transcript) {
+        throw new Error("No transcript available");
+      }
+
+      console.log("Transcript segments:", transcriptData.transcript.content?.body?.initial_segments?.length);
+
+      // Extract text from transcript segments
+      const segments = transcriptData.transcript.content?.body?.initial_segments || [];
+      transcriptText = segments
+        .map((segment: any) => segment.snippet?.text?.toString() || "")
+        .filter((text: string) => text.trim().length > 0)
+        .join(" ");
+
+      console.log("Transcript text length:", transcriptText.length);
+      console.log("First 200 chars:", transcriptText.substring(0, 200));
+
+      if (!transcriptText || transcriptText.trim().length === 0) {
+        throw new Error("Transcript is empty");
+      }
+    } catch (error: any) {
+      console.error("Transcript fetch error:", error);
+      console.error("Error details:", {
+        message: error.message,
+        stack: error.stack,
+        videoId,
+      });
       return NextResponse.json(
         {
           error:
             "Could not fetch transcript. The video may be private, deleted, or have captions disabled.",
+          details: error.message || String(error),
         },
         { status: 400 }
       );
     }
 
-    // 5. Combine transcript text
-    const transcriptText = transcript.map((item) => item.text).join(" ");
-
-    if (!transcriptText || transcriptText.trim().length === 0) {
-      return NextResponse.json(
-        { error: "No transcript available for this video" },
-        { status: 400 }
-      );
-    }
-
-    // 6. Generate notes with AI
+    // 5. Generate notes with AI
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -109,14 +134,14 @@ Make the notes educational, organized, and easy to review.`,
 
     const generatedNotes = completion.choices[0].message.content;
 
-    // 7. Generate title and summary
+    // 6. Generate title and summary
     const summaryCompletion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
           content:
-            "Generate a concise title (max 60 characters) and a brief description (max 160 characters) for the video based on its transcript.",
+            "Generate a concise title (max 60 characters) and a brief description (max 160 characters) for the video based on its transcript. Return the response as a JSON object with 'title' and 'description' fields.",
         },
         {
           role: "user",
@@ -134,7 +159,7 @@ Make the notes educational, organized, and easy to review.`,
     const description =
       summaryData.description || "Notes generated from YouTube video";
 
-    // 8. Save to database
+    // 7. Save to database
     const { data: note, error: dbError } = await supabase
       .from("notes")
       .insert({
@@ -155,7 +180,7 @@ Make the notes educational, organized, and easy to review.`,
       );
     }
 
-    // 9. Return success
+    // 8. Return success
     return NextResponse.json({
       success: true,
       noteId: note.id,
