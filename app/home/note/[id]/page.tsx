@@ -13,6 +13,8 @@ interface Note {
   content: string;
   upload_id: string;
   created_at: string;
+  youtube_url?: string;
+  transcript?: string;
   uploads: {
     filename: string;
     file_type: string;
@@ -21,6 +23,21 @@ interface Note {
 }
 
 type TabType = "note" | "quiz" | "flashcards" | "transcript";
+
+// Extract video ID from YouTube URL
+function getYouTubeVideoId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+    /^([a-zA-Z0-9_-]{11})$/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+
+  return null;
+}
 
 export default function NotePage() {
   const router = useRouter();
@@ -352,6 +369,25 @@ export default function NotePage() {
                   <div className="flex flex-col mx-auto w-full max-w-2xl space-y-3 pt-5 max-[600px]:pt-0">
                     {activeTab === "note" && (
                       <div className="animate-in fade-in duration-300">
+                        {/* YouTube Video Embed */}
+                        {note.youtube_url && (() => {
+                          const videoId = getYouTubeVideoId(note.youtube_url);
+                          return videoId ? (
+                            <div className="mb-6">
+                              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                                <iframe
+                                  className="absolute top-0 left-0 w-full h-full rounded-lg"
+                                  src={`https://www.youtube.com/embed/${videoId}`}
+                                  title="YouTube video player"
+                                  frameBorder="0"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                  allowFullScreen
+                                />
+                              </div>
+                            </div>
+                          ) : null;
+                        })()}
+
                         {note.content ? (
                           <div className="prose max-w-none">
                             <div
@@ -417,12 +453,22 @@ export default function NotePage() {
 
                     {activeTab === "transcript" && (
                       <div className="animate-in fade-in duration-300">
-                        <div className="text-center py-12">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                            Transcript
-                          </h3>
-                          <p className="text-gray-600">Coming soon...</p>
-                        </div>
+                        {note.transcript ? (
+                          <div className="prose max-w-none">
+                            <div className="text-gray-700 whitespace-pre-wrap">
+                              {note.transcript}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center py-12">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                              No Transcript Available
+                            </h3>
+                            <p className="text-gray-600">
+                              This note doesn't have a transcript
+                            </p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

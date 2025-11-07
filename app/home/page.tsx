@@ -36,6 +36,9 @@ export default function HomePage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [newNoteName, setNewNoteName] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingMessage, setProcessingMessage] = useState("");
+  const [youtubeError, setYoutubeError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -98,11 +101,46 @@ export default function HomePage() {
     }
   };
 
-  const handleGenerateNote = () => {
-    if (youtubeLink.trim()) {
-      console.log("Generating note for YouTube link:", youtubeLink);
-      setYoutubeLink("");
+  const handleGenerateNote = async () => {
+    if (!youtubeLink.trim()) return;
+
+    setIsProcessing(true);
+    setYoutubeError(null);
+    setProcessingMessage("Fetching video transcript...");
+
+    try {
+      const response = await fetch("/api/youtube", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ youtubeUrl: youtubeLink }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate notes");
+      }
+
+      setProcessingMessage("Generating notes with AI...");
+
+      // Set prefetched note for faster loading on the note page
+      setPrefetchedNote(data.note);
+
+      // Refresh notes list
+      await fetchNotes();
+
+      // Close modal and redirect
       setYoutubeModalOpen(false);
+      setYoutubeLink("");
+      router.push(`/home/note/${data.noteId}`);
+    } catch (error) {
+      console.error("YouTube generation error:", error);
+      setYoutubeError(error instanceof Error ? error.message : "Failed to generate notes");
+    } finally {
+      setIsProcessing(false);
+      setProcessingMessage("");
     }
   };
 
@@ -908,6 +946,12 @@ export default function HomePage() {
           </DialogHeader>
           <div className="w-full flex flex-col items-center pt-2">
             <div className="flex flex-col w-full items-start gap-2">
+                {youtubeError && (
+                  <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                    {youtubeError}
+                  </div>
+                )}
+
                 <label
                   htmlFor="youtubeLink"
                   className="text-[16px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex flex-row items-center gap-1 text-black"
@@ -935,40 +979,52 @@ export default function HomePage() {
                   type="text"
                   value={youtubeLink}
                   onChange={(e) => setYoutubeLink(e.target.value)}
+                  disabled={isProcessing}
                   className="flex w-full rounded-2xl border border-gray-300 bg-transparent px-3 py-1 text-[15px]  transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-300 disabled:cursor-not-allowed disabled:opacity-50 h-12 text-black"
                   placeholder="Ex. https://www.youtube.com/watch/example"
                 />
+
+                {isProcessing && processingMessage && (
+                  <div className="w-full flex items-center gap-2 text-sm text-gray-600">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
+                    <span>{processingMessage}</span>
+                  </div>
+                )}
             </div>
           </div>
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
             <button
               onClick={handleGenerateNote}
-              disabled={!youtubeLink.trim()}
+              disabled={!youtubeLink.trim() || isProcessing}
               className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 py-2 gap-2 mt-3 w-full ${
-                youtubeLink.trim()
-                  ? 'bg-black text-white hover:bg-black cursor-pointer'
+                youtubeLink.trim() && !isProcessing
+                  ? 'bg-black text-white hover:bg-gray-900 cursor-pointer'
                   : 'bg-gray-200 text-black cursor-not-allowed opacity-50'
               }`}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-sparkles"
-              >
-                <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
-                <path d="M20 3v4"></path>
-                <path d="M22 5h-4"></path>
-                <path d="M4 17v2"></path>
-                <path d="M5 18H3"></path>
-              </svg>
-              Generate Notes
+              {isProcessing ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-sparkles"
+                >
+                  <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                  <path d="M20 3v4"></path>
+                  <path d="M22 5h-4"></path>
+                  <path d="M4 17v2"></path>
+                  <path d="M5 18H3"></path>
+                </svg>
+              )}
+              {isProcessing ? "Processing..." : "Generate Notes"}
                 </button>
           </div>
         </DialogContent>
