@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNoteContext } from "@/contexts/NoteContext";
 import Link from "next/link";
 import MarkdownPreview from "@uiw/react-markdown-preview";
+import FolderAssignmentModal from "@/components/notes/FolderAssignmentModal";
 
 interface Note {
   id: string;
@@ -16,6 +17,7 @@ interface Note {
   created_at: string;
   youtube_url?: string;
   transcript?: string;
+  folder_id?: string | null;
   uploads: {
     filename: string;
     file_type: string;
@@ -51,13 +53,14 @@ export default function NotePage() {
   const params = useParams();
   const noteId = params?.id as string;
   const { user, loading: authLoading } = useAuth();
-  const { prefetchedNote, setPrefetchedNote } = useNoteContext();
+  const { prefetchedNote, setPrefetchedNote, getNote } = useNoteContext();
 
   const [note, setNote] = useState<Note | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("note");
+  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
 
   const transcriptSegments = useMemo(() => {
     if (!note?.transcript) return [];
@@ -65,19 +68,29 @@ export default function NotePage() {
   }, [note?.transcript]);
 
   useEffect(() => {
-    // Check if we have prefetched data for this note
+    // Priority 1: Check prefetched data (from navigation)
     if (prefetchedNote && prefetchedNote.id === noteId) {
-      // Use prefetched data immediately - no loading!
       setNote(prefetchedNote);
       setPdfUrl(prefetchedNote.pdfUrl || null);
       setLoading(false);
-      // Clear prefetched data after using it
       setPrefetchedNote(null);
-    } else if (!authLoading) {
-      // Fall back to fetching if no prefetched data
+      return;
+    }
+
+    // Priority 2: Check cache (instant load!)
+    const cachedNote = getNote(noteId);
+    if (cachedNote) {
+      setNote(cachedNote);
+      setPdfUrl(cachedNote.pdfUrl || null);
+      setLoading(false);
+      return;
+    }
+
+    // Priority 3: Fetch from database (cache miss)
+    if (!authLoading) {
       loadNote();
     }
-  }, [noteId, authLoading, prefetchedNote]);
+  }, [noteId, authLoading, prefetchedNote, getNote]);
 
   const loadNote = async () => {
     try {
@@ -166,8 +179,9 @@ export default function NotePage() {
   }
 
   return (
-    <div className="flex w-full flex-col px-8 max-[600px]:px-4 !flex-row pl-0">
-      <div className="w-full ml-8 max-[600px]:ml-0 h-auto">
+    <>
+      <div className="flex w-full flex-col px-8 max-[600px]:px-4 !flex-row pl-0">
+        <div className="w-full ml-8 max-[600px]:ml-0 h-auto">
         <div className="flex flex-col space-y-3 pt-5">
           {/* Breadcrumb Navigation */}
           <div className="flex items-center gap-3">
@@ -412,7 +426,11 @@ export default function NotePage() {
                           <section className="flex flex-col gap-3">
                             <div className="flex max-[600px]:flex-col max-[600px]:items-start justify-between gap-2">
                               <div className="flex items-center gap-2">
-                                <button className="justify-center whitespace-nowrap text-sm font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 h-9 px-3 flex items-center rounded-md min-w-[120px]">
+                                <button
+                                  type="button"
+                                  onClick={() => setIsFolderModalOpen(true)}
+                                  className="justify-center whitespace-nowrap text-sm font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 h-9 px-3 flex items-center rounded-md min-w-[120px]"
+                                >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
                                     <path d="M12 10v6"></path>
                                     <path d="M9 13h6"></path>
@@ -448,9 +466,9 @@ export default function NotePage() {
                             const videoId = getYouTubeVideoId(note.youtube_url);
                             return videoId ? (
                               <section>
-                                <div className="relative w-full overflow-hidden rounded-xl bg-black aspect-video">
+                                <div className="w-full h-0 pb-[56.25%] relative">
                                   <iframe
-                                    className="absolute inset-0 h-full w-full"
+                                    className="absolute top-0 left-0 w-full h-full rounded-lg"
                                     src={`https://www.youtube.com/embed/${videoId}`}
                                     title="YouTube video player"
                                     frameBorder="0"
@@ -592,6 +610,20 @@ export default function NotePage() {
         </div>
       </div>
     </div>
+      {note && (
+        <FolderAssignmentModal
+          isOpen={isFolderModalOpen}
+          onOpenChange={setIsFolderModalOpen}
+          noteId={note.id}
+          currentFolderId={note.folder_id ?? null}
+          onFolderChange={(folderId) => {
+            setNote((prev) =>
+              prev ? { ...prev, folder_id: folderId ?? null } : prev
+            );
+          }}
+        />
+      )}
+    </>
   );
 }
 

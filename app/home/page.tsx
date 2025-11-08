@@ -5,10 +5,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useNoteContext } from "@/contexts/NoteContext";
 import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
+import FolderAssignmentModal from "@/components/notes/FolderAssignmentModal";
 
 // Helper function to extract YouTube video ID
 const getYouTubeVideoId = (url: string) => {
@@ -19,7 +21,15 @@ const getYouTubeVideoId = (url: string) => {
 export default function HomePage() {
   const { user } = useAuth();
   const router = useRouter();
-  const { setPrefetchedNote } = useNoteContext();
+  const {
+    setPrefetchedNote,
+    notes,
+    isLoading: isLoadingNotes,
+    updateNoteInCache,
+    deleteNoteFromCache,
+    addNoteToCache,
+    folders,
+  } = useNoteContext();
   const [youtubeModalOpen, setYoutubeModalOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [youtubeLink, setYoutubeLink] = useState("");
@@ -30,7 +40,6 @@ export default function HomePage() {
   const [textInput, setTextInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [notes, setNotes] = useState<any[]>([]);
   const [pdfUrls, setPdfUrls] = useState<Record<string, string>>({});
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -39,51 +48,36 @@ export default function HomePage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingMessage, setProcessingMessage] = useState("");
   const [youtubeError, setYoutubeError] = useState<string | null>(null);
+  const [folderModalNote, setFolderModalNote] = useState<{
+    noteId: string;
+    folderId: string | null;
+  } | null>(null);
+  const searchParams = useSearchParams();
+  const activeFolderId = searchParams.get("folder");
 
+  const filteredNotes = useMemo(() => {
+    if (!activeFolderId) return notes;
+    if (activeFolderId === "null") {
+      return notes.filter((note) => !note.folder_id);
+    }
+    return notes.filter((note) => note.folder_id === activeFolderId);
+  }, [notes, activeFolderId]);
+
+  const activeFolderName = useMemo(() => {
+    if (!activeFolderId || activeFolderId === "null") return null;
+    return folders.find((folder) => folder.id === activeFolderId)?.name ?? null;
+  }, [activeFolderId, folders]);
+
+  // Extract PDF URLs from cached notes
   useEffect(() => {
-    if (user) {
-      fetchNotes();
-    }
-  }, [user]);
-
-  const fetchNotes = async () => {
-    try {
-      const { createClient } = await import("@/lib/supabase/client");
-      const supabase = createClient();
-
-      const { data, error } = await supabase
-        .from("notes")
-        .select(`
-          *,
-          uploads (
-            filename,
-            file_type,
-            storage_path
-          )
-        `)
-        .eq("user_id", user?.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setNotes(data || []);
-
-      // Fetch PDF URLs for all PDF notes
-      const urls: Record<string, string> = {};
-      for (const note of data || []) {
-        if (note.uploads?.file_type === "pdf") {
-          const { data: urlData } = supabase.storage
-            .from("uploads")
-            .getPublicUrl(note.uploads.storage_path);
-          if (urlData?.publicUrl) {
-            urls[note.id] = urlData.publicUrl;
-          }
-        }
+    const urls: Record<string, string> = {};
+    notes.forEach((note) => {
+      if (note.pdfUrl) {
+        urls[note.id] = note.pdfUrl;
       }
-      setPdfUrls(urls);
-    } catch (error) {
-      console.error("Error fetching notes:", error);
-    }
-  };
+    });
+    setPdfUrls(urls);
+  }, [notes]);
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextInput(e.target.value);
@@ -128,11 +122,11 @@ export default function HomePage() {
 
       setProcessingMessage("Generating notes with AI...");
 
+      // Add to cache immediately
+      addNoteToCache(data.note);
+
       // Set prefetched note for faster loading on the note page
       setPrefetchedNote(data.note);
-
-      // Refresh notes list
-      await fetchNotes();
 
       // Close modal and redirect
       setYoutubeModalOpen(false);
@@ -190,12 +184,16 @@ export default function HomePage() {
 
       const data = await response.json();
 
-      setPrefetchedNote({
+      const noteWithUrl = {
         ...data.note,
         pdfUrl: data.pdfUrl,
-      });
+      };
 
-      await fetchNotes();
+      // Add to cache immediately
+      addNoteToCache(noteWithUrl);
+
+      setPrefetchedNote(noteWithUrl);
+
       router.push(`/home/note/${data.note.id}`);
     } catch (error) {
       console.error("Upload error:", error);
@@ -228,6 +226,10 @@ export default function HomePage() {
     }
   };
 
+  const openFolderModal = (noteId: string, folderId: string | null) => {
+    setFolderModalNote({ noteId, folderId });
+  };
+
   const openDeleteModal = (noteId: string) => {
     setSelectedNoteId(noteId);
     setDeleteModalOpen(true);
@@ -236,6 +238,13 @@ export default function HomePage() {
   const handleDeleteNote = async () => {
     if (!selectedNoteId) return;
 
+    const noteIdToDelete = selectedNoteId;
+
+    // Optimistically remove from cache
+    deleteNoteFromCache(noteIdToDelete);
+    setDeleteModalOpen(false);
+    setSelectedNoteId(null);
+
     try {
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
@@ -243,17 +252,13 @@ export default function HomePage() {
       const { error } = await supabase
         .from("notes")
         .delete()
-        .eq("id", selectedNoteId);
+        .eq("id", noteIdToDelete);
 
       if (error) throw error;
-
-      // Refresh notes list
-      await fetchNotes();
-      setDeleteModalOpen(false);
-      setSelectedNoteId(null);
     } catch (error) {
       console.error("Error deleting note:", error);
       alert("Failed to delete note");
+      // TODO: Could implement rollback here by re-adding the note to cache
     }
   };
 
@@ -262,6 +267,15 @@ export default function HomePage() {
       return;
     }
 
+    const noteIdToRename = selectedNoteId;
+    const oldTitle = notes.find(n => n.id === noteIdToRename)?.title;
+
+    // Optimistically update cache
+    updateNoteInCache(noteIdToRename, { title: newNoteName.trim() });
+    setRenameModalOpen(false);
+    setSelectedNoteId(null);
+    setNewNoteName("");
+
     try {
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
@@ -269,18 +283,16 @@ export default function HomePage() {
       const { error } = await supabase
         .from("notes")
         .update({ title: newNoteName.trim() })
-        .eq("id", selectedNoteId);
+        .eq("id", noteIdToRename);
 
       if (error) throw error;
-
-      // Refresh notes list
-      await fetchNotes();
-      setRenameModalOpen(false);
-      setSelectedNoteId(null);
-      setNewNoteName("");
     } catch (error) {
       console.error("Error renaming note:", error);
       alert("Failed to rename note");
+      // Rollback on error
+      if (oldTitle) {
+        updateNoteInCache(noteIdToRename, { title: oldTitle });
+      }
     }
   };
 
@@ -513,26 +525,64 @@ export default function HomePage() {
         </div>
 
         {/* Recent Notes Section */}
-        {notes.length > 0 && (
-          <div className="w-full mt-12">
-            <div className="mb-11">
-              <div className="text-left w-full flex justify-between items-center mb-4">
-                <div className="flex flex-col">
-                  <span className="text-base lg:text-lg font-bold text-gray-900">Recents</span>
-                </div>
-                <Link href="/home" className="self-center">
-                  <button className="inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 h-9 rounded-lg px-3 text-xs sm:text-sm font-medium text-gray-900 hover:text-gray-600">
-                    <span>View all</span>
-                  </button>
-                </Link>
+        <div className="w-full mt-12">
+          <div className="mb-11">
+            <div className="text-left w-full flex justify-between items-center mb-4">
+              <div className="flex flex-col">
+                <span className="text-base lg:text-lg font-bold text-gray-900">Recents</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-                {notes.map((note) => (
-                  <Link
-                    key={note.id}
-                    href={`/home/note/${note.id}`}
-                    className="flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.02)] border-gray-300 hover:border-gray-400 bg-white cursor-pointer transition-all duration-200 rounded-2xl border group"
-                  >
+              <Link href="/home" className="self-center">
+                <button className="inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 h-9 rounded-lg px-3 text-xs sm:text-sm font-medium text-gray-900 hover:text-gray-600">
+                  <span>View all</span>
+                </button>
+              </Link>
+            </div>
+            {(isLoadingNotes || filteredNotes.length > 0) && (
+              <motion.div
+                layout
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4"
+              >
+                {isLoadingNotes ? (
+                  // Skeleton loading cards
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.02)] border-gray-200 bg-white rounded-2xl border animate-pulse"
+                    >
+                      <div className="relative flex-col justify-center items-center rounded-lg w-full">
+                        {/* Skeleton Thumbnail */}
+                        <div className="rounded-t-2xl overflow-hidden relative bg-gradient-to-br from-gray-50 to-gray-100">
+                          <div className="aspect-video w-full relative overflow-hidden flex items-center justify-center bg-gray-200">
+                          </div>
+                        </div>
+                        {/* Skeleton Content */}
+                        <div className="w-full my-2.5 flex gap-2 px-3 py-1 relative items-center">
+                          <div className="w-4 h-4 bg-gray-200 rounded flex-shrink-0"></div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col gap-2">
+                              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <AnimatePresence mode="popLayout">
+                    {filteredNotes.map((note) => (
+                      <motion.div
+                        key={note.id}
+                        layout
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -12 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                      >
+                        <Link
+                          href={`/home/note/${note.id}`}
+                          className="flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.02)] border-gray-200 hover:border-gray-300 bg-white cursor-pointer transition-all duration-200 rounded-2xl border group"
+                        >
                     <div className="relative cursor-pointer flex-col justify-center items-center rounded-lg transition duration-200 group hover:shadow-none w-full drop-shadow-none">
                       {/* Options Menu */}
                       <div className="absolute z-30 top-2.5 right-2.5">
@@ -571,13 +621,43 @@ export default function HomePage() {
                               list: "bg-white"
                             }}
                             onAction={(key) => {
-                              if (key === "rename") {
+                              const action = String(key);
+                              if (action === "folder") {
+                                openFolderModal(note.id, note.folder_id ?? null);
+                              } else if (action === "rename") {
                                 openRenameModal(note.id, note.title);
-                              } else if (key === "delete") {
+                              } else if (action === "delete") {
                                 openDeleteModal(note.id);
                               }
                             }}
                           >
+                            <DropdownItem
+                              key="folder"
+                              className="text-black hover:bg-gray-100"
+                              classNames={{
+                                base: "text-black",
+                                title: "text-black"
+                              }}
+                              startContent={
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="text-black"
+                                >
+                                  <path d="M3 19V6a2 2 0 0 1 2-2h3.6a2 2 0 0 1 1.6.8l1 1.2H19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
+                                  <path d="M3 10h18" />
+                                </svg>
+                              }
+                            >
+                              Add to folder
+                            </DropdownItem>
                             <DropdownItem
                               key="rename"
                               className="text-black hover:bg-gray-100"
@@ -800,16 +880,26 @@ export default function HomePage() {
                       </div>
                     </div>
                   </Link>
-                ))}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
+        </motion.div>
+      )}
+            {!isLoadingNotes && activeFolderId && filteredNotes.length === 0 && (
+              <div className="text-center text-sm text-gray-500 py-12">
+                No notes found in {activeFolderName ?? "this folder"} yet.
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Upload PDF Dialog */}
-      <Dialog open={uploadModalOpen} onOpenChange={setUploadModalOpen}>
-        <DialogContent className="max-w-lg w-full p-6 bg-white border border-gray-300 rounded-2xl">
+      <AnimatePresence>
+        {uploadModalOpen && (
+          <Dialog open={uploadModalOpen} onOpenChange={setUploadModalOpen}>
+            <DialogContent className="max-w-lg w-full p-6 bg-white border border-gray-300 rounded-2xl">
           <DialogHeader>
             <DialogTitle className="scroll-m-20 text-2xl tracking-tight font-bold text-black text-center">
               Upload File
@@ -937,10 +1027,14 @@ export default function HomePage() {
             </button>
           </div>
         </DialogContent>
-      </Dialog>
+          </Dialog>
+        )}
+      </AnimatePresence>
 
       {/* YouTube Video Note Dialog */}
-      <Dialog open={youtubeModalOpen} onOpenChange={setYoutubeModalOpen}>
+      <AnimatePresence>
+        {youtubeModalOpen && (
+          <Dialog open={youtubeModalOpen} onOpenChange={setYoutubeModalOpen}>
         <DialogContent className="max-w-lg w-full p-6 bg-white border border-gray-300 rounded-2xl">
           <DialogHeader>
             <DialogTitle className="scroll-m-20 text-2xl tracking-tight font-bold text-black text-center">
@@ -1031,7 +1125,9 @@ export default function HomePage() {
                 </button>
           </div>
         </DialogContent>
-      </Dialog>
+          </Dialog>
+        )}
+      </AnimatePresence>
 
       {/* Rename Note Modal */}
       <Modal
@@ -1186,6 +1282,17 @@ export default function HomePage() {
           )}
         </ModalContent>
       </Modal>
+
+      <FolderAssignmentModal
+        isOpen={!!folderModalNote}
+        onOpenChange={(open) => {
+          if (!open) {
+            setFolderModalNote(null);
+          }
+        }}
+        noteId={folderModalNote?.noteId ?? null}
+        currentFolderId={folderModalNote?.folderId ?? null}
+      />
     </main>
   );
 }

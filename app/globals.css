@@ -14,6 +14,7 @@
 
 html {
   overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -22,30 +23,15 @@ body {
   font-family: var(--font-geist-sans), sans-serif;
 }
 
-/* Custom scrollbar */
+/* Hide scrollbar but keep functionality */
 ::-webkit-scrollbar {
-  width: 0.35rem;
+  width: 0px;
+  background: transparent;
 }
 
-::-webkit-scrollbar-track {
-  background: #ffffff;
-  border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 999px;
-  border: 1px solid #ffffff;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #bfc6d1;
-}
-
-/* Firefox scrollbar */
+/* Firefox - hide scrollbar */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: #d1d5db #ffffff;
+  scrollbar-width: none;
 }
 
 /* Custom text selection color */

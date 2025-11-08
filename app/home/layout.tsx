@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { createClient } from "@/lib/supabase/client";
+import { useNoteContext } from "@/contexts/NoteContext";
 
 export default function HomeLayout({
   children,
@@ -13,8 +13,7 @@ export default function HomeLayout({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [notes, setNotes] = useState<any[]>([]);
-  const [notesLoading, setNotesLoading] = useState(true);
+  const { notes, isLoading: notesLoading, fetchNotes } = useNoteContext();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -22,39 +21,14 @@ export default function HomeLayout({
     }
   }, [user, loading, router]);
 
+  // Fetch notes when user is available
   useEffect(() => {
     if (user) {
       fetchNotes();
     }
-  }, [user]);
+  }, [user, fetchNotes]);
 
-  const fetchNotes = async () => {
-    try {
-      const supabase = createClient();
-
-      const { data, error } = await supabase
-        .from("notes")
-        .select(`
-          *,
-          uploads (
-            filename,
-            file_type,
-            storage_path
-          )
-        `)
-        .eq("user_id", user?.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setNotes(data || []);
-    } catch (error) {
-      console.error("Error fetching notes:", error);
-    } finally {
-      setNotesLoading(false);
-    }
-  };
-
-  if (loading || notesLoading) {
+  if (loading || (notesLoading && notes.length === 0)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white text-black">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-gray-900"></div>

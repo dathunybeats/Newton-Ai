@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { AnimatePresence } from "framer-motion";
+import { useNoteContext } from "@/contexts/NoteContext";
 
 interface SidebarProps {
   notes: any[];
@@ -18,10 +20,30 @@ interface SidebarProps {
 export function Sidebar({ notes, notesCount }: SidebarProps) {
   const { user, signOut } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { folders, fetchFolders, createFolder, updateFolderInCache, deleteFolderFromCache } = useNoteContext();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pricingOpen, setPricingOpen] = useState(false);
   const [isYearly, setIsYearly] = useState(true);
+
+  // Folder management modals
+  const [createFolderOpen, setCreateFolderOpen] = useState(false);
+  const [renameFolderOpen, setRenameFolderOpen] = useState(false);
+  const [deleteFolderOpen, setDeleteFolderOpen] = useState(false);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [folderName, setFolderName] = useState("");
+  const [folderColor, setFolderColor] = useState("#d1d5db");
+
+  const activeFolderId = searchParams.get("folder");
+
+  // Fetch folders on mount
+  useEffect(() => {
+    if (user) {
+      fetchFolders();
+    }
+  }, [user, fetchFolders]);
 
   const handleSignOut = async () => {
     try {
@@ -29,6 +51,78 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
       router.push("/");
     } catch (error) {
       console.error("Error signing out:", error);
+    }
+  };
+
+  // Get count of notes in a folder
+  const getFolderNoteCount = (folderId: string | null) => {
+    return notes.filter((note) => note.folder_id === folderId).length;
+  };
+
+  // Handle create folder
+  const handleCreateFolder = async () => {
+    if (!folderName.trim()) return;
+
+    const newFolder = await createFolder(folderName.trim(), folderColor);
+    if (newFolder) {
+      setCreateFolderOpen(false);
+      setFolderName("");
+      setFolderColor("#d1d5db");
+    }
+  };
+
+  // Handle rename folder
+  const handleRenameFolder = async () => {
+    if (!selectedFolderId || !folderName.trim()) return;
+
+    const oldFolder = folders.find(f => f.id === selectedFolderId);
+    if (!oldFolder) return;
+
+    // Optimistic update
+    updateFolderInCache(selectedFolderId, { name: folderName.trim() });
+    setRenameFolderOpen(false);
+    setSelectedFolderId(null);
+    setFolderName("");
+
+    try {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+
+      const { error } = await supabase
+        .from("folders")
+        .update({ name: folderName.trim() })
+        .eq("id", selectedFolderId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error renaming folder:", error);
+      // Rollback
+      updateFolderInCache(selectedFolderId, { name: oldFolder.name });
+    }
+  };
+
+  // Handle delete folder
+  const handleDeleteFolder = async () => {
+    if (!selectedFolderId) return;
+
+    // Optimistic delete
+    deleteFolderFromCache(selectedFolderId);
+    setDeleteFolderOpen(false);
+    setSelectedFolderId(null);
+
+    try {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+
+      const { error } = await supabase
+        .from("folders")
+        .delete()
+        .eq("id", selectedFolderId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error deleting folder:", error);
+      alert("Failed to delete folder");
     }
   };
 
@@ -130,9 +224,14 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
           {/* Scrollable Navigation */}
           <div className="flex-1 overflow-y-auto mx-4 pb-12">
             <div className="flex flex-col gap-1">
+              {/* All Notes */}
               <Link
                 href="/home"
-                className="inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-gray-100 hover:bg-gray-200 h-9 rounded-md px-3 w-full justify-between cursor-pointer"
+                className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer ${
+                  !activeFolderId
+                    ? "bg-gray-100 hover:bg-gray-200"
+                    : "hover:bg-gray-50"
+                }`}
               >
                 <div className="flex items-center text-xs text-gray-900">
                   <svg
@@ -153,6 +252,53 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
                 </div>
                 <small className="font-medium text-gray-500 text-xs">({notesCount})</small>
               </Link>
+
+              {/* Folders List */}
+              {folders.map((folder) => (
+                <Link
+                  key={folder.id}
+                  href={`/home?folder=${folder.id}`}
+                  className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer group ${
+                    activeFolderId === folder.id
+                      ? "bg-gray-100 hover:bg-gray-200"
+                      : "hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-center text-xs text-gray-900 flex-1 min-w-0">
+                    <div
+                      className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
+                      style={{ backgroundColor: folder.color }}
+                    />
+                    <span className="truncate">{folder.name}</span>
+                  </div>
+                  <small className="font-medium text-gray-500 text-xs ml-2">
+                    ({getFolderNoteCount(folder.id)})
+                  </small>
+                </Link>
+              ))}
+
+              {/* New Folder Button */}
+              <button
+                onClick={() => setCreateFolderOpen(true)}
+                className="inline-flex items-center whitespace-nowrap text-sm font-medium h-9 rounded-md px-3 w-full justify-start cursor-pointer hover:bg-gray-50 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mr-2"
+                >
+                  <path d="M5 12h14"></path>
+                  <path d="M12 5v14"></path>
+                </svg>
+                <span className="text-xs">New folder</span>
+              </button>
             </div>
           </div>
 
@@ -307,8 +453,10 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
       </aside>
 
       {/* Settings Dialog */}
-      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <DialogContent className="max-w-4xl w-full px-10 py-10 bg-white border border-gray-200 shadow-lg">
+      <AnimatePresence>
+        {settingsOpen && (
+          <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+            <DialogContent className="max-w-4xl w-full px-10 py-10 bg-white border border-gray-200 shadow-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center text-sm font-bold text-gray-900">
               <svg
@@ -401,10 +549,14 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
             </button>
           </div>
         </DialogContent>
-      </Dialog>
+          </Dialog>
+        )}
+      </AnimatePresence>
 
       {/* Pricing Dialog - Content remains the same as in your original code */}
-      <Dialog open={pricingOpen} onOpenChange={setPricingOpen}>
+      <AnimatePresence>
+        {pricingOpen && (
+          <Dialog open={pricingOpen} onOpenChange={setPricingOpen}>
         <DialogContent className="w-full max-w-5xl px-6 py-5 bg-white border border-gray-200 shadow-lg">
           <DialogHeader>
             <DialogTitle className="sr-only">Choose Your Plan</DialogTitle>
@@ -447,7 +599,7 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
             {/* Pricing Cards */}
             <div className="mx-auto mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Monthly/Yearly Plan */}
-              <div className="flex flex-col shadow-none border rounded-lg">
+              <div className="flex flex-col shadow-none border border-gray-200 rounded-lg">
                 <div className="flex flex-grow flex-col p-5">
                   <div className="flex flex-col">
                     <h3 className="text-xl font-bold text-gray-900 mb-1.5">
@@ -518,7 +670,7 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
               </div>
 
               {/* Lifetime Plan */}
-              <div className="flex flex-col shadow-none border-2 border-blue-500 relative rounded-lg">
+              <div className="flex flex-col shadow-none border border-blue-300 relative rounded-lg">
                 <div className="absolute -top-2 right-4 bg-blue-500 text-white px-2.5 py-1 rounded-full text-[11px] font-bold">
                   BEST VALUE
                 </div>
@@ -590,7 +742,87 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
             </div>
           </div>
         </DialogContent>
-      </Dialog>
+          </Dialog>
+        )}
+      </AnimatePresence>
+
+      {/* Create Folder Modal */}
+      <AnimatePresence>
+        {createFolderOpen && (
+          <Dialog open={createFolderOpen} onOpenChange={setCreateFolderOpen}>
+            <DialogContent className="max-w-md w-full p-6 bg-white border border-gray-300 rounded-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-2xl tracking-tight font-bold text-black text-center">
+                  Create Folder
+                </DialogTitle>
+              </DialogHeader>
+              <div className="w-full flex flex-col items-center pt-3">
+                <div className="flex flex-col w-full items-start gap-3">
+                  <div className="w-full">
+                    <label htmlFor="folderName" className="text-sm font-medium leading-none text-black mb-2 block">
+                      Folder name
+                    </label>
+                    <input
+                      id="folderName"
+                      type="text"
+                      value={folderName}
+                      onChange={(e) => setFolderName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && folderName.trim()) {
+                          handleCreateFolder();
+                        }
+                      }}
+                      className="flex w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2 text-sm transition-colors placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 disabled:cursor-not-allowed disabled:opacity-50 text-black"
+                      placeholder="e.g. Work, Study, Personal"
+                      autoFocus
+                    />
+                  </div>
+                  <div className="w-full">
+                    <label className="text-sm font-medium leading-none text-black mb-2 block">
+                      Color
+                    </label>
+                    <div className="flex gap-2 flex-wrap">
+                      {["#d1d5db", "#3b82f6", "#10b981", "#ef4444", "#f59e0b", "#8b5cf6", "#ec4899"].map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => setFolderColor(color)}
+                          className={`w-8 h-8 rounded-full transition-all ${
+                            folderColor === color ? "ring-2 ring-offset-2 ring-gray-900" : "hover:scale-110"
+                          }`}
+                          style={{ backgroundColor: color }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  onClick={() => {
+                    setCreateFolderOpen(false);
+                    setFolderName("");
+                    setFolderColor("#d1d5db");
+                  }}
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium h-10 px-4 py-2 bg-gray-200 text-black hover:bg-gray-300 cursor-pointer transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateFolder}
+                  disabled={!folderName.trim()}
+                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium h-10 px-4 py-2 transition-colors ${
+                    folderName.trim()
+                      ? "bg-black text-white hover:bg-gray-900 cursor-pointer"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed opacity-50"
+                  }`}
+                >
+                  Create
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </AnimatePresence>
     </>
   );
 }
