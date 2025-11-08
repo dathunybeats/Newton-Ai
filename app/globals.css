@@ -14,13 +14,20 @@
 
 html {
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-gutter: stable;
+  max-width: 100vw;
+  width: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), sans-serif;
+  max-width: 100vw;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
 }
 
 /* Hide scrollbar but keep functionality */
@@ -43,4 +50,35 @@ body {
 ::-moz-selection {
   background-color: #7DFF97;
   color: #000000;
+}
+
+.markdown {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
+}
+
+.markdown pre {
+  overflow-x: auto;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.markdown table {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+/* Ensure markdown images don't overflow */
+.markdown img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fix for any potential overflow issues */
+.markdown * {
+  max-width: 100%;
 }

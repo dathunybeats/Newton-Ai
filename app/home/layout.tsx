@@ -53,7 +53,7 @@ export default function HomeLayout({
 
   return (
     <SidebarContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
-      <div className="flex min-h-screen bg-white text-black">
+      <div className="flex min-h-screen bg-white text-black w-full max-w-full overflow-x-hidden">
         <Sidebar
           notes={notes}
           notesCount={notes.length}
@@ -61,7 +61,7 @@ export default function HomeLayout({
           setSidebarOpen={setSidebarOpen}
         />
         {/* Main Content Area with left margin for sidebar */}
-        <div className="ml-[272px] max-[872px]:ml-0 flex-1">
+        <div className="ml-[272px] max-[872px]:ml-0 flex-1 w-full max-w-full min-w-0">
           {children}
         </div>
       </div>

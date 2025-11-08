@@ -319,8 +319,8 @@ export default function HomePage() {
   };
 
   return (
-    <main className="flex-1 flex justify-center overflow-y-auto px-4 sm:px-10 lg:px-24 py-12 sm:py-20 bg-white">
-      <div className="w-full flex flex-col items-center sm:gap-3 text-black">
+    <main className="flex-1 flex justify-center overflow-y-auto px-4 sm:px-8 md:px-10 lg:px-12 py-12 sm:py-20 bg-white w-full">
+      <div className="w-full max-w-6xl flex flex-col items-center sm:gap-3 text-black">
         <h2 className="text-center font-medium sm:text-3xl 2xl:text-4xl text-xl mb-3 text-black">
           What do you want to learn?
         </h2>

@@ -174,9 +174,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
               <Image
                 src="/icon.svg"
                 alt="Newton AI"
-                width={25}
-                height={50}
-                className="object-contain"
+                width={36}
+                height={36}
+                className="object-contain w-9 h-9"
+                priority
               />
               <h4 className="scroll-m-20 tracking-tight text-2xl font-bold text-gray-900">
                 Newton AI

@@ -181,12 +181,12 @@ export default function NotePage() {
   }
 
   return (
-    <>
-        <div className="flex w-full flex-col px-8 max-[872px]:px-4 !flex-row pl-0 touch-manipulation">
-        <div className="w-full ml-8 max-[872px]:ml-0 h-auto overflow-x-hidden">
-        <div className="flex flex-col space-y-3 pt-5">
+<main className="flex-1 flex justify-center overflow-y-auto px-2 xs:px-4 sm:px-8 py-8 sm:py-12 lg:py-20 bg-white w-full max-w-full min-w-0">
+
+
+  <div className="w-full max-w-4xl flex flex-col space-y-4 sm:space-y-6 text-black min-w-0">
           {/* Breadcrumb Navigation */}
-          <div className="flex items-center gap-3 text-sm max-[872px]:text-base text-gray-600">
+          <div className="flex items-center gap-2 text-sm max-[872px]:text-base text-gray-600 min-w-0 w-full overflow-hidden">
           {/* Mobile Menu Button - Inline with breadcrumbs */}
           <button
             onClick={() => setSidebarOpen(true)}
@@ -210,11 +210,11 @@ export default function NotePage() {
             </svg>
           </button>
 
-          <nav aria-label="breadcrumb" className="flex-1 min-w-0">
-            <ol className="flex flex-wrap items-center gap-1.5 break-words sm:gap-2.5">
-              <li className="inline-flex items-center gap-1.5">
+          <nav aria-label="breadcrumb" className="flex-1 min-w-0 overflow-hidden">
+            <ol className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 overflow-hidden">
+              <li className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Link
-                  className="flex items-center hover:text-gray-900"
+                  className="flex items-center hover:text-gray-900 whitespace-nowrap"
                   href="/home"
                 >
                   <svg
@@ -227,18 +227,18 @@ export default function NotePage() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="mr-1"
+                    className="mr-1 flex-shrink-0"
                   >
                     <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path>
                   </svg>
                   All notes
                 </Link>
               </li>
-              <li role="presentation" aria-hidden="true" className="[&>svg]:size-3.5">
+              <li role="presentation" aria-hidden="true" className="flex-shrink-0">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -249,9 +249,9 @@ export default function NotePage() {
                   <path d="m9 18 6-6-6-6"></path>
                 </svg>
               </li>
-              <li className="inline-flex items-center gap-1.5 min-w-0 flex-1">
+              <li className="inline-flex items-center gap-1.5 min-w-0 overflow-hidden">
                 <span
-                  className="truncate font-medium text-gray-900"
+                  className="truncate font-medium text-gray-900 block"
                   title={note.title}
                 >
                   {note.title}
@@ -262,20 +262,20 @@ export default function NotePage() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="w-full grid grid-cols-4 max-[600px]:grid-cols-2 gap-2 bg-gray-100 rounded-xl p-1 border border-gray-200">
+        <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 bg-gray-100 rounded-xl p-1 border border-gray-200 overflow-hidden">
             <button
               onClick={() => setActiveTab("note")}
-              className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${
                 activeTab === "note"
                   ? "bg-gray-900 text-white"
                   : "bg-white text-gray-700 hover:bg-gray-50"
               }`}
           >
             <svg
-              className="mr-1"
+              className="mr-0.5 sm:mr-1 flex-shrink-0"
               xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
             >
@@ -294,11 +294,11 @@ export default function NotePage() {
                 strokeLinejoin="round"
               ></path>
             </svg>
-            Note
+            <span className="hidden xs:inline">Note</span>
           </button>
           <button
             onClick={() => setActiveTab("quiz")}
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
+            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${
               activeTab === "quiz"
                 ? "bg-gray-900 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"
@@ -306,35 +306,35 @@ export default function NotePage() {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="mr-1"
+              className="mr-0.5 sm:mr-1 flex-shrink-0"
             >
               <path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"></path>
               <rect x="3" y="14" width="7" height="7" rx="1"></rect>
               <circle cx="17.5" cy="17.5" r="3.5"></circle>
             </svg>
-            Quiz
+            <span className="hidden xs:inline">Quiz</span>
           </button>
           <button
             onClick={() => setActiveTab("flashcards")}
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
+            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${
               activeTab === "flashcards"
                 ? "bg-gray-900 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
-            <div className="flex items-center h-5 w-4 rounded justify-center border border-current mr-1">
+            <div className="flex items-center h-5 w-4 rounded justify-center border border-current mr-0.5 sm:mr-1 flex-shrink-0">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="17"
-                height="17"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="none"
               >
@@ -348,11 +348,11 @@ export default function NotePage() {
                 ></path>
               </svg>
             </div>
-            Flashcards
+            <span className="hidden xs:inline">Flashcards</span>
           </button>
           <button
             onClick={() => setActiveTab("transcript")}
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
+            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${
               activeTab === "transcript"
                 ? "bg-gray-900 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"
@@ -360,86 +360,74 @@ export default function NotePage() {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="mr-1"
+              className="mr-0.5 sm:mr-1 flex-shrink-0"
             >
               <rect width="18" height="14" x="3" y="5" rx="2" ry="2"></rect>
               <path d="M7 15h4M15 15h2M7 11h2M13 11h4"></path>
             </svg>
-            Transcript
+            <span className="hidden xs:inline">Transcript</span>
           </button>
         </div>
 
         {/* Content Card */}
-        <div className="rounded-lg bg-white text-gray-900  relative border-1 border-gray-200">
-          <div className="relative overflow-hidden h-[calc(100dvh-10rem)]">
-            <div className="h-full w-full rounded-[inherit] overflow-y-auto">
-              <div style={{ minWidth: "100%", display: "table" }}>
-                <div className="flex flex-col space-y-1.5 p-6"></div>
-                <div className="p-6 pt-0">
-                  <div className="flex flex-col mx-auto w-full max-w-2xl space-y-3 pt-5 max-[600px]:pt-0">
-                    {activeTab === "note" && (
-                      <div className="animate-in fade-in duration-300">
-                        <div className="flex flex-col space-y-8">
-                          {/* Hero Section */}
-                          <section id="hero">
-                            <div className="gap-2 flex justify-between">
-                              <div className="flex-col flex flex-1 space-y-1.5">
-                                <div className="flex">
-                                  <span className="inline-block text-2xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                                    {note.title}
-                                  </span>
-                                </div>
-                                {note.created_at && (
-                                  <div className="flex">
-                                    <span className="inline-block max-w-[600px] md:text-lg text-gray-600">
-                                      {new Date(note.created_at).toLocaleDateString('en-US', {
-                                        day: 'numeric',
-                                        month: 'short',
-                                        year: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                      })}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </section>
+        <div className="rounded-lg bg-white text-gray-900 border border-gray-200 p-3 sm:p-4 lg:p-6 min-w-0 w-full max-w-full">
 
-                          {/* Action Bar */}
-                          <section className="flex flex-col gap-3">
-                            <div className="flex max-[600px]:flex-col max-[600px]:items-start justify-between gap-2">
-                              <div className="flex items-center gap-2">
+
+        <div className="flex flex-col w-full space-y-4 sm:space-y-6 lg:space-y-8 min-w-0 max-w-full">
+
+            {activeTab === "note" && (
+              <>
+                {/* Hero Section */}
+                <section id="hero" className="min-w-0">
+                  <h1 className="text-2xl font-bold tracking-tighter sm:text-4xl xl:text-5xl break-words">
+                    {note.title}
+                  </h1>
+                  {note.created_at && (
+                    <p className="text-sm md:text-base text-gray-600">
+                      {new Date(note.created_at).toLocaleDateString('en-US', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  )}
+                </section>
+
+                {/* Action Bar */}
+                <section className="flex flex-wrap items-start justify-between gap-2 sm:gap-3 min-w-0 w-full">
+                <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
                                 <button
                                   type="button"
                                   onClick={() => setIsFolderModalOpen(true)}
-                                  className="justify-center whitespace-nowrap text-sm font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 h-9 px-3 flex items-center rounded-md min-w-[120px]"
+                                  className="justify-center whitespace-nowrap text-xs sm:text-sm font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 h-9 px-2 sm:px-3 flex items-center rounded-md"
                                 >
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1 flex-shrink-0">
                                     <path d="M12 10v6"></path>
                                     <path d="M9 13h6"></path>
                                     <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
                                   </svg>
-                                  <small className="text-sm font-medium leading-none">Add folder</small>
+                                  <span className="text-xs sm:text-sm font-medium leading-none">Add folder</span>
                                 </button>
                                 {note.youtube_url && (
-                                  <div className="flex items-center">
-                                    <svg className="mr-1" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                  <div className="flex items-center gap-1">
+                                    <svg className="flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
                                       <path fill="red" d="M17 4H7C4 4 2 6 2 9v6c0 3 2 5 5 5h10c3 0 5-2 5-5V9c0-3-2-5-5-5zm-3.11 9.03l-2.47 1.48c-1 .6-1.82.14-1.82-1.03v-2.97c0-1.17.82-1.63 1.82-1.03l2.47 1.48c.95.58.95 1.5 0 2.07z"></path>
                                     </svg>
-                                    <small className="text-sm font-medium leading-none">Youtube video</small>
+                                    <span className="text-xs sm:text-sm font-medium leading-none whitespace-nowrap">Youtube video</span>
                                   </div>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2">
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
                                 <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-red-500 hover:bg-red-600 text-white size-9">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M3 6h18"></path>
@@ -447,161 +435,132 @@ export default function NotePage() {
                                     <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
                                     <line x1="10" x2="10" y1="11" y2="17"></line>
                                     <line x1="14" x2="14" y1="11" y2="17"></line>
-                                  </svg>
-                                </button>
-                              </div>
-                            </div>
-                          </section>
-
-                          {/* YouTube Video Embed */}
-                          {note.youtube_url && (() => {
-                            const videoId = getYouTubeVideoId(note.youtube_url);
-                            return videoId ? (
-                              <section>
-                                <div className="w-full h-0 pb-[56.25%] relative">
-                                  <iframe
-                                    className="absolute top-0 left-0 w-full h-full rounded-lg"
-                                    src={`https://www.youtube.com/embed/${videoId}`}
-                                    title="YouTube video player"
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                    allowFullScreen
-                                    loading="lazy"
-                                  />
-                                </div>
-                              </section>
-                            ) : null;
-                          })()}
-
-                          {/* Note Content */}
-                          {note.content ? (
-                            <section id="note-content" data-color-mode="light">
-                              <MarkdownPreview
-                                source={note.content}
-                                className="wmde-markdown wmde-markdown-color markdown !bg-transparent"
-                                wrapperElement={{
-                                  "data-color-mode": "light"
-                                }}
-                              />
-                            </section>
-                          ) : (
-                            <div className="text-center py-12">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="48"
-                                height="48"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="mx-auto text-gray-400 mb-4"
-                              >
-                                <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
-                                <path d="M20 3v4"></path>
-                                <path d="M22 5h-4"></path>
-                                <path d="M4 17v2"></path>
-                                <path d="M5 18H3"></path>
-                              </svg>
-                              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                No notes yet
-                              </h3>
-                              <p className="text-gray-600 mb-4">
-                                AI-generated notes will appear here
-                              </p>
-                              <button className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800">
-                                Generate Notes
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {activeTab === "quiz" && (
-                      <div className="animate-in fade-in duration-300">
-                        <div className="text-center py-12">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                            Quiz
-                          </h3>
-                          <p className="text-gray-600">Coming soon...</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {activeTab === "flashcards" && (
-                      <div className="animate-in fade-in duration-300">
-                        <div className="text-center py-12">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                            Flashcards
-                          </h3>
-                          <p className="text-gray-600">Coming soon...</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {activeTab === "transcript" && (
-                      <div className="animate-in fade-in duration-300">
-                        {transcriptSegments.length ? (
-                          <div className="flex flex-col mx-auto w-full max-w-2xl space-y-4">
-                            <div
-                              className="flex flex-col space-y-4"
-                              style={{
-                                opacity: 1,
-                                filter: "blur(0px)",
-                                willChange: "transform",
-                                transform: "translateY(-6px)",
-                              }}
-                            >
-                              <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-                                Transcript
-                              </h3>
-                              <div className="flex flex-col space-y-6">
-                                {transcriptSegments.map((segment) => (
-                                  <div key={segment.id} className="space-y-2">
-                                    {segment.timeLabel && (
-                                      <span
-                                        id="subtitle-time"
-                                        style={{
-                                          color: "#c084fc",
-                                          fontSize: "small",
-                                          fontWeight: 700,
-                                        }}
-                                      >
-                                        {segment.timeLabel}
-                                      </span>
-                                    )}
-                                    <p className="whitespace-pre-line text-sm leading-7 text-zinc-800">
-                                      {segment.text}
-                                    </p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="text-center py-12">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                              No Transcript Available
-                            </h3>
-                            <p className="text-gray-600">
-                              This note doesn't have a transcript
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                      </svg>
+                    </button>
                   </div>
-                </div>
-                <div className="flex items-center p-6 pt-0"></div>
+                </section>
+
+                {/* YouTube Video Embed */}
+                {note.youtube_url && (() => {
+                  const videoId = getYouTubeVideoId(note.youtube_url);
+                  return videoId ? (
+                    <section className="w-full">
+                      <div className="w-full aspect-video relative rounded-lg overflow-hidden">
+                        <iframe
+                          className="absolute top-0 left-0 w-full h-full"
+                          src={`https://www.youtube.com/embed/${videoId}`}
+                          title="YouTube video player"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          loading="lazy"
+                        />
+                      </div>
+                    </section>
+                  ) : null;
+                })()}
+
+                {/* Note Content */}
+                {note.content ? (
+                        <section id="note-content" data-color-mode="light" className="min-w-0 w-full max-w-full overflow-auto">
+        <MarkdownPreview
+          source={note.content}
+          className="wmde-markdown wmde-markdown-color markdown !btransparent"
+          wrapperElement={{
+            "data-color-mode": "light"
+          }}
+        />
+      </section>
+                ) : (
+                  <div className="text-center py-12">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="48"
+                      height="48"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mx-auto text-gray-400 mb-4"
+                    >
+                      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                      <path d="M20 3v4"></path>
+                      <path d="M22 5h-4"></path>
+                      <path d="M4 17v2"></path>
+                      <path d="M5 18H3"></path>
+                    </svg>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      No notes yet
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      AI-generated notes will appear here
+                    </p>
+                    <button className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800">
+                      Generate Notes
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+
+            {activeTab === "quiz" && (
+              <div className="text-center py-12">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Quiz
+                </h3>
+                <p className="text-gray-600">Coming soon...</p>
               </div>
-            </div>
+            )}
+
+            {activeTab === "flashcards" && (
+              <div className="text-center py-12">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Flashcards
+                </h3>
+                <p className="text-gray-600">Coming soon...</p>
+              </div>
+            )}
+
+            {activeTab === "transcript" && (
+              <>
+                {transcriptSegments.length ? (
+                  <>
+                    <h3 className="text-2xl font-semibold tracking-tight">
+                      Transcript
+                    </h3>
+                    <div className="flex flex-col space-y-6">
+                      {transcriptSegments.map((segment) => (
+                        <div key={segment.id} className="space-y-2">
+                          {segment.timeLabel && (
+                            <span className="text-purple-400 text-sm font-bold break-words">
+                              {segment.timeLabel}
+                            </span>
+                          )}
+                          <p className="whitespace-pre-line text-sm leading-7 text-zinc-800 break-words">
+                            {segment.text}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-12">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      No Transcript Available
+                    </h3>
+                    <p className="text-gray-600">
+                      This note doesn't have a transcript
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
-        </div>
       </div>
-    </div>
+
       {note && (
         <FolderAssignmentModal
           isOpen={isFolderModalOpen}
@@ -615,7 +574,7 @@ export default function NotePage() {
           }}
         />
       )}
-    </>
+    </main>
   );
 }
 
