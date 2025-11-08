@@ -182,11 +182,11 @@ export default function NotePage() {
 
   return (
     <>
-        <div className="flex w/full flex-col px-8 max-[872px]:px-4 !flex-row pl-0">
-        <div className="w-full ml-8 max-[872px]:ml-0 h-auto">
+        <div className="flex w-full flex-col px-8 max-[872px]:px-4 !flex-row pl-0 touch-manipulation">
+        <div className="w-full ml-8 max-[872px]:ml-0 h-auto overflow-x-hidden">
         <div className="flex flex-col space-y-3 pt-5">
           {/* Breadcrumb Navigation */}
-          <div className="flex items-center gap-3 text-sm text-gray-600">
+          <div className="flex items-center gap-3 text-sm max-[872px]:text-base text-gray-600">
           {/* Mobile Menu Button - Inline with breadcrumbs */}
           <button
             onClick={() => setSidebarOpen(true)}
@@ -265,7 +265,7 @@ export default function NotePage() {
         <div className="w-full grid grid-cols-4 max-[600px]:grid-cols-2 gap-2 bg-gray-100 rounded-xl p-1 border border-gray-200">
             <button
               onClick={() => setActiveTab("note")}
-              className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
                 activeTab === "note"
                   ? "bg-gray-900 text-white"
                   : "bg-white text-gray-700 hover:bg-gray-50"
@@ -298,7 +298,7 @@ export default function NotePage() {
           </button>
           <button
             onClick={() => setActiveTab("quiz")}
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
+            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
               activeTab === "quiz"
                 ? "bg-gray-900 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"
@@ -324,7 +324,7 @@ export default function NotePage() {
           </button>
           <button
             onClick={() => setActiveTab("flashcards")}
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
+            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
               activeTab === "flashcards"
                 ? "bg-gray-900 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"
@@ -352,7 +352,7 @@ export default function NotePage() {
           </button>
           <button
             onClick={() => setActiveTab("transcript")}
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
+            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
               activeTab === "transcript"
                 ? "bg-gray-900 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"
