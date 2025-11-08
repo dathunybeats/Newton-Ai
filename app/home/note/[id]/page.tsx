@@ -181,88 +181,89 @@ export default function NotePage() {
   }
 
   return (
-<main className="flex-1 flex justify-center overflow-y-auto px-2 xs:px-4 sm:px-8 py-8 sm:py-12 lg:py-20 bg-white w-full max-w-full min-w-0">
+    <main className="flex-1 flex justify-center bg-white w-full max-w-full min-w-0 h-screen max-h-screen overflow-hidden box-border px-1 sm:px-3 lg:px-4 py-2 sm:py-4 lg:py-6">
 
 
-  <div className="w-full max-w-4xl flex flex-col space-y-4 sm:space-y-6 text-black min-w-0">
+  <div className="w-full flex flex-col gap-4 sm:gap-6 text-black min-w-0 flex-1 min-h-0">
+        <div className="w-full sticky top-0 z-20 bg-white flex flex-col gap-4 sm:gap-6 pt-1 pb-2 sm:pb-3">
           {/* Breadcrumb Navigation */}
           <div className="flex items-center gap-2 text-sm max-[872px]:text-base text-gray-600 min-w-0 w-full overflow-hidden">
-          {/* Mobile Menu Button - Inline with breadcrumbs */}
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="hidden max-[872px]:flex items-center justify-center w-9 h-9 rounded-md bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors flex-shrink-0"
-            aria-label="Open menu"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            {/* Mobile Menu Button - Inline with breadcrumbs */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="hidden max-[872px]:flex items-center justify-center w-9 h-9 rounded-md bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors flex-shrink-0"
+              aria-label="Open menu"
             >
-              <line x1="4" x2="20" y1="12" y2="12"></line>
-              <line x1="4" x2="20" y1="6" y2="6"></line>
-              <line x1="4" x2="20" y1="18" y2="18"></line>
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="4" x2="20" y1="12" y2="12"></line>
+                <line x1="4" x2="20" y1="6" y2="6"></line>
+                <line x1="4" x2="20" y1="18" y2="18"></line>
+              </svg>
+            </button>
 
-          <nav aria-label="breadcrumb" className="flex-1 min-w-0 overflow-hidden">
-            <ol className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 overflow-hidden">
-              <li className="inline-flex items-center gap-1.5 flex-shrink-0">
-                <Link
-                  className="flex items-center hover:text-gray-900 whitespace-nowrap"
-                  href="/home"
-                >
+            <nav aria-label="breadcrumb" className="flex-1 min-w-0 overflow-hidden">
+              <ol className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 overflow-hidden">
+                <li className="inline-flex items-center gap-1.5 flex-shrink-0">
+                  <Link
+                    className="flex items-center hover:text-gray-900 whitespace-nowrap"
+                    href="/home"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-1 flex-shrink-0"
+                    >
+                      <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    All notes
+                  </Link>
+                </li>
+                <li role="presentation" aria-hidden="true" className="flex-shrink-0">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
+                    width="16"
+                    height="16"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="mr-1 flex-shrink-0"
                   >
-                    <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path>
+                    <path d="m9 18 6-6-6-6"></path>
                   </svg>
-                  All notes
-                </Link>
-              </li>
-              <li role="presentation" aria-hidden="true" className="flex-shrink-0">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="m9 18 6-6-6-6"></path>
-                </svg>
-              </li>
-              <li className="inline-flex items-center gap-1.5 min-w-0 overflow-hidden">
-                <span
-                  className="truncate font-medium text-gray-900 block"
-                  title={note.title}
-                >
-                  {note.title}
-                </span>
-              </li>
-            </ol>
-          </nav>
-        </div>
+                </li>
+                <li className="inline-flex items-center gap-1.5 min-w-0 overflow-hidden">
+                  <span
+                    className="truncate font-medium text-gray-900 block"
+                    title={note.title}
+                  >
+                    {note.title}
+                  </span>
+                </li>
+              </ol>
+            </nav>
+          </div>
 
-        {/* Tab Navigation */}
-        <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 bg-gray-100 rounded-xl p-1 border border-gray-200 overflow-hidden">
+          {/* Tab Navigation */}
+          <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 bg-gray-100 rounded-xl p-1 border border-gray-200 overflow-hidden">
             <button
               onClick={() => setActiveTab("note")}
               className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${
@@ -296,9 +297,9 @@ export default function NotePage() {
             </svg>
             <span className="hidden xs:inline">Note</span>
           </button>
-          <button
-            onClick={() => setActiveTab("quiz")}
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${
+            <button
+              onClick={() => setActiveTab("quiz")}
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${
               activeTab === "quiz"
                 ? "bg-gray-900 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"
@@ -377,11 +378,13 @@ export default function NotePage() {
           </button>
         </div>
 
+        </div>
+
         {/* Content Card */}
-        <div className="rounded-lg bg-white text-gray-900 border border-gray-200 p-3 sm:p-4 lg:p-6 min-w-0 w-full max-w-full">
+        <div className="rounded-lg bg-white text-gray-900 border border-gray-200 p-3 sm:p-4 lg:p-6 w-full self-center flex-1 min-h-0 overflow-y-auto scrollbar-visible">
 
 
-        <div className="flex flex-col w-full space-y-4 sm:space-y-6 lg:space-y-8 min-w-0 max-w-full">
+        <div className="flex flex-col w-full max-w-2xl mx-auto space-y-4 sm:space-y-6 lg:space-y-8 min-w-0">
 
             {activeTab === "note" && (
               <>
@@ -462,7 +465,7 @@ export default function NotePage() {
 
                 {/* Note Content */}
                 {note.content ? (
-                        <section id="note-content" data-color-mode="light" className="min-w-0 w-full max-w-full overflow-auto">
+                        <section id="note-content" data-color-mode="light" className="min-w-0 w-full max-w-full">
         <MarkdownPreview
           source={note.content}
           className="wmde-markdown wmde-markdown-color markdown !btransparent"
