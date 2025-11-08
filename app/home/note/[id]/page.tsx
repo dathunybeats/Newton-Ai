@@ -13,12 +13,12 @@ interface Note {
   id: string;
   title: string;
   content: string;
-  upload_id: string;
+  upload_id?: string | null;
   created_at: string;
   youtube_url?: string;
   transcript?: string;
   folder_id?: string | null;
-  uploads: {
+  uploads?: {
     filename: string;
     file_type: string;
     storage_path: string;
