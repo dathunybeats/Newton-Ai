@@ -1,10 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, createContext, useContext } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useNoteContext } from "@/contexts/NoteContext";
+
+const SidebarContext = createContext<{
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+}>({
+  sidebarOpen: false,
+  setSidebarOpen: () => {},
+});
+
+export const useSidebar = () => useContext(SidebarContext);
 
 export default function HomeLayout({
   children,
@@ -14,6 +24,7 @@ export default function HomeLayout({
   const { user, loading } = useAuth();
   const router = useRouter();
   const { notes, isLoading: notesLoading, fetchNotes } = useNoteContext();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -41,12 +52,19 @@ export default function HomeLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-white text-black">
-      <Sidebar notes={notes} notesCount={notes.length} />
-      {/* Main Content Area with left margin for sidebar */}
-      <div className="ml-[272px] max-[872px]:ml-0 flex-1">
-        {children}
+    <SidebarContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
+      <div className="flex min-h-screen bg-white text-black">
+        <Sidebar
+          notes={notes}
+          notesCount={notes.length}
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+        />
+        {/* Main Content Area with left margin for sidebar */}
+        <div className="ml-[272px] max-[872px]:ml-0 flex-1">
+          {children}
+        </div>
       </div>
-    </div>
+    </SidebarContext.Provider>
   );
 }

@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNoteContext } from "@/contexts/NoteContext";
+import { useSidebar } from "@/app/home/layout";
 import Link from "next/link";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import FolderAssignmentModal from "@/components/notes/FolderAssignmentModal";
@@ -54,6 +55,7 @@ export default function NotePage() {
   const noteId = params?.id as string;
   const { user, loading: authLoading } = useAuth();
   const { prefetchedNote, setPrefetchedNote, getNote } = useNoteContext();
+  const { setSidebarOpen } = useSidebar();
 
   const [note, setNote] = useState<Note | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -180,13 +182,36 @@ export default function NotePage() {
 
   return (
     <>
-        <div className="flex w/full flex-col px-8 max-[600px]:px-4 !flex-row pl-0">
-        <div className="w-full ml-8 max-[600px]:ml-0 h-auto">
+        <div className="flex w/full flex-col px-8 max-[872px]:px-4 !flex-row pl-0">
+        <div className="w-full ml-8 max-[872px]:ml-0 h-auto">
         <div className="flex flex-col space-y-3 pt-5">
           {/* Breadcrumb Navigation */}
-          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+          <div className="flex items-center gap-3 text-sm text-gray-600">
+          {/* Mobile Menu Button - Inline with breadcrumbs */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="hidden max-[872px]:flex items-center justify-center w-9 h-9 rounded-md bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors flex-shrink-0"
+            aria-label="Open menu"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="4" x2="20" y1="12" y2="12"></line>
+              <line x1="4" x2="20" y1="6" y2="6"></line>
+              <line x1="4" x2="20" y1="18" y2="18"></line>
+            </svg>
+          </button>
+
           <nav aria-label="breadcrumb" className="flex-1 min-w-0">
-            <ol className="flex flex-wrap items-center gap-1.5 break-words sm:gap-2.5 max-[866px]:pt-2">
+            <ol className="flex flex-wrap items-center gap-1.5 break-words sm:gap-2.5">
               <li className="inline-flex items-center gap-1.5">
                 <Link
                   className="flex items-center hover:text-gray-900"

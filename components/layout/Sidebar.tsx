@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -15,18 +15,22 @@ import { useNoteContext } from "@/contexts/NoteContext";
 interface SidebarProps {
   notes: any[];
   notesCount: number;
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
 }
 
-export function Sidebar({ notes, notesCount }: SidebarProps) {
+export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: SidebarProps) {
   const { user, signOut } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const { folders, fetchFolders, createFolder, updateFolderInCache, deleteFolderFromCache } = useNoteContext();
-
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pricingOpen, setPricingOpen] = useState(false);
   const [isYearly, setIsYearly] = useState(true);
+
+  // Check if we're on a note page
+  const isNotePage = pathname?.startsWith('/home/note/');
 
   // Folder management modals
   const [createFolderOpen, setCreateFolderOpen] = useState(false);
@@ -128,11 +132,12 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setSidebarOpen(true)}
-        className="fixed top-4 left-4 z-40 hidden max-[872px]:flex items-center justify-center w-9 h-9 rounded-md bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
-      >
+      {/* Mobile Menu Button - Hidden on note pages where inline button is used */}
+      {!isNotePage && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="fixed top-4 left-4 z-40 hidden max-[872px]:flex items-center justify-center w-9 h-9 rounded-md bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
+        >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"
@@ -150,6 +155,7 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
           <path d="m16 15-3-3 3-3"></path>
         </svg>
       </button>
+      )}
 
       {/* Sidebar Overlay */}
       {sidebarOpen && (
@@ -456,7 +462,7 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
       <AnimatePresence>
         {settingsOpen && (
           <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-            <DialogContent className="max-w-4xl w-full px-10 py-10 bg-white border border-gray-200 shadow-lg">
+            <DialogContent className="w-[95vw] max-w-2xl sm:max-w-3xl px-5 py-6 sm:px-10 sm:py-10 bg-white border border-gray-200 shadow-lg rounded-xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center text-sm font-bold text-gray-900">
               <svg
@@ -557,7 +563,7 @@ export function Sidebar({ notes, notesCount }: SidebarProps) {
       <AnimatePresence>
         {pricingOpen && (
           <Dialog open={pricingOpen} onOpenChange={setPricingOpen}>
-        <DialogContent className="w-full max-w-5xl px-6 py-5 bg-white border border-gray-200 shadow-lg">
+        <DialogContent className="w-[95vw] max-w-3xl sm:max-w-4xl px-5 py-5 sm:px-6 sm:py-6 bg-white border border-gray-200 shadow-lg rounded-xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="sr-only">Choose Your Plan</DialogTitle>
           </DialogHeader>

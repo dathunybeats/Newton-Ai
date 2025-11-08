@@ -3,10 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Modal,
-  ModalBody,
   ModalContent,
-  ModalFooter,
-  ModalHeader,
 } from "@heroui/modal";
 import { useNoteContext } from "@/contexts/NoteContext";
 
@@ -152,22 +149,24 @@ const FolderAssignmentModal = ({
       hideCloseButton
       backdrop="blur"
       classNames={{
-        backdrop: "bg-black/20 backdrop-blur-sm",
-        base: "bg-white border border-gray-200 rounded-2xl",
-        body: "py-4",
+        wrapper: "z-50 items-center",
+        backdrop: "bg-black/30 backdrop-blur-sm backdrop-saturate-150",
+        base: "bg-white border border-gray-300 rounded-2xl w-[calc(100vw-2rem)] sm:w-auto max-w-md my-0",
+        header: "p-0",
+        body: "p-0",
+        footer: "p-0",
       }}
     >
       <ModalContent>
         {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1 text-black">
-              Organize note
+          <div className="flex flex-col gap-4 p-5">
+            <div className="flex flex-col gap-1.5 text-black">
+              <h3 className="text-lg font-semibold">Organize note</h3>
               <p className="text-sm font-normal text-gray-500">
                 Add this note to a folder or remove it from one.
               </p>
-            </ModalHeader>
-            <ModalBody>
-              <div className="space-y-4">
+            </div>
+            <div className="space-y-4">
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-gray-700">
                     Select folder
@@ -233,8 +232,7 @@ const FolderAssignmentModal = ({
                   </p>
                 )}
               </div>
-            </ModalBody>
-            <ModalFooter>
+            <div className="flex gap-2 justify-end">
               <button
                 type="button"
                 onClick={onClose}
@@ -254,8 +252,8 @@ const FolderAssignmentModal = ({
               >
                 {isSaving ? <Spinner /> : selectedFolderId ? "Save" : "Remove"}
               </button>
-            </ModalFooter>
-          </>
+            </div>
+          </div>
         )}
       </ModalContent>
     </Modal>

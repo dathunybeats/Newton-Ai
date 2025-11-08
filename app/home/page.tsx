@@ -934,7 +934,7 @@ export default function HomePage() {
       <AnimatePresence>
         {uploadModalOpen && (
           <Dialog open={uploadModalOpen} onOpenChange={setUploadModalOpen}>
-            <DialogContent className="max-w-lg w-full p-6 bg-white border border-gray-300 rounded-2xl">
+            <DialogContent className="w-[92vw] max-w-lg p-5 sm:p-6 bg-white border border-gray-300 rounded-xl sm:rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="scroll-m-20 text-2xl tracking-tight font-bold text-black text-center">
               Upload File
@@ -1070,7 +1070,7 @@ export default function HomePage() {
       <AnimatePresence>
         {youtubeModalOpen && (
           <Dialog open={youtubeModalOpen} onOpenChange={setYoutubeModalOpen}>
-        <DialogContent className="max-w-lg w-full p-6 bg-white border border-gray-300 rounded-2xl">
+        <DialogContent className="w-[92vw] max-w-lg p-5 sm:p-6 bg-white border border-gray-300 rounded-xl sm:rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="scroll-m-20 text-2xl tracking-tight font-bold text-black text-center">
               Youtube Video
@@ -1191,55 +1191,51 @@ export default function HomePage() {
           }
         }}
         classNames={{
-          wrapper: "z-50",
+          wrapper: "z-50 items-center",
           backdrop: "bg-black/30 backdrop-blur-sm backdrop-saturate-150",
-          base: "bg-white border border-gray-300 rounded-2xl",
-          header: "",
-          body: "py-6",
-          footer: ""
+          base: "bg-white border border-gray-300 rounded-2xl w-[calc(100vw-2rem)] sm:w-auto max-w-md my-0",
+          header: "p-0",
+          body: "p-0",
+          footer: "p-0"
         }}
       >
         <ModalContent>
           {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1 text-black">
-                Rename Note
-              </ModalHeader>
-              <ModalBody>
-                <div className="flex flex-col w-full items-start gap-2">
-                  <label
-                    htmlFor="noteName"
-                    className="text-[16px] font-medium leading-none text-black"
-                  >
-                    Note name
-                  </label>
-                  <input
-                    id="noteName"
-                    name="noteName"
-                    type="text"
-                    value={newNoteName}
-                    onChange={(e) => setNewNoteName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && newNoteName.trim()) {
-                        handleRenameNote();
-                      }
-                    }}
-                    className="flex w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2 text-[15px] transition-colors placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 disabled:cursor-not-allowed disabled:opacity-50 text-black"
-                    placeholder="Enter new note name"
-                  />
-                </div>
-              </ModalBody>
-              <ModalFooter>
+            <div className="flex flex-col gap-4 p-5">
+              <h3 className="text-lg font-semibold text-black">Rename Note</h3>
+              <div className="flex flex-col w-full items-start gap-2">
+                <label
+                  htmlFor="noteName"
+                  className="text-sm font-medium leading-none text-black"
+                >
+                  Note name
+                </label>
+                <input
+                  id="noteName"
+                  name="noteName"
+                  type="text"
+                  value={newNoteName}
+                  onChange={(e) => setNewNoteName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newNoteName.trim()) {
+                      handleRenameNote();
+                    }
+                  }}
+                  className="flex w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2 text-sm transition-colors placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 disabled:cursor-not-allowed disabled:opacity-50 text-black"
+                  placeholder="Enter new note name"
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
                 <button
                   onClick={onClose}
-                  className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium transition-colors h-10 px-4 py-2 bg-gray-200 text-black hover:bg-gray-300 cursor-pointer"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-colors h-10 px-4 bg-gray-200 text-black hover:bg-gray-300 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleRenameNote}
                   disabled={!newNoteName.trim()}
-                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium transition-colors h-10 px-4 py-2 ${
+                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-colors h-10 px-4 ${
                     newNoteName.trim()
                       ? 'bg-black text-white hover:bg-gray-900 cursor-pointer'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
@@ -1247,8 +1243,8 @@ export default function HomePage() {
                 >
                   Rename
                 </button>
-              </ModalFooter>
-            </>
+              </div>
+            </div>
           )}
         </ModalContent>
       </Modal>
@@ -1280,26 +1276,24 @@ export default function HomePage() {
           }
         }}
         classNames={{
-          wrapper: "z-50",
+          wrapper: "z-50 items-center",
           backdrop: "bg-black/30 backdrop-blur-sm backdrop-saturate-150",
-          base: "bg-white border border-gray-300 rounded-2xl",
-          header: "",
-          body: "py-6",
-          footer: ""
+          base: "bg-white border border-gray-300 rounded-2xl w-[calc(100vw-2rem)] sm:w-auto max-w-md my-0",
+          header: "p-0",
+          body: "p-0",
+          footer: "p-0"
         }}
       >
         <ModalContent>
           {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1 text-black">
-                Delete Note
-              </ModalHeader>
-              <ModalBody>
-                <p className="text-black">
+            <div className="flex flex-col gap-3 p-5">
+              <div className="flex flex-col gap-1.5 text-black">
+                <h3 className="text-lg font-semibold">Delete Note</h3>
+                <p className="text-sm text-gray-600">
                   Are you sure you want to delete this note? This action cannot be undone.
                 </p>
-              </ModalBody>
-              <ModalFooter>
+              </div>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <button
                   onClick={onClose}
                   className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium transition-colors h-10 px-4 py-2 bg-gray-200 text-black hover:bg-gray-300 cursor-pointer"
@@ -1312,8 +1306,8 @@ export default function HomePage() {
                 >
                   Delete
                 </button>
-              </ModalFooter>
-            </>
+              </div>
+            </div>
           )}
         </ModalContent>
       </Modal>
