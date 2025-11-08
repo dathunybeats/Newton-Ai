@@ -6,7 +6,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/d
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, type SVGProps } from "react";
 import { useNoteContext } from "@/contexts/NoteContext";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,6 +17,22 @@ const getYouTubeVideoId = (url: string) => {
   const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
   return match?.[1] || null;
 };
+
+const YoutubeIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="1em"
+    height="1em"
+    viewBox="0 0 256 180"
+    {...props}
+  >
+    <path
+      fill="red"
+      d="M250.346 28.075A32.18 32.18 0 0 0 227.69 5.418C207.824 0 127.87 0 127.87 0S47.912.164 28.046 5.582A32.18 32.18 0 0 0 5.39 28.24c-6.009 35.298-8.34 89.084.165 122.97a32.18 32.18 0 0 0 22.656 22.657c19.866 5.418 99.822 5.418 99.822 5.418s79.955 0 99.82-5.418a32.18 32.18 0 0 0 22.657-22.657c6.338-35.348 8.291-89.1-.164-123.134Z"
+    ></path>
+    <path fill="#FFF" d="m102.421 128.06l66.328-38.418l-66.328-38.418z"></path>
+  </svg>
+);
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -529,7 +545,7 @@ export default function HomePage() {
           <div className="mb-11">
             <div className="text-left w-full flex justify-between items-center mb-4">
               <div className="flex flex-col">
-                <span className="text-base lg:text-lg font-bold text-gray-900">Recents</span>
+                <span className="text-base lg:text-lg font-bold text-gray-900">Notes</span>
               </div>
               <Link href="/home" className="self-center">
                 <button className="inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 h-9 rounded-lg px-3 text-xs sm:text-sm font-medium text-gray-900 hover:text-gray-600">
@@ -845,7 +861,7 @@ export default function HomePage() {
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className="w-4 h-4 text-gray-500 flex-shrink-0 mr-1"
+                            className="w-4 h-4 text-black flex-shrink-0 mr-1"
                           >
                             <polygon points="6 3 20 12 6 21 6 3"></polygon>
                           </svg>
@@ -853,27 +869,46 @@ export default function HomePage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2 w-full">
-                              <h5 className="text-sm font-medium truncate tracking-wide flex-1 text-gray-700 group-hover:text-gray-900">
+                              <h5 className="text-sm font-semibold truncate tracking-wide flex-1 text-black group-hover:text-gray-900">
                                 {note.title}
                               </h5>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="w-4 h-4 text-gray-400 opacity-100 xl:opacity-0 group-hover:opacity-100 cursor-pointer flex-shrink-0 transition-opacity duration-200 hover:text-gray-900"
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  openRenameModal(note.id, note.title);
+                                }}
+                                className="p-1 rounded-full text-gray-400 opacity-100 xl:opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
+                                aria-label="Rename note"
                               >
-                                <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
-                                <path d="m15 5 4 4"></path>
-                              </svg>
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="w-4 h-4"
+                                >
+                                  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
+                                  <path d="m15 5 4 4"></path>
+                                </svg>
+                              </button>
                             </div>
-                            <div className="text-xs text-gray-500">
-                              {new Date(note.created_at).toLocaleDateString()}
+                            <div className="text-xs text-gray-500 flex items-center justify-between gap-1.5">
+                              <span>{new Date(note.created_at).toLocaleDateString()}</span>
+                              {note.youtube_url && (
+                                <YoutubeIcon
+                                  width={18}
+                                  height={12}
+                                  className="-translate-x-0.5"
+                                  style={{ filter: "grayscale(1)" }}
+                                />
+                              )}
                             </div>
                           </div>
                         </div>

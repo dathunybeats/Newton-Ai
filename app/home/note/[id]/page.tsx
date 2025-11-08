@@ -180,30 +180,13 @@ export default function NotePage() {
 
   return (
     <>
-      <div className="flex w-full flex-col px-8 max-[600px]:px-4 !flex-row pl-0">
+        <div className="flex w/full flex-col px-8 max-[600px]:px-4 !flex-row pl-0">
         <div className="w-full ml-8 max-[600px]:ml-0 h-auto">
         <div className="flex flex-col space-y-3 pt-5">
           {/* Breadcrumb Navigation */}
-          <div className="flex items-center gap-3">
-          <button className="items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gray-200 text-gray-700 hover:bg-gray-300 size-9 hidden max-[866px]:flex">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-              <path d="M9 3v18"></path>
-              <path d="m14 9 3 3-3 3"></path>
-            </svg>
-          </button>
-          <nav aria-label="breadcrumb">
-            <ol className="flex flex-wrap items-center gap-1.5 break-words text-sm text-gray-600 sm:gap-2.5">
+          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+          <nav aria-label="breadcrumb" className="flex-1 min-w-0">
+            <ol className="flex flex-wrap items-center gap-1.5 break-words sm:gap-2.5 max-[866px]:pt-2">
               <li className="inline-flex items-center gap-1.5">
                 <Link
                   className="flex items-center hover:text-gray-900"
@@ -241,12 +224,10 @@ export default function NotePage() {
                   <path d="m9 18 6-6-6-6"></path>
                 </svg>
               </li>
-              <li className="inline-flex items-center gap-1.5">
+              <li className="inline-flex items-center gap-1.5 min-w-0 flex-1">
                 <span
-                  role="link"
-                  aria-disabled="true"
-                  aria-current="page"
-                  className="font-normal text-gray-900"
+                  className="truncate font-medium text-gray-900"
+                  title={note.title}
                 >
                   {note.title}
                 </span>
@@ -256,26 +237,13 @@ export default function NotePage() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="w-full relative bg-gray-200 rounded-2xl p-1 border border-gray-200">
-          {/* Sliding background indicator */}
-          <div
-            className="absolute top-1 bottom-1 bg-gray-900 rounded-xl transition-all duration-300 ease-in-out"
-            style={{
-              left: activeTab === "note" ? "0.25rem" :
-                    activeTab === "quiz" ? "calc(25% + 0.125rem)" :
-                    activeTab === "flashcards" ? "calc(50% + 0.125rem)" :
-                    "calc(75% + 0.125rem)",
-              width: "calc(25% - 0.25rem)"
-            }}
-          />
-
-          <div className="grid grid-cols-4 max-[600px]:grid-cols-2 gap-2 relative">
+        <div className="w-full grid grid-cols-4 max-[600px]:grid-cols-2 gap-2 bg-gray-100 rounded-xl p-1 border border-gray-200">
             <button
               onClick={() => setActiveTab("note")}
-              className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 z-10 ${
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
                 activeTab === "note"
-                  ? "text-white"
-                  : "hover:text-gray-900 text-gray-700"
+                  ? "bg-gray-900 text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-50"
               }`}
           >
             <svg
@@ -305,10 +273,10 @@ export default function NotePage() {
           </button>
           <button
             onClick={() => setActiveTab("quiz")}
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 z-10 ${
+            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
               activeTab === "quiz"
-                ? "text-white"
-                : "hover:text-gray-900 text-gray-700"
+                ? "bg-gray-900 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
             <svg
@@ -331,10 +299,10 @@ export default function NotePage() {
           </button>
           <button
             onClick={() => setActiveTab("flashcards")}
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 z-10 ${
+            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
               activeTab === "flashcards"
-                ? "text-white"
-                : "hover:text-gray-900 text-gray-700"
+                ? "bg-gray-900 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
             <div className="flex items-center h-5 w-4 rounded justify-center border border-current mr-1">
@@ -359,10 +327,10 @@ export default function NotePage() {
           </button>
           <button
             onClick={() => setActiveTab("transcript")}
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 z-10 ${
+            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-4 py-2 ${
               activeTab === "transcript"
-                ? "text-white"
-                : "hover:text-gray-900 text-gray-700"
+                ? "bg-gray-900 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
             <svg
@@ -382,7 +350,6 @@ export default function NotePage() {
             </svg>
             Transcript
           </button>
-          </div>
         </div>
 
         {/* Content Card */}
