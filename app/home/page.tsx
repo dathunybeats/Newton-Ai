@@ -1193,7 +1193,7 @@ export default function HomePage() {
         classNames={{
           wrapper: "z-50 items-center",
           backdrop: "bg-black/30 backdrop-blur-sm backdrop-saturate-150",
-          base: "bg-white border border-gray-300 rounded-2xl w-[calc(100vw-2rem)] sm:w-auto max-w-md my-0",
+          base: "bg-white border border-gray-300 rounded-2xl w-[calc(100vw-2rem)] sm:w-full sm:max-w-[480px] my-0",
           header: "p-0",
           body: "p-0",
           footer: "p-0"
@@ -1278,7 +1278,7 @@ export default function HomePage() {
         classNames={{
           wrapper: "z-50 items-center",
           backdrop: "bg-black/30 backdrop-blur-sm backdrop-saturate-150",
-          base: "bg-white border border-gray-300 rounded-2xl w-[calc(100vw-2rem)] sm:w-auto max-w-md my-0",
+          base: "bg-white border border-gray-300 rounded-2xl w-[calc(100vw-2rem)] sm:w-full sm:max-w-[480px] my-0",
           header: "p-0",
           body: "p-0",
           footer: "p-0"

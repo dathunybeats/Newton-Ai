@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AnimatePresence } from "framer-motion";
 import { useNoteContext } from "@/contexts/NoteContext";
+import { buildWhopCheckoutUrl } from "@/lib/payments/whop";
 
 interface SidebarProps {
   notes: any[];
@@ -28,6 +29,11 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pricingOpen, setPricingOpen] = useState(false);
   const [isYearly, setIsYearly] = useState(true);
+  const checkoutUrls = {
+    monthly: process.env.NEXT_PUBLIC_WHOP_MONTHLY_CHECKOUT_URL,
+    yearly: process.env.NEXT_PUBLIC_WHOP_YEARLY_CHECKOUT_URL,
+    lifetime: process.env.NEXT_PUBLIC_WHOP_LIFETIME_CHECKOUT_URL,
+  } as const;
 
   // Check if we're on a note page
   const isNotePage = pathname?.startsWith('/home/note/');
@@ -55,6 +61,27 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
       router.push("/");
     } catch (error) {
       console.error("Error signing out:", error);
+    }
+  };
+
+  const handleCheckout = (interval: "monthly" | "yearly" | "lifetime") => {
+    const baseUrl = checkoutUrls[interval];
+    if (!baseUrl) {
+      alert("Checkout link is not configured yet. Please try again later.");
+      return;
+    }
+    if (!user?.id) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const checkoutUrl = buildWhopCheckoutUrl(baseUrl, user.id);
+      setPricingOpen(false);
+      window.open(checkoutUrl, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.error("Failed to start checkout:", error);
+      alert("Unable to start checkout. Please try again.");
     }
   };
 
@@ -624,7 +651,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                           / {isYearly ? "year" : "month"}
                         </span>
                       </div>
-                      <Button className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-gray-900 hover:bg-gray-800 text-white py-2.5">
+                      <Button
+                        className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-gray-900 hover:bg-gray-800 text-white py-2.5"
+                        onClick={() => handleCheckout(isYearly ? "yearly" : "monthly")}
+                      >
                         Upgrade plan
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -692,7 +722,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                         <span className="text-3xl font-bold text-gray-900">$99.99</span>
                         <span className="text-sm font-medium text-gray-600 ml-1.5">one-time</span>
                       </div>
-                      <Button className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-blue-500 hover:bg-blue-600 text-white py-2.5">
+                      <Button
+                        className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-blue-500 hover:bg-blue-600 text-white py-2.5"
+                        onClick={() => handleCheckout("lifetime")}
+                      >
                         Get Lifetime Access
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

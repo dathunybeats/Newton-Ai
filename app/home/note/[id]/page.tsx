@@ -9,6 +9,8 @@ import { useSidebar } from "@/app/home/layout";
 import Link from "next/link";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import FolderAssignmentModal from "@/components/notes/FolderAssignmentModal";
+import NoteQuiz from "@/components/quiz/NoteQuiz";
+import { Modal, ModalContent } from "@heroui/modal";
 
 interface Note {
   id: string;
@@ -19,6 +21,7 @@ interface Note {
   youtube_url?: string;
   transcript?: string;
   folder_id?: string | null;
+  quiz_questions?: any[] | null;
   uploads?: {
     filename: string;
     file_type: string;
@@ -63,6 +66,9 @@ export default function NotePage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("note");
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
+  const [loadingQuiz, setLoadingQuiz] = useState(false);
 
   const transcriptSegments = useMemo(() => {
     if (!note?.transcript) return [];
@@ -93,6 +99,79 @@ export default function NotePage() {
       loadNote();
     }
   }, [noteId, authLoading, prefetchedNote, getNote]);
+
+  useEffect(() => {
+    if (activeTab === "quiz" && note && !quizQuestions.length && !loadingQuiz) {
+      console.log("Quiz tab opened. Checking for saved questions...");
+      console.log("Note has quiz_questions?", note.quiz_questions ? `Yes (${note.quiz_questions.length} questions)` : "No");
+
+      // Check if quiz questions already exist in the database
+      if (note.quiz_questions && note.quiz_questions.length > 0) {
+        console.log("Loading saved quiz questions from database");
+        setQuizQuestions(note.quiz_questions);
+      } else {
+        console.log("No saved questions found. Generating new quiz...");
+        generateQuizQuestions();
+      }
+    }
+  }, [activeTab, note]);
+
+  const handleDeleteNote = async () => {
+    if (!note?.id) return;
+
+    try {
+      const supabase = createClient();
+
+      // Delete the note
+      const { error: deleteError } = await supabase
+        .from("notes")
+        .delete()
+        .eq("id", note.id);
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      // Redirect to home after successful deletion
+      router.push("/home");
+    } catch (err) {
+      console.error("Error deleting note:", err);
+      setError("Failed to delete note");
+    }
+  };
+
+  const generateQuizQuestions = async () => {
+    if (!note?.content || !note?.id) return;
+
+    setLoadingQuiz(true);
+    try {
+      const response = await fetch("/api/generate-quiz", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: note.content,
+          title: note.title,
+          noteId: note.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate quiz");
+      }
+
+      const data = await response.json();
+      setQuizQuestions(data.questions || []);
+
+      // Update the note state to include the new quiz questions
+      setNote((prev) => prev ? { ...prev, quiz_questions: data.questions } : prev);
+    } catch (error) {
+      console.error("Error generating quiz:", error);
+    } finally {
+      setLoadingQuiz(false);
+    }
+  };
 
   const loadNote = async () => {
     try {
@@ -431,7 +510,10 @@ export default function NotePage() {
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                                <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-red-500 hover:bg-red-600 text-white size-9">
+                                <button
+                                  onClick={() => setIsDeleteModalOpen(true)}
+                                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-red-500 hover:bg-red-600 text-white size-9 cursor-pointer hover:shadow-md"
+                                >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M3 6h18"></path>
                                     <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
@@ -509,12 +591,18 @@ export default function NotePage() {
             )}
 
             {activeTab === "quiz" && (
-              <div className="text-center py-12">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Quiz
-                </h3>
-                <p className="text-gray-600">Coming soon...</p>
-              </div>
+              <>
+                {loadingQuiz ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-gray-900 mx-auto mb-4"></div>
+                      <p className="text-gray-600">Generating quiz questions...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <NoteQuiz topic={note.title} questions={quizQuestions} />
+                )}
+              </>
             )}
 
             {activeTab === "flashcards" && (
@@ -554,7 +642,7 @@ export default function NotePage() {
                       No Transcript Available
                     </h3>
                     <p className="text-gray-600">
-                      This note doesn't have a transcript
+                      This note doesn&apos;t have a transcript
                     </p>
                   </div>
                 )}
@@ -565,17 +653,57 @@ export default function NotePage() {
       </div>
 
       {note && (
-        <FolderAssignmentModal
-          isOpen={isFolderModalOpen}
-          onOpenChange={setIsFolderModalOpen}
-          noteId={note.id}
-          currentFolderId={note.folder_id ?? null}
-          onFolderChange={(folderId) => {
-            setNote((prev) =>
-              prev ? { ...prev, folder_id: folderId ?? null } : prev
-            );
-          }}
-        />
+        <>
+          <FolderAssignmentModal
+            isOpen={isFolderModalOpen}
+            onOpenChange={setIsFolderModalOpen}
+            noteId={note.id}
+            currentFolderId={note.folder_id ?? null}
+            onFolderChange={(folderId) => {
+              setNote((prev) =>
+                prev ? { ...prev, folder_id: folderId ?? null } : prev
+              );
+            }}
+          />
+
+          <Modal
+            isOpen={isDeleteModalOpen}
+            onOpenChange={setIsDeleteModalOpen}
+            placement="center"
+            backdrop="blur"
+            hideCloseButton
+            classNames={{
+              backdrop: "bg-black/60"
+            }}
+          >
+            <ModalContent className="bg-white rounded-2xl">
+              {(onClose) => (
+                <div className="flex flex-col gap-3 p-5 bg-white rounded-2xl">
+                  <div className="flex flex-col gap-1.5 text-black">
+                    <h3 className="text-lg font-semibold">Delete Note</h3>
+                    <p className="text-sm text-gray-600">
+                      Are you sure you want to delete this note? This action cannot be undone.
+                    </p>
+                  </div>
+                  <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                    <button
+                      onClick={onClose}
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium transition-colors h-10 px-4 py-2 bg-gray-200 text-black hover:bg-gray-300 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDeleteNote}
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium transition-colors h-10 px-4 py-2 bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              )}
+            </ModalContent>
+          </Modal>
+        </>
       )}
     </main>
   );

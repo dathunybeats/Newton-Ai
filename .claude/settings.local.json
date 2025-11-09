@@ -34,7 +34,8 @@
       "Bash(pnpm build:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(pnpm uninstall:*)"
     ],
     "deny": [
       "Bash(npm run dev)",
