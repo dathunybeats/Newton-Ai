@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { canCreateNote } from "@/lib/subscriptions";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +14,23 @@ export async function POST(request: NextRequest) {
 
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Check subscription limits
+    const noteCheck = await canCreateNote(user.id);
+
+    if (!noteCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: "Note limit reached",
+          message: `You've reached your limit of ${noteCheck.limit} notes on the ${noteCheck.tier} plan. Upgrade to create unlimited notes!`,
+          currentCount: noteCheck.currentCount,
+          limit: noteCheck.limit,
+          tier: noteCheck.tier,
+          upgradeRequired: true,
+        },
+        { status: 403 }
+      );
     }
 
     // Get the file from the form data
