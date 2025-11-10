@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { Innertube } from "youtubei.js";
 import OpenAI from "openai";
+import { canCreateNote } from "@/lib/subscriptions";
 
 function getOpenAIClient() {
   return new OpenAI({
@@ -37,7 +38,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2. Get YouTube URL from request
+    // 2. Check subscription limits
+    const noteCheck = await canCreateNote(user.id);
+
+    if (!noteCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: "Note limit reached",
+          message: `You've reached your limit of ${noteCheck.limit} notes on the ${noteCheck.tier} plan. Upgrade to create unlimited notes!`,
+          currentCount: noteCheck.currentCount,
+          limit: noteCheck.limit,
+          tier: noteCheck.tier,
+          upgradeRequired: true,
+        },
+        { status: 403 }
+      );
+    }
+
+    // 3. Get YouTube URL from request
     const { youtubeUrl } = await request.json();
 
     if (!youtubeUrl) {
@@ -47,7 +65,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Extract video ID
+    // 4. Extract video ID
     const videoId = extractVideoId(youtubeUrl);
 
     if (!videoId) {
@@ -57,7 +75,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Fetch transcript using youtubei.js
+    // 5. Fetch transcript using youtubei.js
     let transcriptText = "";
 
     try {
@@ -106,7 +124,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 5. Generate notes with AI
+    // 6. Generate notes with AI
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -167,7 +185,7 @@ Generate notes that are professional, comprehensive, and perfect for studying or
 
     const generatedNotes = completion.choices[0].message.content;
 
-    // 6. Generate title and summary
+    // 7. Generate title and summary
     const summaryCompletion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -192,7 +210,7 @@ Generate notes that are professional, comprehensive, and perfect for studying or
     const description =
       summaryData.description || "Notes generated from YouTube video";
 
-    // 7. Save to database
+    // 8. Save to database
     const { data: note, error: dbError } = await supabase
       .from("notes")
       .insert({
@@ -213,7 +231,7 @@ Generate notes that are professional, comprehensive, and perfect for studying or
       );
     }
 
-    // 8. Return success
+    // 9. Return success
     return NextResponse.json({
       success: true,
       noteId: note.id,

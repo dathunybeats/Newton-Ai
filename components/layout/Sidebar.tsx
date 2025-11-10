@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { AnimatePresence } from "framer-motion";
 import { useNoteContext } from "@/contexts/NoteContext";
 import { buildWhopCheckoutUrl } from "@/lib/payments/whop";
+import { getSubscriptionStatus, formatPlanName, type PlanTier } from "@/lib/subscriptions";
 
 interface SidebarProps {
   notes: any[];
@@ -45,6 +46,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [folderName, setFolderName] = useState("");
   const [folderColor, setFolderColor] = useState("#d1d5db");
+  const [userTier, setUserTier] = useState<PlanTier>("free");
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState(true);
 
   const activeFolderId = searchParams.get("folder");
 
@@ -54,6 +57,35 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
       fetchFolders();
     }
   }, [user, fetchFolders]);
+
+  // Fetch subscription status
+  useEffect(() => {
+    async function fetchSubscriptionStatus() {
+      if (!user?.id) return;
+
+      try {
+        setIsLoadingSubscription(true);
+        const status = await getSubscriptionStatus(user.id);
+        setUserTier(status.tier);
+      } catch (error) {
+        console.error("Error fetching subscription:", error);
+      } finally {
+        setIsLoadingSubscription(false);
+      }
+    }
+
+    fetchSubscriptionStatus();
+  }, [user?.id]);
+
+  // Listen for pricing modal open event from upgrade modal
+  useEffect(() => {
+    const handleOpenPricing = () => {
+      setPricingOpen(true);
+    };
+
+    window.addEventListener("openPricingModal", handleOpenPricing);
+    return () => window.removeEventListener("openPricingModal", handleOpenPricing);
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -530,11 +562,20 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
             <div className="flex justify-between items-center">
               <small className="font-medium text-sm text-gray-900">Active plan</small>
               <div className="flex items-center gap-2">
-                <Badge className="px-2 py-1 rounded-full text-gray-900 border border-gray-200 shadow-none">free</Badge>
-                <Button
-                  onClick={() => setPricingOpen(true)}
-                  className="h-[32px] px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white active:scale-[0.98] transition-all duration-100 cursor-pointer"
-                >
+                <Badge className={`px-2 py-1 rounded-full border shadow-none ${
+                  userTier === "free"
+                    ? "text-gray-900 border-gray-200"
+                    : userTier === "lifetime"
+                    ? "text-purple-900 border-purple-300 bg-purple-50"
+                    : "text-blue-900 border-blue-300 bg-blue-50"
+                }`}>
+                  {isLoadingSubscription ? "..." : userTier}
+                </Badge>
+                {userTier === "free" && (
+                  <Button
+                    onClick={() => setPricingOpen(true)}
+                    className="h-[32px] px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white active:scale-[0.98] transition-all duration-100 cursor-pointer"
+                  >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -552,6 +593,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                   </svg>
                   <span className="text-sm font-bold">Upgrade plan</span>
                 </Button>
+                )}
               </div>
             </div>
           </div>

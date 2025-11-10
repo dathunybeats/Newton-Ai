@@ -68,6 +68,8 @@ export default function HomePage() {
     noteId: string;
     folderId: string | null;
   } | null>(null);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [upgradeMessage, setUpgradeMessage] = useState("");
   const searchParams = useSearchParams();
   const activeFolderId = searchParams.get("folder");
 
@@ -130,6 +132,14 @@ export default function HomePage() {
       const data = await response.json();
 
       if (!response.ok) {
+        // Check if this is a subscription limit error
+        if (response.status === 403 && data.upgradeRequired) {
+          setYoutubeModalOpen(false);
+          setUpgradeMessage(data.message || "Upgrade to create unlimited notes!");
+          setUpgradeModalOpen(true);
+          return;
+        }
+
         const errorMsg = data.details
           ? `${data.error}\n\nDetails: ${data.details}`
           : data.error || "Failed to generate notes";
@@ -195,6 +205,16 @@ export default function HomePage() {
 
       if (!response.ok) {
         const error = await response.json();
+
+        // Check if this is a subscription limit error
+        if (response.status === 403 && error.upgradeRequired) {
+          setUploadModalOpen(false);
+          setUploadedFile(null);
+          setUpgradeMessage(error.message || "Upgrade to create unlimited notes!");
+          setUpgradeModalOpen(true);
+          return;
+        }
+
         throw new Error(error.error || "Upload failed");
       }
 
@@ -1322,6 +1342,130 @@ export default function HomePage() {
         noteId={folderModalNote?.noteId ?? null}
         currentFolderId={folderModalNote?.folderId ?? null}
       />
+
+      {/* Upgrade Modal */}
+      <Modal
+        isOpen={upgradeModalOpen}
+        onOpenChange={setUpgradeModalOpen}
+        hideCloseButton={true}
+        backdrop="blur"
+        motionProps={{
+          variants: {
+            enter: {
+              y: 0,
+              opacity: 1,
+              transition: {
+                duration: 0.3,
+                ease: "easeOut"
+              }
+            },
+            exit: {
+              y: -20,
+              opacity: 0,
+              transition: {
+                duration: 0.2,
+                ease: "easeIn"
+              }
+            }
+          }
+        }}
+        classNames={{
+          wrapper: "z-50 items-center",
+          backdrop: "bg-black/30 backdrop-blur-sm backdrop-saturate-150",
+          base: "bg-white border border-gray-300 rounded-2xl w-[calc(100vw-2rem)] sm:w-full sm:max-w-[480px] my-0",
+          header: "p-0",
+          body: "p-0",
+          footer: "p-0"
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <div className="flex flex-col gap-4 p-6">
+              {/* Icon */}
+              <div className="flex justify-center">
+                <div className="rounded-full bg-blue-100 p-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-blue-600"
+                  >
+                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                    <path d="M20 3v4"></path>
+                    <path d="M22 5h-4"></path>
+                    <path d="M4 17v2"></path>
+                    <path d="M5 18H3"></path>
+                  </svg>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="flex flex-col gap-2 text-center">
+                <h3 className="text-xl font-semibold text-gray-900">Upgrade to Continue</h3>
+                <p className="text-sm text-gray-600">
+                  {upgradeMessage}
+                </p>
+              </div>
+
+              {/* Features List */}
+              <div className="flex flex-col gap-2 bg-gray-50 rounded-lg p-4">
+                <p className="text-xs font-semibold text-gray-900 mb-1">Upgrade to unlock:</p>
+                {[
+                  "Unlimited notes from any source",
+                  "Unlimited AI-generated quizzes",
+                  "Unlimited flashcards",
+                  "Priority support",
+                  "All future features"
+                ].map((feature, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-green-500 flex-shrink-0"
+                    >
+                      <path d="M20 6 9 17l-5-5"></path>
+                    </svg>
+                    <span className="text-xs text-gray-700">{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => {
+                    onClose();
+                    // Open pricing modal - we'll need to trigger this from parent
+                    window.dispatchEvent(new CustomEvent("openPricingModal"));
+                  }}
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-base font-semibold transition-colors h-11 px-6 bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                >
+                  View Plans & Upgrade
+                </button>
+                <button
+                  onClick={onClose}
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-colors h-10 px-4 text-gray-600 hover:text-gray-900 cursor-pointer"
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </div>
+          )}
+        </ModalContent>
+      </Modal>
     </main>
   );
 }
