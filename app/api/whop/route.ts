@@ -21,7 +21,8 @@ function verifySignature(body: string, signatureHeader: string | null, timestamp
     return false;
   }
 
-  const [, signature = ""] = signatureHeader.split(",");
+  // Whop signature is just the base64 string, no prefix to split
+  const signature = signatureHeader.trim();
   const signedPayload = `${timestampHeader}.${body}`;
   const expected = crypto
     .createHmac("sha256", WEBHOOK_SECRET)
@@ -116,10 +117,15 @@ async function logEvent(eventType: string, payload: WebhookPayload, subscription
 export async function POST(request: Request) {
   const rawBody = await request.text();
   const headersList = await headers();
+
   const signatureHeader = headersList.get("webhook-signature");
   const timestampHeader = headersList.get("webhook-timestamp");
 
-  if (process.env.NODE_ENV !== "production") {
+  // Allow bypass in development when headers are missing (test webhooks)
+  const isDev = process.env.NODE_ENV !== "production";
+  const hasSignatureHeaders = signatureHeader && timestampHeader;
+
+  if (isDev) {
     console.log("Whop webhook debug", {
       signatureHeader,
       timestampHeader,
@@ -127,9 +133,13 @@ export async function POST(request: Request) {
     });
   }
 
-  
+  // In production, require signature headers
+  if (!isDev && !hasSignatureHeaders) {
+    return NextResponse.json({ error: "Missing signature headers" }, { status: 400 });
+  }
 
-  if (!verifySignature(rawBody, signatureHeader, timestampHeader)) {
+  // Verify signature only if headers are present
+  if (hasSignatureHeaders && !verifySignature(rawBody, signatureHeader, timestampHeader)) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
@@ -140,17 +150,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
+  // Whop uses 'action' not 'type' in webhook payload
+  const eventType = payload.type || (payload as any).action;
+  
+  if (!eventType) {
+    return NextResponse.json({ error: "Missing event type" }, { status: 400 });
+  }
+
   const data = payload.data ?? {};
   let subscriptionId: string | null = null;
 
   try {
-    if (payload.type === "membership_activated" || payload.type === "membership_deactivated") {
+    if (eventType === "membership_activated" || eventType === "membership_deactivated") {
       const membershipId = extractMembershipId(data);
       const userId = extractUserId(data);
       const productId = extractProductId(data);
 
       if (membershipId && userId && productId) {
-        const status = payload.type === "membership_activated" ? "active" : "canceled";
+        const status = eventType === "membership_activated" ? "active" : "canceled";
         subscriptionId = await upsertSubscription({
           membershipId,
           userId,
@@ -163,7 +180,7 @@ export async function POST(request: Request) {
       }
     }
 
-    await logEvent(payload.type, payload, subscriptionId);
+    await logEvent(eventType, payload, subscriptionId);
   } catch (error) {
     console.error("Whop webhook handling failed:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
