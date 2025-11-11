@@ -44,9 +44,9 @@ export async function POST(request: Request) {
     });
 
     // Create checkout configuration with metadata using shared SDK
+    // Using plan_id to reference existing plan (simpler approach)
     const checkoutConfig = await whopSdk.checkoutConfigurations.create({
       plan_id: planId,
-      company_id: WHOP_COMPANY_ID,
       metadata: {
         [WHOP_USER_METADATA_KEY]: userId,
       },
