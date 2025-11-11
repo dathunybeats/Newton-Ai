@@ -879,7 +879,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                           handleCreateFolder();
                         }
                       }}
-                      className="flex w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2 text-sm transition-colors placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 disabled:cursor-not-allowed disabled:opacity-50 text-black"
+                      autoComplete="off"
+                      className="flex w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2 text-base transition-colors placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 disabled:cursor-not-allowed disabled:opacity-50 text-black"
                       placeholder="e.g. Work, Study, Personal"
                       autoFocus
                     />

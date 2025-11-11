@@ -212,7 +212,8 @@ const FolderAssignmentModal = ({
                       value={newFolderName}
                       onChange={(e) => setNewFolderName(e.target.value)}
                       placeholder="Folder name"
-                      className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none"
+                      autoComplete="off"
+                      className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-base focus:border-gray-900 focus:outline-none"
                     />
                     <button
                       type="button"
