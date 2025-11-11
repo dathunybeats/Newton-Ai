@@ -1,15 +1,10 @@
 import { NextResponse } from "next/server";
-import Whop from "@whop/sdk";
+import { whopSdk } from "@/lib/whop-sdk";
 import { WHOP_USER_METADATA_KEY } from "@/lib/payments/whop";
 
 export const runtime = "nodejs";
 
-const WHOP_API_KEY = process.env.WHOP_API_KEY;
 const WHOP_COMPANY_ID = process.env.NEXT_PUBLIC_WHOP_COMPANY_ID;
-
-if (!WHOP_API_KEY) {
-  console.error("Missing WHOP_API_KEY environment variable");
-}
 
 if (!WHOP_COMPANY_ID) {
   console.error("Missing NEXT_PUBLIC_WHOP_COMPANY_ID environment variable");
@@ -34,24 +29,12 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!WHOP_API_KEY) {
-      return NextResponse.json(
-        { error: "Server configuration error: Missing Whop API key" },
-        { status: 500 }
-      );
-    }
-
     if (!WHOP_COMPANY_ID) {
       return NextResponse.json(
         { error: "Server configuration error: Missing Whop company ID" },
         { status: 500 }
       );
     }
-
-    // Initialize Whop SDK
-    const whop = new Whop({
-      apiKey: WHOP_API_KEY,
-    });
 
     console.log("Creating checkout configuration with:", {
       planId,
@@ -60,8 +43,8 @@ export async function POST(request: Request) {
       companyId: WHOP_COMPANY_ID,
     });
 
-    // Create checkout configuration with metadata
-    const checkoutConfig = await whop.checkoutConfigurations.create({
+    // Create checkout configuration with metadata using shared SDK
+    const checkoutConfig = await whopSdk.checkoutConfigurations.create({
       plan_id: planId,
       company_id: WHOP_COMPANY_ID,
       metadata: {

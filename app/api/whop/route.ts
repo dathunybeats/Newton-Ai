@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import crypto from "crypto";
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getPlanForProduct, WHOP_USER_METADATA_KEY } from "@/lib/payments/whop";
+import { whopSdk } from "@/lib/whop-sdk";
 
 export const runtime = "nodejs";
 
@@ -14,27 +14,6 @@ type WebhookPayload = {
   data?: any;
 };
 
-const WEBHOOK_SECRET = process.env.WHOP_WEBHOOK_SECRET;
-
-function verifySignature(body: string, signatureHeader: string | null, timestampHeader: string | null) {
-  if (!WEBHOOK_SECRET || !signatureHeader || !timestampHeader) {
-    return false;
-  }
-
-  // Whop signature is just the base64 string, no prefix to split
-  const signature = signatureHeader.trim();
-  const signedPayload = `${timestampHeader}.${body}`;
-  const expected = crypto
-    .createHmac("sha256", WEBHOOK_SECRET)
-    .update(signedPayload)
-    .digest("base64");
-
-  try {
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
-  } catch {
-    return false;
-  }
-}
 
 function toIsoDate(value: unknown) {
   if (!value) return null;
@@ -115,85 +94,93 @@ async function logEvent(eventType: string, payload: WebhookPayload, subscription
 }
 
 export async function POST(request: Request) {
-  const rawBody = await request.text();
-  const headersList = await headers();
+  try {
+    // Get raw body and headers for Whop SDK verification
+    const rawBody = await request.text();
+    const headersList = await headers();
+    const headersObject = Object.fromEntries(headersList);
 
-  const signatureHeader = headersList.get("webhook-signature");
-  const timestampHeader = headersList.get("webhook-timestamp");
+    // Use Whop SDK to verify and unwrap the webhook
+    // This handles signature verification automatically
+    let webhookData: WebhookPayload;
 
-  // Allow bypass in development when headers are missing (test webhooks)
-  const isDev = process.env.NODE_ENV !== "production";
-  const hasSignatureHeaders = signatureHeader && timestampHeader;
-
-  if (isDev) {
-    console.log("Whop webhook debug", {
-      signatureHeader,
-      timestampHeader,
-      signedPayload: timestampHeader ? `${timestampHeader}.${rawBody}` : null,
-    });
-  }
-
-  // Log warning if signature headers are missing but allow through for test webhooks
-  if (!hasSignatureHeaders) {
-    console.warn("⚠️ Webhook received without signature headers (likely a test webhook)");
-  } else {
-    // Verify signature only if headers are present
-    if (!verifySignature(rawBody, signatureHeader, timestampHeader)) {
-      console.error("❌ Webhook signature verification failed");
-      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    try {
+      webhookData = whopSdk.webhooks.unwrap(rawBody, { headers: headersObject });
+      console.log("✅ Webhook signature verified by Whop SDK");
+    } catch (error) {
+      // Allow through if no webhook secret is configured (development/testing)
+      if (!process.env.WHOP_WEBHOOK_SECRET) {
+        console.warn("⚠️ No webhook secret configured, parsing without verification");
+        webhookData = JSON.parse(rawBody);
+      } else {
+        console.error("❌ Webhook signature verification failed:", error);
+        return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+      }
     }
-    console.log("✅ Webhook signature verified");
-  }
 
-  let payload: WebhookPayload;
-  try {
-    payload = JSON.parse(rawBody);
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
+    // LOG EVERYTHING WHOP SENDS (for testing)
+    console.log("🔔 WHOP WEBHOOK RECEIVED:", JSON.stringify(webhookData, null, 2));
 
-  // LOG EVERYTHING WHOP SENDS (for testing)
-  console.log("🔔 WHOP WEBHOOK RECEIVED:", JSON.stringify(payload, null, 2));
-  console.log("📋 Headers:", {
-    signature: signatureHeader,
-    timestamp: timestampHeader,
-  });
+    // Get event type (handle both 'type' and 'action' fields)
+    const eventType = webhookData.type || (webhookData as any).action;
 
-  // Whop uses 'action' not 'type' in webhook payload
-  const eventType = payload.type || (payload as any).action;
+    if (!eventType) {
+      return NextResponse.json({ error: "Missing event type" }, { status: 400 });
+    }
 
-  if (!eventType) {
-    return NextResponse.json({ error: "Missing event type" }, { status: 400 });
-  }
+    const data = webhookData.data ?? {};
+    let subscriptionId: string | null = null;
 
-  const data = payload.data ?? {};
-  let subscriptionId: string | null = null;
-
-  try {
-    if (eventType === "membership_activated" || eventType === "membership_deactivated") {
+    // Handle membership events
+    if (eventType === "membership.went_valid" || eventType === "membership_activated") {
       const membershipId = extractMembershipId(data);
       const userId = extractUserId(data);
       const productId = extractProductId(data);
 
+      console.log("Processing membership activation:", { membershipId, userId, productId });
+
       if (membershipId && userId && productId) {
-        const status = eventType === "membership_activated" ? "active" : "canceled";
         subscriptionId = await upsertSubscription({
           membershipId,
           userId,
           productId,
-          status,
+          status: "active",
           periodStart: toIsoDate(data.current_period_start ?? data.period_start),
           periodEnd: toIsoDate(data.current_period_end ?? data.period_end),
           cancelAt: toIsoDate(data.cancel_at),
         });
+        console.log("✅ Subscription created/updated:", subscriptionId);
+      } else {
+        console.error("❌ Missing required fields:", { membershipId, userId, productId });
+      }
+    } else if (eventType === "membership.went_invalid" || eventType === "membership_deactivated") {
+      const membershipId = extractMembershipId(data);
+      const userId = extractUserId(data);
+      const productId = extractProductId(data);
+
+      console.log("Processing membership deactivation:", { membershipId, userId, productId });
+
+      if (membershipId && userId && productId) {
+        subscriptionId = await upsertSubscription({
+          membershipId,
+          userId,
+          productId,
+          status: "canceled",
+          periodStart: toIsoDate(data.current_period_start ?? data.period_start),
+          periodEnd: toIsoDate(data.current_period_end ?? data.period_end),
+          cancelAt: toIsoDate(data.cancel_at),
+        });
+        console.log("✅ Subscription canceled:", subscriptionId);
       }
     }
 
-    await logEvent(eventType, payload, subscriptionId);
+    // Log the event
+    await logEvent(eventType, webhookData, subscriptionId);
+
+    // Return 200 quickly to avoid webhook retries
+    return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("Whop webhook handling failed:", error);
+    console.error("❌ Whop webhook handling failed:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
-
-  return NextResponse.json({ ok: true });
 }
