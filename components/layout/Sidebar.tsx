@@ -22,7 +22,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: SidebarProps) {
-  const { user, signOut } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -402,7 +402,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
           <div className="shrink-0 bg-gray-200 height-[1px] w-full mb-4 mt-2" />
 
           {/* Upgrade Plan Card - Only show for free users */}
-          {userTier === "free" && (
+          {!isLoadingSubscription && userTier === "free" && (
             <div className="mx-4 mb-3">
               <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
                 <div className="p-6 py-4 flex justify-center items-center flex-col px-3">
@@ -486,42 +486,56 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
           {/* User Card */}
           <div className="rounded-lg border border-gray-200 bg-white shadow-sm mb-4 mx-4">
             <div className="flex items-center justify-between w-full p-3">
-              <div className="flex flex-1 items-center gap-2">
-                {user?.user_metadata?.avatar_url ? (
-                  <span className="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8">
-                    <Image
-                      src={user.user_metadata.avatar_url}
-                      alt="User avatar"
-                      width={32}
-                      height={32}
-                      className="aspect-square h-full w-full rounded-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                      }}
-                    />
-                  </span>
-                ) : (
-                  <span className="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8">
-                    <div className="flex h-full w-full aspect-square items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 text-sm font-semibold text-white">
-                      {user?.email?.[0]?.toUpperCase() || "U"}
+              {authLoading ? (
+                // Skeleton loader
+                <>
+                  <div className="flex flex-1 items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+                    <div className="flex w-[140px] flex-col gap-2">
+                      <div className="h-3.5 bg-gray-200 rounded animate-pulse w-24" />
+                      <div className="h-3 bg-gray-200 rounded animate-pulse w-32" />
                     </div>
-                  </span>
-                )}
-                <div className="flex w-[140px] flex-col">
-                  <small className="truncate text-sm font-medium leading-none text-gray-900">
-                    <b>{user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}</b>
-                  </small>
-                  <small className="truncate text-xs font-medium text-gray-500">
-                    {user?.email}
-                  </small>
-                </div>
-              </div>
-              <button
-                onClick={() => setSettingsOpen(true)}
-                className="transition-all duration-100 active:scale-105 cursor-pointer"
-                title="Settings"
-              >
+                  </div>
+                  <div className="w-5 h-5 rounded bg-gray-200 animate-pulse" />
+                </>
+              ) : (
+                <>
+                  <div className="flex flex-1 items-center gap-2">
+                    {user?.user_metadata?.avatar_url ? (
+                      <span className="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8">
+                        <Image
+                          src={user.user_metadata.avatar_url}
+                          alt="User avatar"
+                          width={32}
+                          height={32}
+                          className="aspect-square h-full w-full rounded-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      </span>
+                    ) : (
+                      <span className="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8">
+                        <div className="flex h-full w-full aspect-square items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 text-sm font-semibold text-white">
+                          {user?.email?.[0]?.toUpperCase() || "U"}
+                        </div>
+                      </span>
+                    )}
+                    <div className="flex w-[140px] flex-col">
+                      <small className="truncate text-sm font-medium leading-none text-gray-900">
+                        <b>{user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}</b>
+                      </small>
+                      <small className="truncate text-xs font-medium text-gray-500">
+                        {user?.email}
+                      </small>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSettingsOpen(true)}
+                    className="transition-all duration-100 active:scale-105 cursor-pointer"
+                    title="Settings"
+                  >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
@@ -538,6 +552,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                   <circle cx="12" cy="12" r="3" />
                 </svg>
               </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -596,7 +612,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                 }`}>
                   {isLoadingSubscription ? "..." : userTier}
                 </Badge>
-                {userTier === "free" && (
+                {!isLoadingSubscription && userTier === "free" && (
                   <Button
                     onClick={() => setPricingOpen(true)}
                     className="h-[32px] px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white active:scale-[0.98] transition-all duration-100 cursor-pointer"
