@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AnimatePresence } from "framer-motion";
 import { useNoteContext } from "@/contexts/NoteContext";
-import { buildWhopCheckoutUrl } from "@/lib/payments/whop";
+import { PLAN_IDS } from "@/lib/payments/whop";
 import { formatPlanName, type PlanTier } from "@/lib/subscriptions/types";
 
 interface SidebarProps {
@@ -30,11 +30,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pricingOpen, setPricingOpen] = useState(false);
   const [isYearly, setIsYearly] = useState(true);
-  const checkoutUrls = {
-    monthly: process.env.NEXT_PUBLIC_WHOP_MONTHLY_CHECKOUT_URL,
-    yearly: process.env.NEXT_PUBLIC_WHOP_YEARLY_CHECKOUT_URL,
-    lifetime: process.env.NEXT_PUBLIC_WHOP_LIFETIME_CHECKOUT_URL,
-  } as const;
+  const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
 
   // Check if we're on a note page
   const isNotePage = pathname?.startsWith('/home/note/');
@@ -99,24 +95,44 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
     }
   };
 
-  const handleCheckout = (interval: "monthly" | "yearly" | "lifetime") => {
-    const baseUrl = checkoutUrls[interval];
-    if (!baseUrl) {
-      alert("Checkout link is not configured yet. Please try again later.");
-      return;
-    }
-    if (!user?.id) {
+  const handleCheckout = async (interval: "monthly" | "yearly" | "lifetime") => {
+    if (!user?.id || !user?.email) {
       router.push("/login");
       return;
     }
 
     try {
-      const checkoutUrl = buildWhopCheckoutUrl(baseUrl, user.id, user.email);
+      setIsCreatingCheckout(true);
+
+      // Get the plan ID for the selected interval
+      const planId = PLAN_IDS[interval];
+
+      // Call our API to create a checkout session with metadata
+      const response = await fetch("/api/checkout/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          planId,
+          userId: user.id,
+          email: user.email,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || "Failed to create checkout");
+      }
+
+      const { purchaseUrl } = await response.json();
+
+      // Close modal and open checkout in new tab
       setPricingOpen(false);
-      window.open(checkoutUrl, "_blank", "noopener,noreferrer");
+      window.open(purchaseUrl, "_blank", "noopener,noreferrer");
     } catch (error) {
       console.error("Failed to start checkout:", error);
       alert("Unable to start checkout. Please try again.");
+    } finally {
+      setIsCreatingCheckout(false);
     }
   };
 
@@ -737,8 +753,9 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                       <Button
                         className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-gray-900 hover:bg-gray-800 text-white py-2.5"
                         onClick={() => handleCheckout(isYearly ? "yearly" : "monthly")}
+                        disabled={isCreatingCheckout}
                       >
-                        Upgrade plan
+                        {isCreatingCheckout ? "Creating checkout..." : "Upgrade plan"}
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
@@ -808,8 +825,9 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                       <Button
                         className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-blue-500 hover:bg-blue-600 text-white py-2.5"
                         onClick={() => handleCheckout("lifetime")}
+                        disabled={isCreatingCheckout}
                       >
-                        Get Lifetime Access
+                        {isCreatingCheckout ? "Creating checkout..." : "Get Lifetime Access"}
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"

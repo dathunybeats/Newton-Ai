@@ -1,3 +1,9 @@
+export const PLAN_IDS = {
+  monthly: "plan_AhTV9u0UD48Z0",
+  yearly: "plan_rgupWHoVJKhDw",
+  lifetime: "plan_g5wnacjwa6tp3",
+} as const;
+
 export const PLAN_MAP = {
   plan_rgupWHoVJKhDw: { name: "Yearly", interval: "yearly" },
   plan_g5wnacjwa6tp3: { name: "Lifetime", interval: "lifetime" },

@@ -1,0 +1,96 @@
+import { NextResponse } from "next/server";
+import Whop from "@whop/sdk";
+import { WHOP_USER_METADATA_KEY } from "@/lib/payments/whop";
+
+export const runtime = "nodejs";
+
+const WHOP_API_KEY = process.env.WHOP_API_KEY;
+const WHOP_COMPANY_ID = process.env.NEXT_PUBLIC_WHOP_COMPANY_ID;
+
+if (!WHOP_API_KEY) {
+  console.error("Missing WHOP_API_KEY environment variable");
+}
+
+if (!WHOP_COMPANY_ID) {
+  console.error("Missing NEXT_PUBLIC_WHOP_COMPANY_ID environment variable");
+}
+
+interface CreateCheckoutRequest {
+  planId: string;
+  userId: string;
+  email: string;
+}
+
+export async function POST(request: Request) {
+  try {
+    const body: CreateCheckoutRequest = await request.json();
+    const { planId, userId, email } = body;
+
+    // Validate required fields
+    if (!planId || !userId || !email) {
+      return NextResponse.json(
+        { error: "Missing required fields: planId, userId, email" },
+        { status: 400 }
+      );
+    }
+
+    if (!WHOP_API_KEY) {
+      return NextResponse.json(
+        { error: "Server configuration error: Missing Whop API key" },
+        { status: 500 }
+      );
+    }
+
+    if (!WHOP_COMPANY_ID) {
+      return NextResponse.json(
+        { error: "Server configuration error: Missing Whop company ID" },
+        { status: 500 }
+      );
+    }
+
+    // Initialize Whop SDK
+    const whop = new Whop({
+      apiKey: WHOP_API_KEY,
+    });
+
+    console.log("Creating checkout configuration with:", {
+      planId,
+      userId,
+      email,
+      companyId: WHOP_COMPANY_ID,
+    });
+
+    // Create checkout configuration with metadata
+    const checkoutConfig = await whop.checkoutConfigurations.create({
+      plan_id: planId,
+      company_id: WHOP_COMPANY_ID,
+      metadata: {
+        [WHOP_USER_METADATA_KEY]: userId,
+      },
+      // Redirect URL after successful checkout (optional)
+      redirect_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.newtonstudy.app"}/home?upgraded=true`,
+    });
+
+    console.log("Checkout configuration created:", {
+      id: checkoutConfig.id,
+      purchaseUrl: checkoutConfig.purchase_url,
+    });
+
+    // Return the purchase URL
+    return NextResponse.json({
+      success: true,
+      purchaseUrl: checkoutConfig.purchase_url,
+      sessionId: checkoutConfig.id,
+    });
+  } catch (error: any) {
+    console.error("Failed to create checkout configuration:", error);
+
+    return NextResponse.json(
+      {
+        error: "Failed to create checkout session",
+        details: error?.message || String(error),
+      },
+      { status: 500 }
+    );
+  }
+}
