@@ -63,11 +63,11 @@ export function FlashcardViewer({ flashcards, title }: FlashcardViewerProps) {
 
   return (
     <div className="flex flex-col mx-auto w-full max-w-2xl space-y-3">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+        <h2 className="text-2xl font-bold text-gray-900 flex-1">{title}</h2>
 
         {/* Reset and Shuffle Buttons */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-shrink-0 self-end sm:self-auto">
           <Button
             onClick={handleReset}
             variant="outline"

@@ -79,6 +79,9 @@ export default function NotePage() {
   }, [note?.transcript]);
 
   useEffect(() => {
+    // Don't retry if there's already an error
+    if (error) return;
+
     // Priority 1: Check prefetched data (from navigation)
     if (prefetchedNote && prefetchedNote.id === noteId) {
       setNote(prefetchedNote);
@@ -105,7 +108,7 @@ export default function NotePage() {
     if (!authLoading) {
       loadNote();
     }
-  }, [noteId, authLoading, prefetchedNote, getNote]);
+  }, [noteId, authLoading, prefetchedNote, getNote, error]);
 
   useEffect(() => {
     if (activeTab === "quiz" && note && !quizQuestions.length && !loadingQuiz) {
@@ -249,12 +252,10 @@ export default function NotePage() {
         .eq("user_id", user.id)
         .single();
 
-      if (error) {
-        throw error;
-      }
-
-      if (!data) {
+      if (error || !data) {
+        // Note not found or user doesn't have access (RLS blocked it)
         setError("Note not found");
+        setLoading(false);
         return;
       }
 
