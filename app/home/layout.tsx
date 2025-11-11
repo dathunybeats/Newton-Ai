@@ -40,7 +40,7 @@ export default function HomeLayout({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]); // Only depend on user, not fetchNotes
 
-  if (loading || (notesLoading && notes.length === 0)) {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white text-black">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-gray-900"></div>

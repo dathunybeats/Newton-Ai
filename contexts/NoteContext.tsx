@@ -149,7 +149,7 @@ export function NoteProvider({ children }: { children: ReactNode }) {
       console.error("Error fetching notes:", error);
       setCache((prev) => ({ ...prev, isLoading: false }));
     }
-  }, [isCacheStale, cache.notes.length]);
+  }, [isCacheStale]);
 
   // Get a specific note from cache
   const getNote = useCallback((id: string): CachedNote | null => {

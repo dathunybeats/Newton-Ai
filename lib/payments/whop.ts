@@ -17,12 +17,13 @@ export function getPlanForProduct(
 export const WHOP_USER_METADATA_KEY = "supabase_user_id";
 
 /**
- * Adds the Supabase user id to a Whop checkout URL via metadata query param.
+ * Adds the Supabase user id and email to a Whop checkout URL via metadata and prefill params.
  * Works for hosted checkout links (metadata[n]=v format) and preserves other params.
  */
 export function buildWhopCheckoutUrl(
   baseUrl: string,
   userId: string,
+  email?: string,
 ) {
   if (!baseUrl) {
     throw new Error("baseUrl is required to build Whop checkout URL");
@@ -33,5 +34,11 @@ export function buildWhopCheckoutUrl(
 
   const url = new URL(baseUrl);
   url.searchParams.set(`metadata[${WHOP_USER_METADATA_KEY}]`, userId);
+
+  // Prefill email if provided
+  if (email) {
+    url.searchParams.set('email', email);
+  }
+
   return url.toString();
 }

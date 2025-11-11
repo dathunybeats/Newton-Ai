@@ -348,7 +348,14 @@ export default function HomePage() {
           <div className="sm:justify-center sm:items-center gap-3 sm:flex grid grid-cols-1 w-full">
             <div className="w-full flex-1 sm:w-1/3">
               <div
-                onClick={() => setUploadModalOpen(true)}
+                onClick={() => {
+                  if (notes.length >= 3) {
+                    setUpgradeMessage("You've reached your limit of 3 notes on the free plan. Upgrade to create unlimited notes!");
+                    setUpgradeModalOpen(true);
+                  } else {
+                    setUploadModalOpen(true);
+                  }
+                }}
                 className="border border-gray-200 text-card-foreground rounded-3xl group shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:dark:border-gray-300 bg-white dark:bg-white cursor-pointer transition-all duration-200 relative"
                 data-state="closed"
               >
@@ -387,7 +394,14 @@ export default function HomePage() {
             </div>
             <div className="w-full flex-1 sm:w-1/3">
               <div
-                onClick={() => setYoutubeModalOpen(true)}
+                onClick={() => {
+                  if (notes.length >= 3) {
+                    setUpgradeMessage("You've reached your limit of 3 notes on the free plan. Upgrade to create unlimited notes!");
+                    setUpgradeModalOpen(true);
+                  } else {
+                    setYoutubeModalOpen(true);
+                  }
+                }}
                 className="border border-gray-200 text-card-foreground rounded-3xl group shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:dark:border-gray-300 bg-white dark:bg-white cursor-pointer transition-all duration-200 relative"
                 data-state="closed"
               >

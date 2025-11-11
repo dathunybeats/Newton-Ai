@@ -111,7 +111,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
     }
 
     try {
-      const checkoutUrl = buildWhopCheckoutUrl(baseUrl, user.id);
+      const checkoutUrl = buildWhopCheckoutUrl(baseUrl, user.id, user.email);
       setPricingOpen(false);
       window.open(checkoutUrl, "_blank", "noopener,noreferrer");
     } catch (error) {
@@ -401,85 +401,87 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
           {/* Separator */}
           <div className="shrink-0 bg-gray-200 height-[1px] w-full mb-4 mt-2" />
 
-          {/* Upgrade Plan Card */}
-          <div className="mx-4 mb-3">
-            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-              <div className="p-6 py-4 flex justify-center items-center flex-col px-3">
-                <Button
-                  onClick={() => setPricingOpen(true)}
-                  className={`group relative w-full rounded-[11px] gap-2 overflow-hidden text-lg font-semibold text-white hover:opacity-90 cursor-pointer active:scale-[0.98] ${
-                    notesCount >= 3
-                      ? "bg-orange-600 hover:bg-orange-700 animate-pulse"
-                      : ""
-                  }`}
-                  style={notesCount < 3 ? { backgroundColor: '#171717' } : undefined}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-4 w-4"
+          {/* Upgrade Plan Card - Only show for free users */}
+          {userTier === "free" && (
+            <div className="mx-4 mb-3">
+              <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+                <div className="p-6 py-4 flex justify-center items-center flex-col px-3">
+                  <Button
+                    onClick={() => setPricingOpen(true)}
+                    className={`group relative w-full rounded-[11px] gap-2 overflow-hidden text-lg font-semibold text-white cursor-pointer active:scale-[0.98] ${
+                      notesCount >= 3
+                        ? "bg-orange-600 hover:bg-orange-700"
+                        : "hover:opacity-90"
+                    }`}
+                    style={notesCount < 3 ? { backgroundColor: '#171717' } : undefined}
                   >
-                    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
-                    <path d="M5 21h14" />
-                  </svg>
-                  <p>Upgrade plan</p>
-                </Button>
-                <small className={`text-sm font-medium leading-none mt-4 text-center ${
-                  notesCount >= 3 ? "text-orange-600 font-bold" : "text-gray-500"
-                }`}>
-                  {notesCount >= 3
-                    ? "Upgrade now to create unlimited notes"
-                    : "Get more features and unlimited access"
-                  }
-                </small>
-                <div className="w-full mt-4">
-                  <div className="flex justify-between mb-1">
-                    <div className="flex items-center gap-1">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className={notesCount >= 3 ? "text-orange-600" : "text-gray-600"}
-                      >
-                        <path d="M2 6h4" />
-                        <path d="M2 10h4" />
-                        <path d="M2 14h4" />
-                        <path d="M2 18h4" />
-                        <rect width="16" height="20" x="4" y="2" rx="2" />
-                        <path d="M16 2v20" />
-                      </svg>
-                      <span className={`text-xs ${notesCount >= 3 ? "text-orange-600 font-bold" : "text-gray-900"}`}>
-                        <span className="font-extrabold">{notesCount}</span> / 3 Notes free
-                      </span>
-                    </div>
-                  </div>
-                  <div className={`relative w-full overflow-hidden rounded-full h-1 ${
-                    notesCount >= 3 ? "bg-orange-200" : "bg-gray-200"
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-4 w-4"
+                    >
+                      <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
+                      <path d="M5 21h14" />
+                    </svg>
+                    <p>Upgrade plan</p>
+                  </Button>
+                  <small className={`text-sm font-medium leading-none mt-4 text-center ${
+                    notesCount >= 3 ? "text-orange-600 font-bold" : "text-gray-500"
                   }`}>
-                    <div
-                      className={`h-full transition-all ${
-                        notesCount >= 3 ? "bg-orange-600" : "bg-gray-900"
-                      }`}
-                      style={{ width: `${Math.min((notesCount / 3) * 100, 100)}%` }}
-                    />
+                    {notesCount >= 3
+                      ? "Upgrade now to create unlimited notes"
+                      : "Get more features and unlimited access"
+                    }
+                  </small>
+                  <div className="w-full mt-4">
+                    <div className="flex justify-between mb-1">
+                      <div className="flex items-center gap-1">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className={notesCount >= 3 ? "text-orange-600" : "text-gray-600"}
+                        >
+                          <path d="M2 6h4" />
+                          <path d="M2 10h4" />
+                          <path d="M2 14h4" />
+                          <path d="M2 18h4" />
+                          <rect width="16" height="20" x="4" y="2" rx="2" />
+                          <path d="M16 2v20" />
+                        </svg>
+                        <span className={`text-xs ${notesCount >= 3 ? "text-orange-600 font-bold" : "text-gray-900"}`}>
+                          <span className="font-extrabold">{notesCount}</span> / 3 Notes free
+                        </span>
+                      </div>
+                    </div>
+                    <div className={`relative w-full overflow-hidden rounded-full h-1 ${
+                      notesCount >= 3 ? "bg-orange-200" : "bg-gray-200"
+                    }`}>
+                      <div
+                        className={`h-full transition-all ${
+                          notesCount >= 3 ? "bg-orange-600" : "bg-gray-900"
+                        }`}
+                        style={{ width: `${Math.min((notesCount / 3) * 100, 100)}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* User Card */}
           <div className="rounded-lg border border-gray-200 bg-white shadow-sm mb-4 mx-4">
