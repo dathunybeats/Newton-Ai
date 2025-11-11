@@ -85,6 +85,8 @@ export default function NotePage() {
       setPdfUrl(prefetchedNote.pdfUrl || null);
       setLoading(false);
       setPrefetchedNote(null);
+      // Fetch flashcards for prefetched note
+      fetchFlashcards(noteId);
       return;
     }
 
@@ -94,6 +96,8 @@ export default function NotePage() {
       setNote(cachedNote);
       setPdfUrl(cachedNote.pdfUrl || null);
       setLoading(false);
+      // Fetch flashcards for cached note
+      fetchFlashcards(noteId);
       return;
     }
 
