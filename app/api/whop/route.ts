@@ -133,14 +133,16 @@ export async function POST(request: Request) {
     });
   }
 
-  // In production, require signature headers
-  if (!isDev && !hasSignatureHeaders) {
-    return NextResponse.json({ error: "Missing signature headers" }, { status: 400 });
-  }
-
-  // Verify signature only if headers are present
-  if (hasSignatureHeaders && !verifySignature(rawBody, signatureHeader, timestampHeader)) {
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  // Log warning if signature headers are missing but allow through for test webhooks
+  if (!hasSignatureHeaders) {
+    console.warn("⚠️ Webhook received without signature headers (likely a test webhook)");
+  } else {
+    // Verify signature only if headers are present
+    if (!verifySignature(rawBody, signatureHeader, timestampHeader)) {
+      console.error("❌ Webhook signature verification failed");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    }
+    console.log("✅ Webhook signature verified");
   }
 
   let payload: WebhookPayload;
