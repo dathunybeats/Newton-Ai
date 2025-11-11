@@ -1,8 +1,4 @@
-// Using dynamic import for CommonJS module compatibility
-const getPdfParse = async () => {
-  const pdfParse = await import("pdf-parse");
-  return pdfParse.default || pdfParse;
-};
+import { extractText } from 'unpdf';
 
 /**
  * Extract text content from a PDF buffer
@@ -11,17 +7,19 @@ const getPdfParse = async () => {
  */
 export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
   try {
-    const pdfParse = await getPdfParse();
-    const data = await pdfParse(pdfBuffer);
-
-    // data.text contains all text from all pages
-    const extractedText = data.text.trim();
+    // Convert Buffer to Uint8Array
+    const uint8Array = new Uint8Array(pdfBuffer);
+    const { text, totalPages } = await extractText(uint8Array);
+    
+    const extractedText = Array.isArray(text) 
+      ? text.map(page => String(page).trim()).join('\n\n') 
+      : String(text).trim();
 
     if (!extractedText || extractedText.length === 0) {
       throw new Error("No text could be extracted from the PDF");
     }
 
-    console.log(`PDF text extraction successful: ${data.numpages} pages, ${extractedText.length} characters`);
+    console.log(`PDF text extraction successful: ${totalPages} pages, ${extractedText.length} characters`);
 
     return extractedText;
   } catch (error: any) {

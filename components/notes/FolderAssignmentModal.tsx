@@ -38,6 +38,7 @@ const FolderAssignmentModal = ({
     currentFolderId ?? null
   );
   const [newFolderName, setNewFolderName] = useState("");
+  const [newFolderColor, setNewFolderColor] = useState("#d1d5db");
   const [isSaving, setIsSaving] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +50,7 @@ const FolderAssignmentModal = ({
       setError(null);
     } else {
       setNewFolderName("");
+      setNewFolderColor("#d1d5db");
       setIsSaving(false);
       setIsCreating(false);
     }
@@ -65,10 +67,11 @@ const FolderAssignmentModal = ({
     setIsCreating(true);
     setError(null);
     try {
-      const folder = await createFolder(newFolderName.trim());
+      const folder = await createFolder(newFolderName.trim(), newFolderColor);
       if (folder) {
         setSelectedFolderId(folder.id);
         setNewFolderName("");
+        setNewFolderColor("#d1d5db");
       }
     } catch (err) {
       console.error("Failed to create folder:", err);
@@ -223,6 +226,19 @@ const FolderAssignmentModal = ({
                     >
                       {isCreating ? <Spinner /> : "Add"}
                     </button>
+                  </div>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {["#d1d5db", "#3b82f6", "#10b981", "#ef4444", "#f59e0b", "#8b5cf6", "#ec4899"].map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => setNewFolderColor(color)}
+                        className={`w-6 h-6 rounded-full transition-all ${
+                          newFolderColor === color ? "ring-2 ring-offset-1 ring-gray-900" : "hover:scale-110"
+                        }`}
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
                   </div>
                 </div>
 

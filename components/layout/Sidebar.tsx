@@ -405,7 +405,15 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
           <div className="mx-4 mb-3">
             <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
               <div className="p-6 py-4 flex justify-center items-center flex-col px-3">
-                <Button onClick={() => setPricingOpen(true)} className=" group relative w-full rounded-[11px] gap-2 overflow-hidden text-lg font-semibold text-white hover:opacity-90 cursor-pointer active:scale-[0.98]" style={{ backgroundColor: '#171717' }}>
+                <Button
+                  onClick={() => setPricingOpen(true)}
+                  className={`group relative w-full rounded-[11px] gap-2 overflow-hidden text-lg font-semibold text-white hover:opacity-90 cursor-pointer active:scale-[0.98] ${
+                    notesCount >= 3
+                      ? "bg-orange-600 hover:bg-orange-700 animate-pulse"
+                      : ""
+                  }`}
+                  style={notesCount < 3 ? { backgroundColor: '#171717' } : undefined}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -423,8 +431,13 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                   </svg>
                   <p>Upgrade plan</p>
                 </Button>
-                <small className="text-sm font-medium leading-none mt-4 text-center text-gray-500">
-                  Get more features and unlimited access
+                <small className={`text-sm font-medium leading-none mt-4 text-center ${
+                  notesCount >= 3 ? "text-orange-600 font-bold" : "text-gray-500"
+                }`}>
+                  {notesCount >= 3
+                    ? "Upgrade now to create unlimited notes"
+                    : "Get more features and unlimited access"
+                  }
                 </small>
                 <div className="w-full mt-4">
                   <div className="flex justify-between mb-1">
@@ -439,7 +452,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="text-gray-600"
+                        className={notesCount >= 3 ? "text-orange-600" : "text-gray-600"}
                       >
                         <path d="M2 6h4" />
                         <path d="M2 10h4" />
@@ -448,13 +461,20 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                         <rect width="16" height="20" x="4" y="2" rx="2" />
                         <path d="M16 2v20" />
                       </svg>
-                      <span className="text-xs text-gray-900">
+                      <span className={`text-xs ${notesCount >= 3 ? "text-orange-600 font-bold" : "text-gray-900"}`}>
                         <span className="font-extrabold">{notesCount}</span> / 3 Notes free
                       </span>
                     </div>
                   </div>
-                  <div className="relative w-full overflow-hidden rounded-full bg-gray-200 h-1">
-                    <div className="h-full bg-gray-900 transition-all" style={{ width: `${(notesCount / 3) * 100}%` }} />
+                  <div className={`relative w-full overflow-hidden rounded-full h-1 ${
+                    notesCount >= 3 ? "bg-orange-200" : "bg-gray-200"
+                  }`}>
+                    <div
+                      className={`h-full transition-all ${
+                        notesCount >= 3 ? "bg-orange-600" : "bg-gray-900"
+                      }`}
+                      style={{ width: `${Math.min((notesCount / 3) * 100, 100)}%` }}
+                    />
                   </div>
                 </div>
               </div>
@@ -835,7 +855,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
       <AnimatePresence>
         {createFolderOpen && (
           <Dialog open={createFolderOpen} onOpenChange={setCreateFolderOpen}>
-            <DialogContent className="max-w-md w-full p-6 bg-white border border-gray-300 rounded-2xl">
+            <DialogContent className="max-w-md w-[90vw] sm:w-full p-6 bg-white border border-gray-300 rounded-2xl">
               <DialogHeader>
                 <DialogTitle className="text-2xl tracking-tight font-bold text-black text-center">
                   Create Folder

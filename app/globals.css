@@ -101,3 +101,9 @@ body {
 .markdown * {
   max-width: 100%;
 }
+
+/* Add dash before bold items in ordered lists (like "Forget the solution") */
+.markdown ol > li > p > strong:first-child::before {
+  content: "- ";
+  color: currentColor;
+}

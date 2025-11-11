@@ -197,7 +197,7 @@ export function NoteProvider({ children }: { children: ReactNode }) {
 
   // Fetch folders with caching logic
   const fetchFolders = useCallback(async (force = false) => {
-    if (!force && !isFoldersCacheStale() && foldersCache.folders.length > 0) {
+    if (!force && !isFoldersCacheStale()) {
       return;
     }
 
@@ -229,7 +229,7 @@ export function NoteProvider({ children }: { children: ReactNode }) {
       console.error("Error fetching folders:", error);
       setFoldersCache((prev) => ({ ...prev, isLoading: false }));
     }
-  }, [isFoldersCacheStale, foldersCache.folders.length]);
+  }, [isFoldersCacheStale]);
 
   // Get a specific folder from cache
   const getFolder = useCallback((id: string): Folder | null => {
