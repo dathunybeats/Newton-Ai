@@ -96,8 +96,8 @@ export function NoteProvider({ children }: { children: ReactNode }) {
 
   // Fetch notes with caching logic
   const fetchNotes = useCallback(async (force = false) => {
-    // If cache is fresh and not forcing, return early
-    if (!force && !isCacheStale() && cache.notes.length > 0) {
+    // If cache is fresh and not forcing, return early (even if empty!)
+    if (!force && !isCacheStale()) {
       return;
     }
 

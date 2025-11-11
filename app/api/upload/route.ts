@@ -1,6 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { canCreateNote } from "@/lib/subscriptions";
+import { extractTextFromPDFFile } from "@/lib/pdf-helpers";
+import {
+  generateNotesFromContent,
+  generateTitleAndDescription,
+} from "@/lib/openai-helpers";
 
 export async function POST(request: NextRequest) {
   try {
@@ -129,14 +134,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Generate notes for PDFs
+    let noteContent = "";
+    let noteTitle = file.name.replace(/\.[^/.]+$/, ""); // Default: filename without extension
+    let extractedText = "";
+
+    if (fileType === "pdf") {
+      try {
+        console.log("Extracting text from PDF...");
+
+        // Extract text from PDF
+        extractedText = await extractTextFromPDFFile(buffer);
+
+        console.log(
+          `Extracted ${extractedText.length} characters from PDF`
+        );
+
+        // Generate AI notes from extracted text
+        console.log("Generating AI notes from PDF content...");
+        noteContent = await generateNotesFromContent(extractedText, "pdf");
+
+        // Generate better title and description
+        console.log("Generating title and description...");
+        const { title } = await generateTitleAndDescription(extractedText);
+        noteTitle = title;
+
+        console.log("PDF notes generated successfully");
+      } catch (error: any) {
+        console.error("PDF processing error:", error);
+        // Continue with empty content rather than failing the entire upload
+        // This allows the file to still be uploaded even if AI processing fails
+        noteContent = "";
+        extractedText = "";
+      }
+    }
+
     // Create a note for this upload
     const { data: noteData, error: noteError } = await supabase
       .from("notes")
       .insert({
         user_id: user.id,
         upload_id: uploadRecord.id,
-        title: file.name.replace(/\.[^/.]+$/, ""), // Remove file extension
-        content: "", // Will be populated later with AI-generated content
+        title: noteTitle,
+        content: noteContent, // Now populated for PDFs!
+        transcript: extractedText || null, // Store original PDF text
       })
       .select()
       .single();

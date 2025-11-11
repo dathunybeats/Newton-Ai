@@ -35,18 +35,25 @@ export async function updateSession(request: NextRequest) {
       error,
     } = await supabase.auth.getUser();
 
-    // If there's an error (like invalid refresh token), clear the cookies
+    // If there's an error (like invalid refresh token), clear the cookies ONCE
     if (error) {
       console.error("Auth error:", error.message);
-      // Clear invalid auth cookies
-      supabaseResponse.cookies.delete("sb-access-token");
-      supabaseResponse.cookies.delete("sb-refresh-token");
-      // Clear all Supabase cookies
-      request.cookies.getAll().forEach((cookie) => {
-        if (cookie.name.startsWith("sb-")) {
-          supabaseResponse.cookies.delete(cookie.name);
-        }
-      });
+
+      // Only clear cookies if we're not already on a public route to avoid loops
+      const isPublicRoute =
+        request.nextUrl.pathname.startsWith("/login") ||
+        request.nextUrl.pathname.startsWith("/signup") ||
+        request.nextUrl.pathname.startsWith("/auth") ||
+        request.nextUrl.pathname === "/";
+
+      if (!isPublicRoute) {
+        // Clear invalid auth cookies
+        request.cookies.getAll().forEach((cookie) => {
+          if (cookie.name.startsWith("sb-")) {
+            supabaseResponse.cookies.delete(cookie.name);
+          }
+        });
+      }
       user = null;
     } else {
       user = fetchedUser;

@@ -13,6 +13,19 @@ export default function LoginPage() {
   const router = useRouter();
   const [isSigningIn, setIsSigningIn] = useState(false);
 
+  // Clear any stale auth cookies on mount
+  useEffect(() => {
+    // Clear all Supabase cookies if user doesn't exist
+    if (!loading && !user) {
+      document.cookie.split(";").forEach((c) => {
+        const cookieName = c.split("=")[0].trim();
+        if (cookieName.startsWith("sb-")) {
+          document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+      });
+    }
+  }, [loading, user]);
+
   useEffect(() => {
     if (user && !loading) {
       router.push("/home");

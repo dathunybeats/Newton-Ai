@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { Innertube } from "youtubei.js";
-import OpenAI from "openai";
 import { canCreateNote } from "@/lib/subscriptions";
-
-function getOpenAIClient() {
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || "",
-  });
-}
+import {
+  generateNotesFromContent,
+  generateTitleAndDescription,
+} from "@/lib/openai-helpers";
 
 // Extract video ID from YouTube URL
 function extractVideoId(url: string): string | null {
@@ -125,90 +122,17 @@ export async function POST(request: NextRequest) {
     }
 
     // 6. Generate notes with AI
-    const openai = getOpenAIClient();
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are an expert note-taking assistant specializing in creating comprehensive, well-structured study notes from video transcripts.
-
-**MARKDOWN FORMATTING REQUIREMENTS:**
-
-1. **Heading Structure:**
-   - Use # for main title (only ONE per document)
-   - Use ## for major sections
-   - Use ### for subsections
-   - Use #### for detailed points when needed
-
-2. **Content Organization:**
-   - Start with a brief overview/introduction section
-   - Group related information under clear section headings
-   - Use bullet points (-) for lists and key points
-   - Use numbered lists (1. 2. 3.) for sequential steps or rankings
-
-3. **Emphasis:**
-   - Use **bold** for important terms, names, and key concepts
-   - Use *italics* for emphasis or definitions
-   - Use \`code blocks\` for technical terms, commands, or code
-
-4. **Tables:**
-   - Create tables for comparisons, features, or structured data
-   - Use proper markdown table syntax with headers
-   - Keep tables clean and readable
-
-5. **Sections to Include (when applicable):**
-   - Introduction/Overview
-   - Key Highlights or Main Points
-   - Detailed breakdown by topic
-   - Important quotes or statements (use > blockquotes)
-   - Summary or Conclusion
-   - Additional resources or references (if mentioned)
-
-**STYLE GUIDELINES:**
-- Write in clear, concise language
-- Focus on key information and main ideas
-- Avoid redundancy
-- Make it scannable with good structure
-- Use proper grammar and spelling
-- Keep paragraphs short and focused
-
-Generate notes that are professional, comprehensive, and perfect for studying or review.`,
-        },
-        {
-          role: "user",
-          content: `Generate comprehensive, well-structured study notes from this video transcript. Follow all markdown formatting requirements strictly:\n\n${transcriptText}`,
-        },
-      ],
-      temperature: 0.7,
-    });
-
-    const generatedNotes = completion.choices[0].message.content;
+    console.log("Generating AI notes from transcript...");
+    const generatedNotes = await generateNotesFromContent(
+      transcriptText,
+      "youtube"
+    );
 
     // 7. Generate title and summary
-    const summaryCompletion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content:
-            "Generate a concise title (max 60 characters) and a brief description (max 160 characters) for the video based on its transcript. Return the response as a JSON object with 'title' and 'description' fields.",
-        },
-        {
-          role: "user",
-          content: `Transcript: ${transcriptText.substring(0, 2000)}`,
-        },
-      ],
-      temperature: 0.7,
-      response_format: { type: "json_object" },
-    });
-
-    const summaryData = JSON.parse(
-      summaryCompletion.choices[0].message.content || "{}"
+    console.log("Generating title and description...");
+    const { title, description } = await generateTitleAndDescription(
+      transcriptText
     );
-    const title = summaryData.title || "YouTube Video Notes";
-    const description =
-      summaryData.description || "Notes generated from YouTube video";
 
     // 8. Save to database
     const { data: note, error: dbError } = await supabase

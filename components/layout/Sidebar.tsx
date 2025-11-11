@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { AnimatePresence } from "framer-motion";
 import { useNoteContext } from "@/contexts/NoteContext";
 import { buildWhopCheckoutUrl } from "@/lib/payments/whop";
-import { getSubscriptionStatus, formatPlanName, type PlanTier } from "@/lib/subscriptions";
+import { formatPlanName, type PlanTier } from "@/lib/subscriptions/types";
 
 interface SidebarProps {
   notes: any[];
@@ -65,8 +65,11 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
 
       try {
         setIsLoadingSubscription(true);
-        const status = await getSubscriptionStatus(user.id);
-        setUserTier(status.tier);
+        const response = await fetch("/api/subscription/status");
+        if (response.ok) {
+          const data = await response.json();
+          setUserTier(data.tier);
+        }
       } catch (error) {
         console.error("Error fetching subscription:", error);
       } finally {

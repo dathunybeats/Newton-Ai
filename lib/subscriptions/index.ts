@@ -1,7 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import type { PlanTier as PlanTierType } from "./types";
 
-export type PlanTier = "free" | "monthly" | "yearly" | "lifetime";
+// Re-export client-safe types
+export type { PlanTier } from "./types";
+export { formatPlanName, getUpgradeMessage } from "./types";
 
 export interface UserSubscription {
   id: string;
@@ -18,7 +21,7 @@ export interface UserSubscription {
 }
 
 export interface SubscriptionStatus {
-  tier: PlanTier;
+  tier: PlanTierType;
   isActive: boolean;
   subscription: UserSubscription | null;
   limits: {
@@ -32,7 +35,7 @@ export interface SubscriptionStatus {
 /**
  * Get plan tier from subscription interval
  */
-function getPlanTier(subscription: UserSubscription | null): PlanTier {
+function getPlanTier(subscription: UserSubscription | null): PlanTierType {
   if (!subscription || subscription.status !== "active") {
     return "free";
   }
@@ -52,7 +55,7 @@ function getPlanTier(subscription: UserSubscription | null): PlanTier {
 /**
  * Get limits based on plan tier
  */
-function getLimitsForTier(tier: PlanTier) {
+function getLimitsForTier(tier: PlanTierType) {
   switch (tier) {
     case "free":
       return {
@@ -182,7 +185,7 @@ export async function canCreateNote(userId: string): Promise<{
   allowed: boolean;
   currentCount: number;
   limit: number;
-  tier: PlanTier;
+  tier: PlanTierType;
 }> {
   const status = await getSubscriptionStatusAdmin(userId);
 
@@ -218,7 +221,7 @@ export async function canCreateNote(userId: string): Promise<{
  */
 export async function canGenerateQuiz(userId: string): Promise<{
   allowed: boolean;
-  tier: PlanTier;
+  tier: PlanTierType;
 }> {
   const status = await getSubscriptionStatusAdmin(userId);
 
@@ -226,30 +229,4 @@ export async function canGenerateQuiz(userId: string): Promise<{
     allowed: status.limits.hasUnlimitedAccess,
     tier: status.tier,
   };
-}
-
-/**
- * Format plan name for display
- */
-export function formatPlanName(tier: PlanTier): string {
-  switch (tier) {
-    case "free":
-      return "Free Plan";
-    case "monthly":
-      return "Monthly Plan";
-    case "yearly":
-      return "Yearly Plan";
-    case "lifetime":
-      return "Lifetime Access";
-  }
-}
-
-/**
- * Get upgrade message based on tier
- */
-export function getUpgradeMessage(tier: PlanTier): string {
-  if (tier === "free") {
-    return "Upgrade to unlock unlimited notes, quizzes, and flashcards!";
-  }
-  return "You have unlimited access to all features!";
 }

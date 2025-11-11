@@ -32,12 +32,13 @@ export default function HomeLayout({
     }
   }, [user, loading, router]);
 
-  // Fetch notes when user is available
+  // Fetch notes when user is available (only once)
   useEffect(() => {
     if (user) {
       fetchNotes();
     }
-  }, [user, fetchNotes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]); // Only depend on user, not fetchNotes
 
   if (loading || (notesLoading && notes.length === 0)) {
     return (
