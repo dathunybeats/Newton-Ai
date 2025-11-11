@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Navbar } from "@/components/shared/Navbar";
+import { Footer } from "@/components/layout/Footer";
 
 export default function Home() {
   return (
@@ -512,21 +513,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white py-8">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-sm text-gray-500">© Copyright 2025. Newton AI Inc.</p>
-            <div className="flex gap-6 text-sm text-gray-600">
-              <Link href="/blog" className="hover:text-gray-900">Blog</Link>
-              <Link href="/help" className="hover:text-gray-900">Help & Earn</Link>
-              <Link href="/careers" className="hover:text-gray-900">Careers</Link>
-              <Link href="/terms" className="hover:text-gray-900">Terms & Conditions</Link>
-              <Link href="/privacy" className="hover:text-gray-900">Privacy Policy</Link>
-              <Link href="/contact" className="hover:text-gray-900">Contact Us</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
