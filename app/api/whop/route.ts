@@ -132,12 +132,23 @@ export async function POST(request: Request) {
     let subscriptionId: string | null = null;
 
     // Handle membership events
-    if (eventType === "membership.went_valid" || eventType === "membership_activated") {
+    if (
+      eventType === "membership.went_valid" ||
+      eventType === "membership_activated" ||
+      eventType === "payment.succeeded" ||
+      eventType === "payment_succeeded"
+    ) {
       const membershipId = extractMembershipId(data);
       const userId = extractUserId(data);
       const productId = extractProductId(data);
 
-      console.log("Processing membership activation:", { membershipId, userId, productId });
+      console.log("Processing membership activation/payment:", {
+        eventType,
+        membershipId,
+        userId,
+        productId,
+        rawData: JSON.stringify(data, null, 2)
+      });
 
       if (membershipId && userId && productId) {
         subscriptionId = await upsertSubscription({
@@ -152,6 +163,7 @@ export async function POST(request: Request) {
         console.log("✅ Subscription created/updated:", subscriptionId);
       } else {
         console.error("❌ Missing required fields:", { membershipId, userId, productId });
+        console.error("Full webhook data:", JSON.stringify(data, null, 2));
       }
     } else if (eventType === "membership.went_invalid" || eventType === "membership_deactivated") {
       const membershipId = extractMembershipId(data);
