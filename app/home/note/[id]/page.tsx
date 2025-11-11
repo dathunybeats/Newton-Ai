@@ -10,6 +10,7 @@ import Link from "next/link";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import FolderAssignmentModal from "@/components/notes/FolderAssignmentModal";
 import NoteQuiz from "@/components/quiz/NoteQuiz";
+import { FlashcardViewer } from "@/components/flashcards/FlashcardViewer";
 import { Modal, ModalContent } from "@heroui/modal";
 
 interface Note {
@@ -69,6 +70,8 @@ export default function NotePage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
   const [loadingQuiz, setLoadingQuiz] = useState(false);
+  const [flashcards, setFlashcards] = useState<any[]>([]);
+  const [loadingFlashcards, setLoadingFlashcards] = useState(false);
 
   const transcriptSegments = useMemo(() => {
     if (!note?.transcript) return [];
@@ -173,6 +176,44 @@ export default function NotePage() {
     }
   };
 
+  const fetchFlashcards = async (id?: string) => {
+    const flashcardNoteId = id || note?.id;
+    if (!flashcardNoteId) return;
+    setLoadingFlashcards(true);
+    try {
+      const response = await fetch(`/api/notes/${flashcardNoteId}/flashcards`);
+      if (!response.ok) throw new Error("Failed to fetch flashcards");
+      const data = await response.json();
+      if (data.flashcards && data.flashcards.length > 0) {
+        setFlashcards(data.flashcards);
+      } else {
+        await generateFlashcards(flashcardNoteId);
+      }
+    } catch (error) {
+      console.error("Error fetching flashcards:", error);
+    } finally {
+      setLoadingFlashcards(false);
+    }
+  };
+
+  const generateFlashcards = async (id?: string) => {
+    const flashcardNoteId = id || note?.id;
+    if (!flashcardNoteId) return;
+    setLoadingFlashcards(true);
+    try {
+      const response = await fetch(`/api/notes/${flashcardNoteId}/flashcards/generate`, {
+        method: "POST",
+      });
+      if (!response.ok) throw new Error("Failed to generate flashcards");
+      const data = await response.json();
+      setFlashcards(data.flashcards || []);
+    } catch (error) {
+      console.error("Error generating flashcards:", error);
+    } finally {
+      setLoadingFlashcards(false);
+    }
+  };
+
   const loadNote = async () => {
     try {
       const supabase = createClient();
@@ -214,6 +255,9 @@ export default function NotePage() {
       }
 
       setNote(data);
+
+      // Fetch flashcards for this note
+      fetchFlashcards(noteId);
 
       // Get PDF URL from storage if it's a PDF
       if (data.uploads?.file_type === "pdf") {
@@ -606,12 +650,21 @@ export default function NotePage() {
             )}
 
             {activeTab === "flashcards" && (
-              <div className="text-center py-12">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Flashcards
-                </h3>
-                <p className="text-gray-600">Coming soon...</p>
-              </div>
+              <>
+                {loadingFlashcards ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-gray-900 mx-auto mb-4"></div>
+                      <p className="text-gray-600">Generating flashcards...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <FlashcardViewer
+                    flashcards={flashcards}
+                    title={`${note?.title || "Note"} Flashcards`}
+                  />
+                )}
+              </>
             )}
 
             {activeTab === "transcript" && (
