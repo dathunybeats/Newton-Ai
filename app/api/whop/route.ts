@@ -150,9 +150,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
+  // LOG EVERYTHING WHOP SENDS (for testing)
+  console.log("🔔 WHOP WEBHOOK RECEIVED:", JSON.stringify(payload, null, 2));
+  console.log("📋 Headers:", {
+    signature: signatureHeader,
+    timestamp: timestampHeader,
+  });
+
   // Whop uses 'action' not 'type' in webhook payload
   const eventType = payload.type || (payload as any).action;
-  
+
   if (!eventType) {
     return NextResponse.json({ error: "Missing event type" }, { status: 400 });
   }
