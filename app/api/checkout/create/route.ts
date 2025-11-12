@@ -59,10 +59,20 @@ export async function POST(request: Request) {
       purchaseUrl: checkoutConfig.purchase_url,
     });
 
+    // Add email as query parameter to prefill in checkout
+    // Try common parameter names that Whop might support
+    const purchaseUrl = new URL(checkoutConfig.purchase_url, process.env.NEXT_PUBLIC_SITE_URL || "https://whop.com");
+    purchaseUrl.searchParams.set("email", email);
+    purchaseUrl.searchParams.set("prefilled_email", email);
+
+    const finalPurchaseUrl = purchaseUrl.toString();
+
+    console.log("Final purchase URL with prefilled email:", finalPurchaseUrl);
+
     // Return the purchase URL
     return NextResponse.json({
       success: true,
-      purchaseUrl: checkoutConfig.purchase_url,
+      purchaseUrl: finalPurchaseUrl,
       sessionId: checkoutConfig.id,
     });
   } catch (error: any) {

@@ -38,7 +38,12 @@
       "Bash(pnpm uninstall:*)",
       "Bash(git stash:*)",
       "Bash(timeout /t 10 /nobreak)",
-      "Bash(node test-webhook.js:*)"
+      "Bash(node test-webhook.js:*)",
+      "Bash(git log:*)",
+      "WebSearch",
+      "WebFetch(domain:docs.whop.com)",
+      "WebFetch(domain:dev.whop.com)",
+      "Bash(nul)"
     ],
     "deny": [
       "Bash(npm run dev)",
