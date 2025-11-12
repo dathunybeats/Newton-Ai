@@ -50,8 +50,8 @@ export async function POST(request: Request) {
       metadata: {
         [WHOP_USER_METADATA_KEY]: userId,
       },
-      // Redirect URL after successful checkout (optional)
-      redirect_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.newtonstudy.app"}/home?upgraded=true`,
+      // Redirect URL after successful checkout
+      redirect_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.newtonstudy.app"}/success`,
     });
 
     console.log("Checkout configuration created:", {
