@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
 
         // Generate AI notes from transcription
         console.log("Generating AI notes from audio transcription...");
-        noteContent = await generateNotesFromContent(extractedText, "audio");
+        noteContent = await generateNotesFromContent(extractedText, "pdf");
 
         // Generate better title
         console.log("Generating title...");
