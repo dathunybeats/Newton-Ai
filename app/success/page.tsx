@@ -1,20 +1,28 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function SuccessPage() {
   const router = useRouter();
+  const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
-    // Redirect to home after 3 seconds
-    const timeout = setTimeout(() => {
-      router.push("/home");
-    }, 3000);
+    // Countdown timer
+    const interval = setInterval(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
 
-    return () => clearTimeout(timeout);
-  }, [router]);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Separate effect for redirect when countdown reaches 0
+  useEffect(() => {
+    if (countdown === 0) {
+      router.push("/home");
+    }
+  }, [countdown, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
@@ -75,7 +83,9 @@ export default function SuccessPage() {
 
         {/* Redirect Notice */}
         <p className="mb-4 text-sm text-gray-500">
-          Redirecting you to your dashboard in 3 seconds...
+          Redirecting you to your dashboard in{" "}
+          <span className="font-semibold text-gray-700">{countdown}</span>{" "}
+          {countdown === 1 ? "second" : "seconds"}...
         </p>
 
         {/* Button */}
