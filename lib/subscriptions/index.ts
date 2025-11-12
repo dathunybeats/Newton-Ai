@@ -97,6 +97,8 @@ export async function getUserSubscriptionAdmin(
       return null;
     }
 
+    console.log("Subscription data for user", userId, ":", data);
+
     return data as UserSubscription | null;
   } catch (error) {
     console.error("Error in getUserSubscriptionAdmin:", error);

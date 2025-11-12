@@ -42,6 +42,14 @@ export async function POST(
       return NextResponse.json({ error: "Note not found" }, { status: 404 });
     }
 
+    // Check if note has content
+    if (!note.content || note.content.trim().length === 0) {
+      return NextResponse.json(
+        { error: "Note has no content to generate flashcards from. Please wait for the note to be processed or add content manually." },
+        { status: 400 }
+      );
+    }
+
     // Check if flashcards already exist
     const { data: existingFlashcards } = await supabase
       .from("flashcards")
@@ -98,10 +106,19 @@ Example format: [{"question": "What is...", "answer": "It is..."}, ...]`;
       throw new Error("No response from OpenAI");
     }
 
-    // Parse the JSON response
+    // Parse the JSON response (handle markdown code blocks)
     let flashcards: Flashcard[];
     try {
-      flashcards = JSON.parse(responseText);
+      // Remove markdown code blocks if present
+      let cleanedResponse = responseText;
+      if (responseText.startsWith('```')) {
+        cleanedResponse = responseText
+          .replace(/^```json\n?/, '')
+          .replace(/^```\n?/, '')
+          .replace(/\n?```$/, '')
+          .trim();
+      }
+      flashcards = JSON.parse(cleanedResponse);
     } catch (parseError) {
       console.error("Failed to parse OpenAI response:", responseText);
       throw new Error("Invalid JSON response from AI");
@@ -136,8 +153,16 @@ Example format: [{"question": "What is...", "answer": "It is..."}, ...]`;
     });
   } catch (error: any) {
     console.error("Flashcard generation error:", error);
+    console.error("Error details:", {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     return NextResponse.json(
-      { error: error.message || "Failed to generate flashcards" },
+      {
+        error: error.message || "Failed to generate flashcards",
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }

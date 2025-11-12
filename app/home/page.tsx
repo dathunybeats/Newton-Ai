@@ -48,6 +48,7 @@ export default function HomePage() {
   } = useNoteContext();
   const [youtubeModalOpen, setYoutubeModalOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [recordModalOpen, setRecordModalOpen] = useState(false);
   const [youtubeLink, setYoutubeLink] = useState("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -70,6 +71,12 @@ export default function HomePage() {
   } | null>(null);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [upgradeMessage, setUpgradeMessage] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [recordingError, setRecordingError] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   const searchParams = useSearchParams();
   const activeFolderId = searchParams.get("folder");
 
@@ -338,6 +345,123 @@ export default function HomePage() {
     setRenameModalOpen(true);
   };
 
+  // Recording functions
+  const startRecording = async () => {
+    try {
+      setRecordingError(null);
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        setAudioBlob(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingTime(0);
+
+      // Start timer
+      const startTime = Date.now();
+      const timerInterval = setInterval(() => {
+        if (mediaRecorderRef.current?.state === "recording") {
+          setRecordingTime(Math.floor((Date.now() - startTime) / 1000));
+        } else {
+          clearInterval(timerInterval);
+        }
+      }, 1000);
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      setRecordingError("Failed to access microphone. Please check your permissions.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const handleGenerateFromRecording = async () => {
+    if (!audioBlob) return;
+
+    setIsUploading(true);
+    setUploadProgress(0);
+    setRecordingError(null);
+
+    try {
+      const formData = new FormData();
+      const audioFile = new File([audioBlob], `recording-${Date.now()}.webm`, { type: 'audio/webm' });
+      formData.append("file", audioFile);
+
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 403 && data.upgradeRequired) {
+          setRecordModalOpen(false);
+          setUpgradeMessage(data.message || "Upgrade to create unlimited notes!");
+          setUpgradeModalOpen(true);
+          return;
+        }
+        throw new Error(data.error || "Failed to generate notes");
+      }
+
+      addNoteToCache(data.note);
+      setPrefetchedNote(data.note);
+
+      setRecordModalOpen(false);
+      setAudioBlob(null);
+      setRecordingTime(0);
+      router.push(`/home/note/${data.noteId}`);
+    } catch (error) {
+      console.error("Recording generation error:", error);
+      setRecordingError(error instanceof Error ? error.message : "Failed to generate notes");
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const cancelRecording = () => {
+    if (isRecording && mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+    setAudioBlob(null);
+    setRecordingTime(0);
+    setRecordingError(null);
+    setRecordModalOpen(false);
+  };
+
   return (
     <main className="flex-1 flex justify-center overflow-y-auto px-4 sm:px-8 md:px-10 lg:px-12 py-12 sm:py-20 bg-white w-full">
       <div className="w-full max-w-6xl flex flex-col items-center sm:gap-3 text-black">
@@ -440,6 +564,14 @@ export default function HomePage() {
             </div>
             <div className="w-full flex-1 sm:w-1/3">
               <div
+                onClick={() => {
+                  if (notes.length >= 3) {
+                    setUpgradeMessage("You've reached your limit of 3 notes on the free plan. Upgrade to create unlimited notes!");
+                    setUpgradeModalOpen(true);
+                  } else {
+                    setRecordModalOpen(true);
+                  }
+                }}
                 className="border border-gray-200 text-card-foreground rounded-3xl group shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:dark:border-gray-300 bg-white dark:bg-white cursor-pointer transition-all duration-200 relative"
                 data-state="closed"
               >
@@ -468,7 +600,7 @@ export default function HomePage() {
                           Record
                         </h3>
                       </div>
-                      <p className="text-xs sm:text-sm text-left text-black transition-colors">
+                      <p className="text-[10px] md:text-xs lg:text-sm text-left text-black transition-colors">
                         Record class, video call
                       </p>
                     </div>
@@ -1194,6 +1326,180 @@ export default function HomePage() {
                 </button>
           </div>
         </DialogContent>
+          </Dialog>
+        )}
+      </AnimatePresence>
+
+      {/* Recording Modal */}
+      <AnimatePresence>
+        {recordModalOpen && (
+          <Dialog open={recordModalOpen} onOpenChange={cancelRecording}>
+            <DialogContent className="w-[92vw] max-w-lg p-5 sm:p-6 bg-white border border-gray-300 rounded-xl sm:rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="scroll-m-20 text-2xl tracking-tight font-bold text-black text-center">
+                  Record Audio
+                </DialogTitle>
+              </DialogHeader>
+              <div className="w-full flex flex-col items-center pt-3">
+                <div className="flex flex-col w-full items-start gap-4">
+                  {recordingError && (
+                    <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                      {recordingError}
+                    </div>
+                  )}
+
+                  {/* Recording Visualizer */}
+                  <div className="w-full flex flex-col items-center justify-center py-8 gap-4">
+                    {/* Animated Mic Icon */}
+                    <div className={`relative ${isRecording ? 'animate-pulse' : ''}`}>
+                      <div className={`absolute inset-0 rounded-full ${isRecording ? 'bg-red-500/20 animate-ping' : ''}`}></div>
+                      <div className={`relative rounded-full p-6 ${isRecording ? 'bg-red-500' : 'bg-gray-200'} transition-colors duration-300`}>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="48"
+                          height="48"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className={`${isRecording ? 'text-white' : 'text-gray-600'}`}
+                        >
+                          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                          <line x1="12" x2="12" y1="19" y2="22"></line>
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Timer */}
+                    {(isRecording || audioBlob) && (
+                      <div className="text-3xl font-mono font-bold text-black">
+                        {Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')}
+                      </div>
+                    )}
+
+                    {/* Status Text */}
+                    <p className="text-sm text-gray-600">
+                      {isRecording
+                        ? "Recording in progress..."
+                        : audioBlob
+                        ? "Recording complete! Generate notes to continue."
+                        : "Click the button below to start recording"}
+                    </p>
+                  </div>
+
+                  {/* Upload Progress */}
+                  {isUploading && (
+                    <div className="w-full">
+                      <div className="flex justify-between mb-1">
+                        <span className="text-sm text-gray-600">Processing audio...</span>
+                        <span className="text-sm text-gray-600">{uploadProgress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-black h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="w-full flex flex-col gap-2">
+                    {!isRecording && !audioBlob && (
+                      <button
+                        onClick={startRecording}
+                        disabled={isUploading}
+                        className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium h-10 px-4 py-2 gap-2 w-full bg-black text-white hover:bg-gray-900 cursor-pointer transition-colors"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+                        </svg>
+                        Start Recording
+                      </button>
+                    )}
+
+                    {isRecording && (
+                      <button
+                        onClick={stopRecording}
+                        className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium h-10 px-4 py-2 gap-2 w-full bg-red-500 text-white hover:bg-red-600 cursor-pointer transition-colors"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+                        </svg>
+                        Stop Recording
+                      </button>
+                    )}
+
+                    {audioBlob && !isRecording && (
+                      <>
+                        <button
+                          onClick={handleGenerateFromRecording}
+                          disabled={isUploading}
+                          className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium h-10 px-4 py-2 gap-2 w-full ${
+                            isUploading
+                              ? 'bg-gray-200 text-black cursor-not-allowed opacity-50'
+                              : 'bg-black text-white hover:bg-gray-900 cursor-pointer'
+                          } transition-colors`}
+                        >
+                          {isUploading ? (
+                            <div className="h-5 w-5 animate-spin rounded-full border-2 border-black border-t-transparent"></div>
+                          ) : (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                              <path d="M20 3v4"></path>
+                              <path d="M22 5h-4"></path>
+                              <path d="M4 17v2"></path>
+                              <path d="M5 18H3"></path>
+                            </svg>
+                          )}
+                          {isUploading ? "Processing..." : "Generate Notes"}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setAudioBlob(null);
+                            setRecordingTime(0);
+                          }}
+                          disabled={isUploading}
+                          className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium h-10 px-4 py-2 gap-2 w-full bg-gray-200 text-black hover:bg-gray-300 cursor-pointer transition-colors disabled:opacity-50"
+                        >
+                          Record Again
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
           </Dialog>
         )}
       </AnimatePresence>
