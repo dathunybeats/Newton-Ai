@@ -71,6 +71,8 @@ export default function HomePage() {
   } | null>(null);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [upgradeMessage, setUpgradeMessage] = useState("");
+  const [userTier, setUserTier] = useState<"free" | "monthly" | "yearly" | "lifetime">("free");
+  const [isLoadingTier, setIsLoadingTier] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -92,6 +94,28 @@ export default function HomePage() {
     if (!activeFolderId || activeFolderId === "null") return null;
     return folders.find((folder) => folder.id === activeFolderId)?.name ?? null;
   }, [activeFolderId, folders]);
+
+  // Fetch user subscription tier
+  useEffect(() => {
+    async function fetchUserTier() {
+      if (!user?.id) return;
+
+      try {
+        setIsLoadingTier(true);
+        const response = await fetch("/api/subscription/status");
+        if (response.ok) {
+          const data = await response.json();
+          setUserTier(data.tier || "free");
+        }
+      } catch (error) {
+        console.error("Error fetching subscription tier:", error);
+      } finally {
+        setIsLoadingTier(false);
+      }
+    }
+
+    fetchUserTier();
+  }, [user?.id]);
 
   // Extract PDF URLs from cached notes
   useEffect(() => {
@@ -345,6 +369,16 @@ export default function HomePage() {
     setRenameModalOpen(true);
   };
 
+  // Helper function to check if user can create notes
+  const canCreateNote = () => {
+    // Paid users have unlimited notes
+    if (userTier === "monthly" || userTier === "yearly" || userTier === "lifetime") {
+      return true;
+    }
+    // Free users are limited to 3 notes
+    return notes.length < 3;
+  };
+
   // Recording functions
   const startRecording = async () => {
     try {
@@ -473,7 +507,7 @@ export default function HomePage() {
             <div className="w-full flex-1 sm:w-1/3">
               <div
                 onClick={() => {
-                  if (notes.length >= 3) {
+                  if (!canCreateNote()) {
                     setUpgradeMessage("You've reached your limit of 3 notes on the free plan. Upgrade to create unlimited notes!");
                     setUpgradeModalOpen(true);
                   } else {
@@ -519,7 +553,7 @@ export default function HomePage() {
             <div className="w-full flex-1 sm:w-1/3">
               <div
                 onClick={() => {
-                  if (notes.length >= 3) {
+                  if (!canCreateNote()) {
                     setUpgradeMessage("You've reached your limit of 3 notes on the free plan. Upgrade to create unlimited notes!");
                     setUpgradeModalOpen(true);
                   } else {
@@ -565,7 +599,7 @@ export default function HomePage() {
             <div className="w-full flex-1 sm:w-1/3">
               <div
                 onClick={() => {
-                  if (notes.length >= 3) {
+                  if (!canCreateNote()) {
                     setUpgradeMessage("You've reached your limit of 3 notes on the free plan. Upgrade to create unlimited notes!");
                     setUpgradeModalOpen(true);
                   } else {
