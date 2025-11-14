@@ -8,11 +8,11 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-md">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="flex h-16 items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 shrink-0">
             <Image
               src="/icon.svg"
               alt="Newton AI"
@@ -20,118 +20,247 @@ export function Navbar() {
               height={32}
               className="h-8 w-8"
             />
-            <span className="text-2xl font-extrabold text-gray-900">Newton AI</span>
+            <span className="text-xl font-bold text-gray-900">Newton AI</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden items-center gap-8 md:flex">
+          {/* Desktop Navigation - Centered */}
+          <div className="hidden items-center gap-0 md:flex absolute left-1/2 -translate-x-1/2">
             <Link
               href="/features"
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+              className="rounded-lg text-[15px] font-normal"
+              style={{
+                padding: '4px 12px',
+                color: 'rgb(63, 63, 70)',
+                backgroundColor: 'rgba(230, 230, 232, 0)',
+                transition: 'background-color 0.3s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 1)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 0)'}
             >
               Features
             </Link>
             <Link
               href="/pricing"
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+              className="rounded-lg text-[15px] font-normal"
+              style={{
+                padding: '4px 12px',
+                color: 'rgb(63, 63, 70)',
+                backgroundColor: 'rgba(230, 230, 232, 0)',
+                transition: 'background-color 0.3s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 1)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 0)'}
             >
               Pricing
             </Link>
             <Link
               href="/about"
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+              className="rounded-lg text-[15px] font-normal"
+              style={{
+                padding: '4px 12px',
+                color: 'rgb(63, 63, 70)',
+                backgroundColor: 'rgba(230, 230, 232, 0)',
+                transition: 'background-color 0.3s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 1)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 0)'}
             >
               About
             </Link>
             <Link
               href="/blog"
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+              className="rounded-lg text-[15px] font-normal"
+              style={{
+                padding: '4px 12px',
+                color: 'rgb(63, 63, 70)',
+                backgroundColor: 'rgba(230, 230, 232, 0)',
+                transition: 'background-color 0.3s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 1)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 0)'}
             >
               Blog
             </Link>
           </div>
 
           {/* Desktop Auth Buttons */}
-          <div className="hidden items-center gap-4 md:flex">
+          <div className="hidden items-center gap-2 md:flex shrink-0">
             <Link
               href="/login"
-              className="text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
+              className="rounded-lg border  border-gray-200 bg-white px-4 py-2 text-[14px] font-medium text-gray-900 transition-colors hover:bg-gray-50"
             >
               Log In
             </Link>
             <Link
               href="/signup"
-              className="rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-gray-800"
+              className="rounded-lg border  border-white/12 px-4 py-2 text-[14px] text-white transition-all hover:shadow-lg"
+              style={{
+                background: 'linear-gradient(241deg, rgba(0, 0, 1) -10.49%, rgba(0, 0, 1) 106.38%)',
+                boxShadow: '0px 0px 6px 1px rgba(50, 61, 214, 0.1)',
+                fontFamily: 'Inter, sans-serif',
+                fontWeight: 400,
+                letterSpacing: '-0.15px'
+              }}
             >
-              Sign Up
+              Start learning
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 md:hidden"
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? (
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
+          {/* Mobile Sign Up & Menu Button */}
+          <div className="flex items-center gap-2 md:hidden">
+            <Link
+              href="/signup"
+              className="rounded-lg border border-white/12 px-4 py-2 text-[14px] text-white transition-all hover:shadow-lg"
+              style={{
+                background: 'linear-gradient(241deg, rgba(0, 0, 1) -10.49%, rgba(0, 0, 1) 106.38%)',
+                boxShadow: '0px 0px 6px 1px rgba(50, 61, 214, 0.1)',
+                fontFamily: 'Inter, sans-serif',
+                fontWeight: 400,
+                letterSpacing: '-0.15px'
+              }}
+            >
+              Sign up
+            </Link>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-gray-100"
+              aria-label="Toggle menu"
+            >
+              <div className="w-6 h-5 relative">
+                <span
+                  className="absolute w-full h-[2px] bg-gray-600 rounded-full transition-all duration-300 ease-in-out"
+                  style={{
+                    top: isMobileMenuOpen ? '50%' : '0',
+                    transform: isMobileMenuOpen ? 'translateY(-50%) rotate(45deg)' : 'translateY(0) rotate(0deg)'
+                  }}
+                />
+                <span
+                  className="absolute w-full h-[2px] bg-gray-600 rounded-full transition-all duration-300 ease-in-out"
+                  style={{
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    opacity: isMobileMenuOpen ? 0 : 1
+                  }}
+                />
+                <span
+                  className="absolute w-full h-[2px] bg-gray-600 rounded-full transition-all duration-300 ease-in-out"
+                  style={{
+                    bottom: isMobileMenuOpen ? '50%' : '0',
+                    transform: isMobileMenuOpen ? 'translateY(50%) rotate(-45deg)' : 'translateY(0) rotate(0deg)'
+                  }}
+                />
+              </div>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="border-t border-gray-200 bg-white md:hidden">
-          <div className="space-y-1 px-6 py-4">
-            <Link
-              href="/features"
-              className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Features
-            </Link>
-            <Link
-              href="/pricing"
-              className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Pricing
-            </Link>
-            <Link
-              href="/about"
-              className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              href="/blog"
-              className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Blog
-            </Link>
-            <div className="border-t border-gray-200 pt-4 mt-4">
+        <div className="bg-white md:hidden" style={{ boxShadow: 'rgba(0, 0, 0, 0.05) 0px 2px 8px 0px' }}>
+          <div className="px-6 py-4">
+            {/* Auth Buttons */}
+            <div className="space-y-2">
               <Link
                 href="/login"
-                className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                className="block rounded-lg border text-center text-[15px] font-normal transition-colors"
+                style={{
+                  padding: '12px',
+                  borderColor: 'rgba(34, 34, 34, 0.1)',
+                  backgroundColor: 'rgb(255, 255, 255)',
+                  color: 'rgb(24, 24, 27)',
+                  width: '100%'
+                }}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Log In
               </Link>
               <Link
                 href="/signup"
-                className="mt-2 block rounded-full bg-gray-900 px-3 py-2 text-center text-sm font-medium text-white transition-all hover:bg-gray-800"
+                className="block rounded-lg border border-white/12 text-center text-[15px] text-white transition-all hover:shadow-lg"
+                style={{
+                  padding: '12px',
+                  background: 'linear-gradient(241deg, rgba(0, 0, 1) -10.49%, rgba(0, 0, 1) 106.38%)',
+                  boxShadow: '0px 0px 6px 1px rgba(50, 61, 214, 0.1)',
+                  fontFamily: 'Inter, sans-serif',
+                  fontWeight: 400,
+                  letterSpacing: '-0.15px',
+                  width: '100%'
+                }}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Sign Up
+                Start learning
+              </Link>
+            </div>
+
+            {/* Divider */}
+            <div className="my-4" style={{ height: '1px', backgroundColor: 'rgb(212, 212, 216)' }}></div>
+
+            {/* Nav Links */}
+            <div className="space-y-1">
+              <Link
+                href="/features"
+                className="block rounded-lg text-[15px] font-normal"
+                style={{
+                  padding: '12px',
+                  color: 'rgb(63, 63, 70)',
+                  backgroundColor: 'rgba(230, 230, 232, 0)',
+                  transition: 'background-color 0.3s ease',
+                  width: '100%'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 1)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 0)'}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Features
+              </Link>
+              <Link
+                href="/pricing"
+                className="block rounded-lg text-[15px] font-normal"
+                style={{
+                  padding: '12px',
+                  color: 'rgb(63, 63, 70)',
+                  backgroundColor: 'rgba(230, 230, 232, 0)',
+                  transition: 'background-color 0.3s ease',
+                  width: '100%'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 1)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 0)'}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Pricing
+              </Link>
+              <Link
+                href="/about"
+                className="block rounded-lg text-[15px] font-normal"
+                style={{
+                  padding: '12px',
+                  color: 'rgb(63, 63, 70)',
+                  backgroundColor: 'rgba(230, 230, 232, 0)',
+                  transition: 'background-color 0.3s ease',
+                  width: '100%'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 1)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 0)'}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="/blog"
+                className="block rounded-lg text-[15px] font-normal"
+                style={{
+                  padding: '12px',
+                  color: 'rgb(63, 63, 70)',
+                  backgroundColor: 'rgba(230, 230, 232, 0)',
+                  transition: 'background-color 0.3s ease',
+                  width: '100%'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 1)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(230, 230, 232, 0)'}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Blog
               </Link>
             </div>
           </div>

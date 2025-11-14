@@ -134,13 +134,63 @@ export default function HomePage() {
     e.target.style.height = e.target.scrollHeight + 'px';
   };
 
-  const handleSubmit = () => {
-    if (textInput.trim()) {
-      console.log("Submitted text:", textInput);
+  const handleSubmit = async () => {
+    if (!textInput.trim()) return;
+
+    // Check if user can create notes
+    if (!canCreateNote()) {
+      setUpgradeMessage("You've reached your limit of 3 notes on the free plan. Upgrade to create unlimited notes!");
+      setUpgradeModalOpen(true);
+      return;
+    }
+
+    setIsProcessing(true);
+    setProcessingMessage("Generating educational content from your prompt...");
+
+    try {
+      const response = await fetch("/api/generate-note", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt: textInput }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Check if this is a subscription limit error
+        if (response.status === 403 && data.upgradeRequired) {
+          setUpgradeMessage(data.message || "Upgrade to create unlimited notes!");
+          setUpgradeModalOpen(true);
+          return;
+        }
+
+        throw new Error(data.error || "Failed to generate note");
+      }
+
+      setProcessingMessage("Creating your study materials...");
+
+      // Add to cache immediately
+      addNoteToCache(data.note);
+
+      // Set prefetched note for faster loading on the note page
+      setPrefetchedNote(data.note);
+
+      // Clear input
       setTextInput("");
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
+
+      // Redirect to note page
+      router.push(`/home/note/${data.noteId}`);
+    } catch (error) {
+      console.error("Generate note error:", error);
+      alert(error instanceof Error ? error.message : "Failed to generate note");
+    } finally {
+      setIsProcessing(false);
+      setProcessingMessage("");
     }
   };
 
@@ -646,6 +696,14 @@ export default function HomePage() {
 
           {/* ChatGPT-style Composer */}
           <div className="w-full mt-6 2xl:max-w-[672px] xl:max-w-[576px] md:max-w-[512px]">
+            {/* Processing Indicator */}
+            {isProcessing && processingMessage && (
+              <div className="mb-3 flex items-center justify-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-2xl py-2 px-4">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
+                <span>{processingMessage}</span>
+              </div>
+            )}
+
             <div
               className="bg-white cursor-text overflow-clip p-2 grid grid-cols-[auto_1fr_auto] gap-2 items-center shadow-[0_0_0_1px_rgba(0,0,0,0.1)] hover:shadow-[0_0_0_2px_rgba(0,0,0,0.15)] transition-shadow duration-200"
               style={{ borderRadius: '28px' }}
@@ -677,12 +735,13 @@ export default function HomePage() {
                   value={textInput}
                   onChange={handleTextareaChange}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey && textInput.trim()) {
+                    if (e.key === "Enter" && !e.shiftKey && textInput.trim() && !isProcessing) {
                       e.preventDefault();
                       handleSubmit();
                     }
                   }}
                   placeholder="Learn anything"
+                  disabled={isProcessing}
                   rows={1}
                   className="w-full resize-none bg-transparent text-base text-gray-900 placeholder:text-gray-500 focus:outline-none py-3 overflow-hidden"
                   style={{
@@ -717,9 +776,9 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={!textInput.trim()}
+                  disabled={!textInput.trim() || isProcessing}
                   className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 ${
-                    textInput.trim()
+                    textInput.trim() && !isProcessing
                       ? 'bg-gray-900 hover:bg-gray-800 text-white'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}

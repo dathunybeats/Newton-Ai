@@ -43,7 +43,11 @@
       "WebSearch",
       "WebFetch(domain:docs.whop.com)",
       "WebFetch(domain:dev.whop.com)",
-      "Bash(nul)"
+      "Bash(nul)",
+      "Bash(pnpm run build:*)",
+      "Bash(timeout /t 3 /nobreak)",
+      "Bash(start http://localhost:3000)",
+      "Bash(npx shadcn@latest add:*)"
     ],
     "deny": [
       "Bash(npm run dev)",
