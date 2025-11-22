@@ -62,7 +62,7 @@ export function FlashcardViewer({ flashcards, title }: FlashcardViewerProps) {
   const currentCard = displayedCards[currentIndex];
 
   return (
-    <div className="flex flex-col mx-auto w-full max-w-2xl space-y-3">
+    <div className="flex flex-col w-full space-y-3">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
         <h2 className="text-2xl font-bold text-gray-900 flex-1">{title}</h2>
 

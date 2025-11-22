@@ -509,10 +509,10 @@ export default function NotePage() {
         </div>
 
         {/* Content Card */}
-        <div className="rounded-lg bg-white text-gray-900 border border-gray-200 p-3 sm:p-4 lg:p-6 w-full self-center flex-1 min-h-0 overflow-y-auto scrollbar-visible">
+        <div className={`rounded-lg bg-white text-gray-900 border border-gray-200 w-full self-center flex-1 min-h-0 overflow-y-auto scrollbar-visible ${activeTab === 'quiz' ? 'p-3 sm:p-4 lg:p-2' : 'p-3 sm:p-4 lg:p-6'}`}>
 
 
-        <div className="flex flex-col w-full max-w-2xl mx-auto space-y-4 sm:space-y-6 lg:space-y-8 min-w-0">
+        <div className={`flex flex-col w-full max-w-2xl mx-auto min-w-0 ${activeTab === 'flashcards' ? 'h-full justify-center space-y-3' : 'space-y-4 sm:space-y-6 lg:space-y-8'}`}>
 
             {activeTab === "note" && (
               <>
