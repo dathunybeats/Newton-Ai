@@ -73,7 +73,7 @@ interface NoteContextType {
 
 const NoteContext = createContext<NoteContextType | undefined>(undefined);
 
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hour (increased from 5 minutes)
 
 export function NoteProvider({ children }: { children: ReactNode }) {
   const [prefetchedNote, setPrefetchedNote] = useState<CachedNote | null>(null);
@@ -312,16 +312,34 @@ export function NoteProvider({ children }: { children: ReactNode }) {
     }
   }, [updateNoteInCache]);
 
-  // Refetch when tab becomes visible if cache is stale
+  // Smart refetch: Only reload when tab becomes visible AND cache is stale
+  // This prevents unnecessary reloads on quick tab switches
   useEffect(() => {
+    let lastHiddenTime: number | null = null;
+
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        if (isCacheStale()) {
+      if (document.visibilityState === "hidden") {
+        // Track when user left
+        lastHiddenTime = Date.now();
+      } else if (document.visibilityState === "visible") {
+        // Only refetch if:
+        // 1. Cache is stale (1 hour old)
+        // 2. User was away for at least 5 minutes (prevents quick tab switch reloads)
+        const timeAway = lastHiddenTime ? Date.now() - lastHiddenTime : 0;
+        const MIN_TIME_AWAY = 5 * 60 * 1000; // 5 minutes
+
+        const shouldRefetchNotes = isCacheStale() && timeAway > MIN_TIME_AWAY;
+        const shouldRefetchFolders = isFoldersCacheStale() && timeAway > MIN_TIME_AWAY;
+
+        if (shouldRefetchNotes) {
+          console.log('[NoteContext] Refreshing notes after being away for', Math.round(timeAway / 1000 / 60), 'minutes');
           fetchNotes();
         }
-        if (isFoldersCacheStale()) {
+        if (shouldRefetchFolders) {
           fetchFolders();
         }
+
+        lastHiddenTime = null;
       }
     };
 
