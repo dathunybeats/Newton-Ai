@@ -313,7 +313,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
               <Link
                 href="/home"
                 className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer ${
-                  !activeFolderId
+                  pathname === '/home' && !activeFolderId
                     ? "bg-gray-100 hover:bg-gray-200"
                     : "hover:bg-gray-50"
                 }`}
@@ -388,8 +388,13 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
 
             {/* Study Buddy Section */}
             <div className="mt-4">
-              <button
-                className="inline-flex items-center whitespace-nowrap text-sm font-semibold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-11 rounded-md px-3 w-full justify-between cursor-pointer hover:bg-gray-50"
+              <Link
+                href="/home/study-room"
+                className={`inline-flex items-center whitespace-nowrap text-sm font-semibold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-11 rounded-md px-3 w-full justify-between cursor-pointer ${
+                  pathname === '/home/study-room'
+                    ? "bg-gray-100 hover:bg-gray-200"
+                    : "hover:bg-gray-50"
+                }`}
               >
                 <div className="flex items-center text-sm text-gray-900">
                   <svg
@@ -411,7 +416,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                   </svg>
                   Study Buddy
                 </div>
-              </button>
+              </Link>
             </div>
           </div>
 
