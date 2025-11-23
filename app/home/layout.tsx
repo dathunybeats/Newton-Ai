@@ -11,7 +11,7 @@ const SidebarContext = createContext<{
   setSidebarOpen: (open: boolean) => void;
 }>({
   sidebarOpen: false,
-  setSidebarOpen: () => {},
+  setSidebarOpen: () => { },
 });
 
 export const useSidebar = () => useContext(SidebarContext);

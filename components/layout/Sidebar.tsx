@@ -313,8 +313,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
               <Link
                 href="/home"
                 className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer ${pathname === '/home' && !activeFolderId
-                    ? "bg-gray-100 hover:bg-gray-200"
-                    : "hover:bg-gray-50"
+                  ? "bg-gray-100 hover:bg-gray-200"
+                  : "hover:bg-gray-50"
                   }`}
               >
                 <div className="flex items-center text-xs text-gray-900">
@@ -343,8 +343,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                   key={folder.id}
                   href={`/home?folder=${folder.id}`}
                   className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer group ${activeFolderId === folder.id
-                      ? "bg-gray-100 hover:bg-gray-200"
-                      : "hover:bg-gray-50"
+                    ? "bg-gray-100 hover:bg-gray-200"
+                    : "hover:bg-gray-50"
                     }`}
                 >
                   <div className="flex items-center text-xs text-gray-900 flex-1 min-w-0">
@@ -389,8 +389,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
               <Link
                 href="/home/study-room"
                 className={`inline-flex items-center whitespace-nowrap text-sm font-semibold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-11 rounded-md px-3 w-full justify-between cursor-pointer ${pathname === '/home/study-room'
-                    ? "bg-gray-100 hover:bg-gray-200"
-                    : "hover:bg-gray-50"
+                  ? "bg-gray-100 hover:bg-gray-200"
+                  : "hover:bg-gray-50"
                   }`}
               >
                 <div className="flex items-center text-sm text-gray-900">
@@ -455,8 +455,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                   <Button
                     onClick={() => setPricingOpen(true)}
                     className={`group relative w-full rounded-[11px] gap-2 overflow-hidden text-lg font-semibold text-white cursor-pointer active:scale-[0.98] ${notesCount >= 3
-                        ? "bg-orange-600 hover:bg-orange-700"
-                        : "hover:opacity-90"
+                      ? "bg-orange-600 hover:bg-orange-700"
+                      : "hover:opacity-90"
                       }`}
                     style={notesCount < 3 ? { backgroundColor: '#171717' } : undefined}
                   >
@@ -646,10 +646,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                   <small className="font-medium text-sm text-gray-900">Active plan</small>
                   <div className="flex items-center gap-2">
                     <Badge className={`px-2 py-1 rounded-full border shadow-none ${userTier === "free"
-                        ? "text-gray-900 border-gray-200"
-                        : userTier === "lifetime"
-                          ? "text-purple-900 border-purple-300 bg-purple-50"
-                          : "text-blue-900 border-blue-300 bg-blue-50"
+                      ? "text-gray-900 border-gray-200"
+                      : userTier === "lifetime"
+                        ? "text-purple-900 border-purple-300 bg-purple-50"
+                        : "text-blue-900 border-blue-300 bg-blue-50"
                       }`}>
                       {isLoadingSubscription ? "..." : userTier}
                     </Badge>
@@ -977,8 +977,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                   onClick={handleCreateFolder}
                   disabled={!folderName.trim()}
                   className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium h-10 px-4 py-2 transition-colors ${folderName.trim()
-                      ? "bg-black text-white hover:bg-gray-900 cursor-pointer"
-                      : "bg-gray-200 text-gray-400 cursor-not-allowed opacity-50"
+                    ? "bg-black text-white hover:bg-gray-900 cursor-pointer"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed opacity-50"
                     }`}
                 >
                   Create
