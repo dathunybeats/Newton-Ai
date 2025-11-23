@@ -21,7 +21,16 @@ import {
   Plus,
   CheckCircle2,
   Circle,
-  X
+  X,
+  Headphones,
+  CloudRain,
+  Music,
+  Coffee,
+  Copy,
+  Link as LinkIcon,
+  ChevronRight,
+  Target,
+  Calendar
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -31,6 +40,30 @@ export default function StudyRoomPage() {
   const [selectedNote, setSelectedNote] = useState("Linear Algebra");
   const [startTime, setStartTime] = useState<number | null>(null);
   const [accumulatedTime, setAccumulatedTime] = useState(0);
+
+  // Modal States
+  const [showFriendModal, setShowFriendModal] = useState(false);
+  const [showChallengeModal, setShowChallengeModal] = useState(false);
+  const [activeChallenge, setActiveChallenge] = useState<any>(null); // Start null to show setup flow
+
+  // Challenge Creation State
+  const [challengeStep, setChallengeStep] = useState(1);
+  const [newChallenge, setNewChallenge] = useState({ goal: "40h", duration: "8 days" });
+
+  const handleCreateChallenge = () => {
+    setActiveChallenge({
+      title: `Study for ${newChallenge.goal} in ${newChallenge.duration}`,
+      dateRange: "2 Apr 2025 - 10 Apr 2025",
+      participants: [
+        { id: 1, name: "Bro 3", time: "1h 24m", goal: newChallenge.goal, progress: 3.5, color: "bg-gradient-to-br from-blue-400 to-cyan-300", isCurrentUser: false },
+        { id: 2, name: "Bro 2", time: "49m", goal: newChallenge.goal, progress: 2, color: "bg-gradient-to-br from-emerald-400 to-teal-300", isCurrentUser: false },
+        { id: 3, name: "You", time: "31m", goal: newChallenge.goal, progress: 1.2, color: "bg-gradient-to-br from-blue-500 to-indigo-500", isCurrentUser: true },
+        { id: 4, name: "Bro", time: "32s", goal: newChallenge.goal, progress: 0.1, color: "bg-gradient-to-br from-purple-400 to-pink-300", isCurrentUser: false },
+      ]
+    });
+    setShowChallengeModal(false);
+    setChallengeStep(1);
+  };
 
   const toggleStudying = () => {
     if (!isStudying) {
@@ -97,15 +130,7 @@ export default function StudyRoomPage() {
     { name: "John", subject: "Math", duration: "45 min", avatar: "J", color: "danger" },
   ];
 
-  const leaderboard = [
-    { rank: 1, name: "You", time: "12h 34m", isCurrentUser: true },
-    { rank: 2, name: "Sarah", time: "11h 23m", isCurrentUser: false },
-    { rank: 3, name: "Mike", time: "9h 12m", isCurrentUser: false },
-    { rank: 4, name: "Alex", time: "7h 45m", isCurrentUser: false },
-    { rank: 5, name: "Emma", time: "6h 18m", isCurrentUser: false },
-    { rank: 6, name: "John", time: "5h 30m", isCurrentUser: false },
-    { rank: 7, name: "David", time: "4h 15m", isCurrentUser: false },
-  ];
+  // Removed static challengeParticipants, now using activeChallenge state
 
   return (
     <div className="h-[100dvh] bg-white p-4 lg:p-6 text-black flex flex-col overflow-hidden">
@@ -163,7 +188,7 @@ export default function StudyRoomPage() {
                         <Pause size={24} strokeWidth={2.5} className="fill-current" />
                       ) : (
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 28 28">
-                          <path fill="currentColor" d="M10.138 3.382C8.304 2.31 6 3.632 6 5.756v16.489c0 2.123 2.304 3.445 4.138 2.374l14.697-8.59c1.552-.907 1.552-3.15 0-4.057l-14.697-8.59Z"/>
+                          <path fill="currentColor" d="M10.138 3.382C8.304 2.31 6 3.632 6 5.756v16.489c0 2.123 2.304 3.445 4.138 2.374l14.697-8.59c1.552-.907 1.552-3.15 0-4.057l-14.697-8.59Z" />
                         </svg>
                       )}
                     </button>
@@ -299,9 +324,17 @@ export default function StudyRoomPage() {
                   <Users className="w-4 h-4 text-gray-500" />
                   Friends Online
                 </h3>
-                <Chip size="sm" variant="flat" className="bg-green-50 text-green-700 h-6 text-xs">
-                  {friendsStudying.length} active
-                </Chip>
+                <div className="flex items-center gap-2">
+                  <Chip size="sm" variant="flat" className="bg-green-50 text-green-700 h-6 text-xs">
+                    {friendsStudying.length} active
+                  </Chip>
+                  <button
+                    onClick={() => setShowFriendModal(true)}
+                    className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </CardHeader>
               <CardBody className="px-6 pb-6 pt-2 overflow-y-auto custom-scrollbar">
                 <div className="space-y-3">
@@ -342,66 +375,275 @@ export default function StudyRoomPage() {
           </div>
 
           {/* Column 3: Leaderboard - 3/12 */}
-          <div className="lg:col-span-3 h-full">
-            <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-gray-200 bg-white rounded-3xl h-full flex flex-col">
-              <CardHeader className="pb-2 pt-6 px-6 shrink-0">
+          <div className="lg:col-span-3 h-full flex flex-col gap-6">
+            {/* Challenge Card */}
+            <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-gray-200 bg-white rounded-3xl flex-1 min-h-0 flex flex-col relative overflow-hidden">
+              {!activeChallenge ? (
+                <CardBody className="flex flex-col items-center justify-center p-8 text-center h-full">
+                  <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mb-4">
+                    <Trophy className="w-8 h-8 text-orange-500" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">No Active Challenge</h3>
+                  <p className="text-sm text-gray-500 mb-6 max-w-[200px]">
+                    Push your limits. Set a goal and compete with friends.
+                  </p>
+                  <Button
+                    onPress={() => setShowChallengeModal(true)}
+                    className="bg-gray-900 text-white font-medium rounded-xl px-6"
+                  >
+                    Create Challenge
+                  </Button>
+                </CardBody>
+              ) : (
+                <>
+                  <CardHeader className="pb-2 pt-6 px-6 shrink-0 flex flex-col items-start gap-1">
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-1.5 bg-orange-50 rounded-lg">
+                          <Trophy className="w-4 h-4 text-orange-500" />
+                        </div>
+                        <span className="text-xs font-semibold text-orange-600 uppercase tracking-wider">Active Challenge</span>
+                      </div>
+                      <button
+                        onClick={() => setActiveChallenge(null)}
+                        className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                      >
+                        End
+                      </button>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 leading-tight">
+                      {activeChallenge.title}
+                    </h3>
+                    <p className="text-xs font-medium text-gray-400">
+                      {activeChallenge.dateRange}
+                    </p>
+                  </CardHeader>
+                  <CardBody className="px-6 pb-6 pt-4 flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+                    <div className="space-y-6">
+                      {activeChallenge.participants.map((participant: any) => (
+                        <div key={participant.id} className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-6 h-6 rounded-full ${participant.color} shadow-sm`} />
+                              <span className={`text-sm font-medium ${participant.isCurrentUser ? "text-gray-900" : "text-gray-600"}`}>
+                                {participant.name}
+                              </span>
+                            </div>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-sm font-bold text-gray-900">{participant.time}</span>
+                              <span className="text-xs text-gray-400">/ {participant.goal}</span>
+                            </div>
+                          </div>
+                          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${participant.progress}%` }}
+                              transition={{ duration: 1, ease: "easeOut" }}
+                              className={`h-full rounded-full ${participant.color}`}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardBody>
+                </>
+              )}
+            </Card>
+
+            {/* Focus Sounds Card */}
+            <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-gray-200 bg-white rounded-3xl shrink-0">
+              <CardHeader className="pb-2 pt-6 px-6">
                 <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-yellow-500" />
-                  Leaderboard
+                  <Headphones className="w-4 h-4 text-violet-500" />
+                  Focus Sounds
                 </h3>
               </CardHeader>
-              <CardBody className="px-6 pb-6 pt-2 flex-1 min-h-0 overflow-y-auto custom-scrollbar">
-                <div className="space-y-1">
-                  {leaderboard.map((entry) => (
-                    <div
-                      key={entry.rank}
-                      className={`flex items-center justify-between p-2.5 rounded-xl transition-all ${entry.isCurrentUser
-                        ? "bg-gray-900 text-white shadow-md transform scale-[1.02]"
-                        : "hover:bg-gray-50 text-gray-900"
-                        }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs ${entry.isCurrentUser
-                            ? "bg-gray-700 text-white"
-                            : entry.rank <= 3
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-gray-100 text-gray-500"
-                            }`}
-                        >
-                          {entry.rank}
-                        </div>
-                        <p className={`font-medium text-sm ${entry.isCurrentUser ? "text-white" : "text-gray-900"}`}>
-                          {entry.name}
-                        </p>
-                      </div>
-                      <span className={`text-xs font-medium ${entry.isCurrentUser ? "text-gray-300" : "text-gray-500"}`}>
-                        {entry.time}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-auto pt-6">
-                  <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
-                    <div className="flex items-start gap-3">
-                      <div className="p-1.5 bg-blue-100 rounded-full text-blue-600 shrink-0">
-                        <Clock className="w-3.5 h-3.5" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-blue-900">Keep it up!</p>
-                        <p className="text-[10px] text-blue-700 mt-1 leading-relaxed">
-                          Top 10% this week. 2h to next rank.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+              <CardBody className="px-6 pb-6 pt-2">
+                <div className="grid grid-cols-3 gap-3">
+                  <button className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-gray-50 hover:bg-blue-50 hover:text-blue-600 transition-all group">
+                    <CloudRain className="w-6 h-6 text-gray-400 group-hover:text-blue-500" />
+                    <span className="text-xs font-medium">Rain</span>
+                  </button>
+                  <button className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-gray-50 hover:bg-purple-50 hover:text-purple-600 transition-all group">
+                    <Music className="w-6 h-6 text-gray-400 group-hover:text-purple-500" />
+                    <span className="text-xs font-medium">Lo-Fi</span>
+                  </button>
+                  <button className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-gray-50 hover:bg-orange-50 hover:text-orange-600 transition-all group">
+                    <Coffee className="w-6 h-6 text-gray-400 group-hover:text-orange-500" />
+                    <span className="text-xs font-medium">Cafe</span>
+                  </button>
                 </div>
               </CardBody>
             </Card>
           </div>
         </div>
       </div>
+      {/* Invite Friend Modal */}
+      <AnimatePresence>
+        {showFriendModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowFriendModal(false)}
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-white rounded-3xl shadow-2xl z-50 p-6 overflow-hidden"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-900">Invite Friends</h3>
+                <button onClick={() => setShowFriendModal(false)} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Share Link</label>
+                  <div className="flex gap-2">
+                    <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-600 truncate">
+                      newton.ai/invite/u/hanim
+                    </div>
+                    <button className="bg-gray-900 text-white px-4 rounded-xl hover:bg-gray-800 transition-colors">
+                      <Copy className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-100"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-gray-400">Or search</span>
+                  </div>
+                </div>
+
+                <div>
+                  <Input
+                    placeholder="Search by username..."
+                    startContent={<Users className="w-4 h-4 text-gray-400" />}
+                    classNames={{
+                      inputWrapper: "bg-gray-50 border-none shadow-none",
+                    }}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Create Challenge Modal */}
+      <AnimatePresence>
+        {showChallengeModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowChallengeModal(false)}
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-white rounded-3xl shadow-2xl z-50 p-6 overflow-hidden"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-900">New Challenge</h3>
+                <button onClick={() => setShowChallengeModal(false)} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              {challengeStep === 1 ? (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      onClick={() => setNewChallenge({ ...newChallenge, goal: "40h" })}
+                      className={`p-4 rounded-2xl border text-left transition-all ${newChallenge.goal === "40h" ? "border-gray-900 bg-gray-50 ring-1 ring-gray-900" : "border-gray-200 hover:border-gray-300"}`}
+                    >
+                      <Target className="w-5 h-5 mb-3 text-gray-900" />
+                      <p className="font-semibold text-gray-900">40 Hours</p>
+                      <p className="text-xs text-gray-500 mt-1">Intense focus</p>
+                    </button>
+                    <button
+                      onClick={() => setNewChallenge({ ...newChallenge, goal: "20h" })}
+                      className={`p-4 rounded-2xl border text-left transition-all ${newChallenge.goal === "20h" ? "border-gray-900 bg-gray-50 ring-1 ring-gray-900" : "border-gray-200 hover:border-gray-300"}`}
+                    >
+                      <Target className="w-5 h-5 mb-3 text-gray-900" />
+                      <p className="font-semibold text-gray-900">20 Hours</p>
+                      <p className="text-xs text-gray-500 mt-1">Balanced week</p>
+                    </button>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 block">Duration</label>
+                    <div className="flex gap-2">
+                      {["3 days", "5 days", "8 days"].map((d) => (
+                        <button
+                          key={d}
+                          onClick={() => setNewChallenge({ ...newChallenge, duration: d })}
+                          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${newChallenge.duration === d ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-600 hover:bg-gray-100"}`}
+                        >
+                          {d}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Button
+                    onPress={() => setChallengeStep(2)}
+                    className="w-full bg-gray-900 text-white font-medium rounded-xl py-6"
+                    endContent={<ChevronRight className="w-4 h-4" />}
+                  >
+                    Next Step
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="bg-orange-50 rounded-2xl p-6 text-center">
+                    <Trophy className="w-12 h-12 text-orange-500 mx-auto mb-3" />
+                    <h4 className="text-lg font-bold text-gray-900">Ready to start?</h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Goal: {newChallenge.goal} in {newChallenge.duration}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 block">Invite Friends</label>
+                    <div className="space-y-2">
+                      {friendsStudying.slice(0, 3).map((friend, i) => (
+                        <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-gray-50">
+                          <div className="flex items-center gap-3">
+                            <Avatar name={friend.avatar} size="sm" className="w-8 h-8 text-xs" />
+                            <span className="text-sm font-medium text-gray-900">{friend.name}</span>
+                          </div>
+                          <Checkbox defaultSelected={i === 0} size="sm" color="default" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Button
+                    onPress={handleCreateChallenge}
+                    className="w-full bg-gray-900 text-white font-medium rounded-xl py-6"
+                  >
+                    Start Challenge
+                  </Button>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

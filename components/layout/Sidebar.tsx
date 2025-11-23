@@ -216,23 +216,23 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
           onClick={() => setSidebarOpen(true)}
           className="fixed top-4 left-4 z-40 hidden max-[872px]:flex items-center justify-center w-9 h-9 rounded-md bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
         >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-gray-900"
-        >
-          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-          <path d="M9 3v18"></path>
-          <path d="m16 15-3-3 3-3"></path>
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-gray-900"
+          >
+            <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+            <path d="M9 3v18"></path>
+            <path d="m16 15-3-3 3-3"></path>
+          </svg>
+        </button>
       )}
 
       {/* Sidebar Overlay */}
@@ -312,11 +312,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
               {/* All Notes */}
               <Link
                 href="/home"
-                className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer ${
-                  pathname === '/home' && !activeFolderId
+                className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer ${pathname === '/home' && !activeFolderId
                     ? "bg-gray-100 hover:bg-gray-200"
                     : "hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 <div className="flex items-center text-xs text-gray-900">
                   <svg
@@ -343,11 +342,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                 <Link
                   key={folder.id}
                   href={`/home?folder=${folder.id}`}
-                  className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer group ${
-                    activeFolderId === folder.id
+                  className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer group ${activeFolderId === folder.id
                       ? "bg-gray-100 hover:bg-gray-200"
                       : "hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center text-xs text-gray-900 flex-1 min-w-0">
                     <div
@@ -390,11 +388,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
             <div className="mt-4">
               <Link
                 href="/home/study-room"
-                className={`inline-flex items-center whitespace-nowrap text-sm font-semibold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-11 rounded-md px-3 w-full justify-between cursor-pointer ${
-                  pathname === '/home/study-room'
+                className={`inline-flex items-center whitespace-nowrap text-sm font-semibold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-11 rounded-md px-3 w-full justify-between cursor-pointer ${pathname === '/home/study-room'
                     ? "bg-gray-100 hover:bg-gray-200"
                     : "hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 <div className="flex items-center text-sm text-gray-900">
                   <svg
@@ -414,7 +411,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                     <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                   </svg>
-                  Study Buddy
+                  Study Room
                 </div>
               </Link>
             </div>
@@ -457,11 +454,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                 <div className="p-6 py-4 flex justify-center items-center flex-col px-3">
                   <Button
                     onClick={() => setPricingOpen(true)}
-                    className={`group relative w-full rounded-[11px] gap-2 overflow-hidden text-lg font-semibold text-white cursor-pointer active:scale-[0.98] ${
-                      notesCount >= 3
+                    className={`group relative w-full rounded-[11px] gap-2 overflow-hidden text-lg font-semibold text-white cursor-pointer active:scale-[0.98] ${notesCount >= 3
                         ? "bg-orange-600 hover:bg-orange-700"
                         : "hover:opacity-90"
-                    }`}
+                      }`}
                     style={notesCount < 3 ? { backgroundColor: '#171717' } : undefined}
                   >
                     <svg
@@ -481,9 +477,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                     </svg>
                     <p>Upgrade plan</p>
                   </Button>
-                  <small className={`text-sm font-medium leading-none mt-4 text-center ${
-                    notesCount >= 3 ? "text-orange-600 font-bold" : "text-gray-500"
-                  }`}>
+                  <small className={`text-sm font-medium leading-none mt-4 text-center ${notesCount >= 3 ? "text-orange-600 font-bold" : "text-gray-500"
+                    }`}>
                     {notesCount >= 3
                       ? "Upgrade now to create unlimited notes"
                       : "Get more features and unlimited access"
@@ -516,13 +511,11 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                         </span>
                       </div>
                     </div>
-                    <div className={`relative w-full overflow-hidden rounded-full h-1 ${
-                      notesCount >= 3 ? "bg-orange-200" : "bg-gray-200"
-                    }`}>
+                    <div className={`relative w-full overflow-hidden rounded-full h-1 ${notesCount >= 3 ? "bg-orange-200" : "bg-gray-200"
+                      }`}>
                       <div
-                        className={`h-full transition-all ${
-                          notesCount >= 3 ? "bg-orange-600" : "bg-gray-900"
-                        }`}
+                        className={`h-full transition-all ${notesCount >= 3 ? "bg-orange-600" : "bg-gray-900"
+                          }`}
                         style={{ width: `${Math.min((notesCount / 3) * 100, 100)}%` }}
                       />
                     </div>
@@ -585,22 +578,22 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                     className="transition-all duration-100 active:scale-105 cursor-pointer"
                     title="Settings"
                   >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-gray-900"
-                >
-                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-              </button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-gray-900"
+                    >
+                      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
                 </>
               )}
             </div>
@@ -613,59 +606,87 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
         {settingsOpen && (
           <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
             <DialogContent className="w-[95vw] max-w-2xl sm:max-w-3xl px-5 py-6 sm:px-10 sm:py-10 bg-white border border-gray-200 shadow-lg rounded-xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center text-sm font-bold text-gray-900">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-5 mr-1 text-gray-900"
-              >
-                <path d="M18 20a6 6 0 0 0-12 0"></path>
-                <circle cx="12" cy="10" r="4"></circle>
-                <circle cx="12" cy="12" r="10"></circle>
-              </svg>
-              My profile
-            </DialogTitle>
-          </DialogHeader>
-
-          <Separator className="my-2" />
-
-          {/* Profile Info */}
-          <div className="flex flex-col gap-3">
-            <div className="flex justify-between items-center">
-              <small className="font-medium text-sm text-gray-900">Display name</small>
-              <small className="font-medium text-sm text-gray-900">
-                {user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}
-              </small>
-            </div>
-            <div className="flex justify-between items-center">
-              <small className="font-medium text-sm text-gray-900">Email</small>
-              <small className="font-medium text-sm text-gray-900">{user?.email}</small>
-            </div>
-            <div className="flex justify-between items-center">
-              <small className="font-medium text-sm text-gray-900">Active plan</small>
-              <div className="flex items-center gap-2">
-                <Badge className={`px-2 py-1 rounded-full border shadow-none ${
-                  userTier === "free"
-                    ? "text-gray-900 border-gray-200"
-                    : userTier === "lifetime"
-                    ? "text-purple-900 border-purple-300 bg-purple-50"
-                    : "text-blue-900 border-blue-300 bg-blue-50"
-                }`}>
-                  {isLoadingSubscription ? "..." : userTier}
-                </Badge>
-                {!isLoadingSubscription && userTier === "free" && (
-                  <Button
-                    onClick={() => setPricingOpen(true)}
-                    className="h-[32px] px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white active:scale-[0.98] transition-all duration-100 cursor-pointer"
+              <DialogHeader>
+                <DialogTitle className="flex items-center text-sm font-bold text-gray-900">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="size-5 mr-1 text-gray-900"
                   >
+                    <path d="M18 20a6 6 0 0 0-12 0"></path>
+                    <circle cx="12" cy="10" r="4"></circle>
+                    <circle cx="12" cy="12" r="10"></circle>
+                  </svg>
+                  My profile
+                </DialogTitle>
+              </DialogHeader>
+
+              <Separator className="my-2" />
+
+              {/* Profile Info */}
+              <div className="flex flex-col gap-3">
+                <div className="flex justify-between items-center">
+                  <small className="font-medium text-sm text-gray-900">Display name</small>
+                  <small className="font-medium text-sm text-gray-900">
+                    {user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}
+                  </small>
+                </div>
+                <div className="flex justify-between items-center">
+                  <small className="font-medium text-sm text-gray-900">Email</small>
+                  <small className="font-medium text-sm text-gray-900">{user?.email}</small>
+                </div>
+                <div className="flex justify-between items-center">
+                  <small className="font-medium text-sm text-gray-900">Active plan</small>
+                  <div className="flex items-center gap-2">
+                    <Badge className={`px-2 py-1 rounded-full border shadow-none ${userTier === "free"
+                        ? "text-gray-900 border-gray-200"
+                        : userTier === "lifetime"
+                          ? "text-purple-900 border-purple-300 bg-purple-50"
+                          : "text-blue-900 border-blue-300 bg-blue-50"
+                      }`}>
+                      {isLoadingSubscription ? "..." : userTier}
+                    </Badge>
+                    {!isLoadingSubscription && userTier === "free" && (
+                      <Button
+                        onClick={() => setPricingOpen(true)}
+                        className="h-[32px] px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white active:scale-[0.98] transition-all duration-100 cursor-pointer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-4 h-4 mr-1"
+                        >
+                          <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+                          <path d="M5 21h14"></path>
+                        </svg>
+                        <span className="text-sm font-bold">Upgrade plan</span>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <Separator className="my-4" />
+
+              <div className="flex justify-end">
+                <button
+                  onClick={handleSignOut}
+                  className="active:scale-105 transition-all duration-100 flex items-center gap-1 text-red-500 hover:text-red-700 transition-all duration-150 cursor-pointer"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -678,43 +699,14 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                     strokeLinejoin="round"
                     className="w-4 h-4 mr-1"
                   >
-                    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
-                    <path d="M5 21h14"></path>
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" x2="9" y1="12" y2="12"></line>
                   </svg>
-                  <span className="text-sm font-bold">Upgrade plan</span>
-                </Button>
-                )}
+                  <span>Logout</span>
+                </button>
               </div>
-            </div>
-          </div>
-
-          <Separator className="my-4" />
-
-          <div className="flex justify-end">
-            <button
-              onClick={handleSignOut}
-              className="active:scale-105 transition-all duration-100 flex items-center gap-1 text-red-500 hover:text-red-700 transition-all duration-150 cursor-pointer"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-4 h-4 mr-1"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" x2="9" y1="12" y2="12"></line>
-              </svg>
-              <span>Logout</span>
-            </button>
-          </div>
-        </DialogContent>
+            </DialogContent>
           </Dialog>
         )}
       </AnimatePresence>
@@ -723,199 +715,199 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
       <AnimatePresence>
         {pricingOpen && (
           <Dialog open={pricingOpen} onOpenChange={setPricingOpen}>
-        <DialogContent className="w-[95vw] max-w-3xl sm:max-w-4xl px-5 py-5 sm:px-6 sm:py-6 bg-white border border-gray-200 shadow-lg rounded-xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="sr-only">Choose Your Plan</DialogTitle>
-          </DialogHeader>
-          <div className="py-2">
-            {/* Yearly/Monthly Toggle */}
-            <div className="flex items-center justify-center mx-auto mb-5 w-full">
-              <div className="relative flex w-fit items-center rounded-full border border-gray-200 p-2 bg-gray-50">
-                {/* Sliding background */}
-                <div
-                  className="absolute inset-y-2 rounded-full bg-gray-900 transition-all duration-300 ease-in-out"
-                  style={{
-                    left: isYearly ? '0.5rem' : '60%',
-                    width: isYearly ? '60%' : 'calc(40% - 0.5rem)',
-                  }}
-                ></div>
+            <DialogContent className="w-[95vw] max-w-3xl sm:max-w-4xl px-5 py-5 sm:px-6 sm:py-6 bg-white border border-gray-200 shadow-lg rounded-xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="sr-only">Choose Your Plan</DialogTitle>
+              </DialogHeader>
+              <div className="py-2">
+                {/* Yearly/Monthly Toggle */}
+                <div className="flex items-center justify-center mx-auto mb-5 w-full">
+                  <div className="relative flex w-fit items-center rounded-full border border-gray-200 p-2 bg-gray-50">
+                    {/* Sliding background */}
+                    <div
+                      className="absolute inset-y-2 rounded-full bg-gray-900 transition-all duration-300 ease-in-out"
+                      style={{
+                        left: isYearly ? '0.5rem' : '60%',
+                        width: isYearly ? '60%' : 'calc(40% - 0.5rem)',
+                      }}
+                    ></div>
 
-                <button
-                  onClick={() => setIsYearly(true)}
-                  className="relative px-7 py-2.5 rounded-full transition-all duration-300 cursor-pointer z-10"
-                >
-                  <span className={`relative block text-base font-medium transition-all duration-300 ${isYearly ? 'text-white' : 'text-gray-700'}`}>
-                    Yearly
-                    <span className="ml-2 text-sm font-bold text-green-400 transition-all duration-300">
-                      Save 60%
-                    </span>
-                  </span>
-                </button>
-                <button
-                  onClick={() => setIsYearly(false)}
-                  className="relative px-7 py-2.5 rounded-full transition-all duration-300 cursor-pointer z-10"
-                >
-                  <span className={`relative block text-base font-medium transition-all duration-300 ${!isYearly ? 'text-white' : 'text-gray-700'}`}>
-                    Monthly
-                  </span>
-                </button>
-              </div>
-            </div>
+                    <button
+                      onClick={() => setIsYearly(true)}
+                      className="relative px-7 py-2.5 rounded-full transition-all duration-300 cursor-pointer z-10"
+                    >
+                      <span className={`relative block text-base font-medium transition-all duration-300 ${isYearly ? 'text-white' : 'text-gray-700'}`}>
+                        Yearly
+                        <span className="ml-2 text-sm font-bold text-green-400 transition-all duration-300">
+                          Save 60%
+                        </span>
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => setIsYearly(false)}
+                      className="relative px-7 py-2.5 rounded-full transition-all duration-300 cursor-pointer z-10"
+                    >
+                      <span className={`relative block text-base font-medium transition-all duration-300 ${!isYearly ? 'text-white' : 'text-gray-700'}`}>
+                        Monthly
+                      </span>
+                    </button>
+                  </div>
+                </div>
 
-            {/* Pricing Cards */}
-            <div className="mx-auto mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-              {/* Monthly/Yearly Plan */}
-              <div className="flex flex-col shadow-none border border-gray-200 rounded-lg">
-                <div className="flex flex-grow flex-col p-5">
-                  <div className="flex flex-col">
-                    <h3 className="text-xl font-bold text-gray-900 mb-1.5">
-                      {isYearly ? "Yearly Plan" : "Monthly Plan"}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-2.5">
-                      All features included
-                    </p>
-                    <div className="flex-1 flex flex-col justify-end">
-                      <div className="mb-2.5">
-                        <span className="text-3xl font-bold text-gray-900">
-                          ${isYearly ? "31.99" : "7.99"}
-                        </span>
-                        <span className="text-sm font-medium text-gray-600 ml-1.5">
-                          / {isYearly ? "year" : "month"}
-                        </span>
+                {/* Pricing Cards */}
+                <div className="mx-auto mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {/* Monthly/Yearly Plan */}
+                  <div className="flex flex-col shadow-none border border-gray-200 rounded-lg">
+                    <div className="flex flex-grow flex-col p-5">
+                      <div className="flex flex-col">
+                        <h3 className="text-xl font-bold text-gray-900 mb-1.5">
+                          {isYearly ? "Yearly Plan" : "Monthly Plan"}
+                        </h3>
+                        <p className="text-gray-600 text-sm mb-2.5">
+                          All features included
+                        </p>
+                        <div className="flex-1 flex flex-col justify-end">
+                          <div className="mb-2.5">
+                            <span className="text-3xl font-bold text-gray-900">
+                              ${isYearly ? "31.99" : "7.99"}
+                            </span>
+                            <span className="text-sm font-medium text-gray-600 ml-1.5">
+                              / {isYearly ? "year" : "month"}
+                            </span>
+                          </div>
+                          <Button
+                            className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-gray-900 hover:bg-gray-800 text-white py-2.5"
+                            onClick={() => handleCheckout(isYearly ? "yearly" : "monthly")}
+                            disabled={isCreatingCheckout}
+                          >
+                            {isCreatingCheckout ? "Creating checkout..." : "Upgrade plan"}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="ml-2 h-4 w-4"
+                            >
+                              <path d="M5 12h14"></path>
+                              <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                          </Button>
+                        </div>
                       </div>
-                      <Button
-                        className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-gray-900 hover:bg-gray-800 text-white py-2.5"
-                        onClick={() => handleCheckout(isYearly ? "yearly" : "monthly")}
-                        disabled={isCreatingCheckout}
-                      >
-                        {isCreatingCheckout ? "Creating checkout..." : "Upgrade plan"}
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="ml-2 h-4 w-4"
-                        >
-                          <path d="M5 12h14"></path>
-                          <path d="m12 5 7 7-7 7"></path>
-                        </svg>
-                      </Button>
+                      <div className="mt-4">
+                        <p className="mb-2.5 text-sm text-gray-600 font-medium">Everything in free plan plus:</p>
+                        {[
+                          "Unlimited note generations",
+                          "Unlimited audio calls",
+                          "Unlimited videos & podcasts",
+                          "Unlimited quiz & flashcards",
+                          "100+ languages support",
+                          "24/7 Customer support"
+                        ].map((feature, index) => (
+                          <div key={index} className="mb-1.5 flex items-center">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="mr-2 h-[18px] w-[18px] text-green-500 flex-shrink-0"
+                            >
+                              <path d="M20 6 9 17l-5-5"></path>
+                            </svg>
+                            <span className="text-sm text-left text-gray-900">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <p className="mb-2.5 text-sm text-gray-600 font-medium">Everything in free plan plus:</p>
-                    {[
-                      "Unlimited note generations",
-                      "Unlimited audio calls",
-                      "Unlimited videos & podcasts",
-                      "Unlimited quiz & flashcards",
-                      "100+ languages support",
-                      "24/7 Customer support"
-                    ].map((feature, index) => (
-                      <div key={index} className="mb-1.5 flex items-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="mr-2 h-[18px] w-[18px] text-green-500 flex-shrink-0"
-                        >
-                          <path d="M20 6 9 17l-5-5"></path>
-                        </svg>
-                        <span className="text-sm text-left text-gray-900">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
 
-              {/* Lifetime Plan */}
-              <div className="flex flex-col shadow-none border border-blue-300 relative rounded-lg">
-                <div className="absolute -top-2 right-4 bg-blue-500 text-white px-2.5 py-1 rounded-full text-[11px] font-bold">
-                  BEST VALUE
-                </div>
-                <div className="flex flex-grow flex-col p-5">
-                  <div className="flex flex-col">
-                    <h3 className="text-xl font-bold text-gray-900 mb-1.5">Lifetime Access</h3>
-                    <p className="text-gray-600 text-sm mb-2.5">
-                      Pay once, own forever
-                    </p>
-                    <div className="flex-1 flex flex-col justify-end">
-                      <div className="mb-2.5">
-                        <span className="text-3xl font-bold text-gray-900">$99.99</span>
-                        <span className="text-sm font-medium text-gray-600 ml-1.5">one-time</span>
+                  {/* Lifetime Plan */}
+                  <div className="flex flex-col shadow-none border border-blue-300 relative rounded-lg">
+                    <div className="absolute -top-2 right-4 bg-blue-500 text-white px-2.5 py-1 rounded-full text-[11px] font-bold">
+                      BEST VALUE
+                    </div>
+                    <div className="flex flex-grow flex-col p-5">
+                      <div className="flex flex-col">
+                        <h3 className="text-xl font-bold text-gray-900 mb-1.5">Lifetime Access</h3>
+                        <p className="text-gray-600 text-sm mb-2.5">
+                          Pay once, own forever
+                        </p>
+                        <div className="flex-1 flex flex-col justify-end">
+                          <div className="mb-2.5">
+                            <span className="text-3xl font-bold text-gray-900">$99.99</span>
+                            <span className="text-sm font-medium text-gray-600 ml-1.5">one-time</span>
+                          </div>
+                          <Button
+                            className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-blue-500 hover:bg-blue-600 text-white py-2.5"
+                            onClick={() => handleCheckout("lifetime")}
+                            disabled={isCreatingCheckout}
+                          >
+                            {isCreatingCheckout ? "Creating checkout..." : "Get Lifetime Access"}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="ml-2 h-4 w-4"
+                            >
+                              <path d="M5 12h14"></path>
+                              <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                          </Button>
+                        </div>
                       </div>
-                      <Button
-                        className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-blue-500 hover:bg-blue-600 text-white py-2.5"
-                        onClick={() => handleCheckout("lifetime")}
-                        disabled={isCreatingCheckout}
-                      >
-                        {isCreatingCheckout ? "Creating checkout..." : "Get Lifetime Access"}
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="ml-2 h-4 w-4"
-                        >
-                          <path d="M5 12h14"></path>
-                          <path d="m12 5 7 7-7 7"></path>
-                        </svg>
-                      </Button>
+                      <div className="mt-4">
+                        <p className="mb-2.5 text-sm text-gray-600 font-medium">All premium features plus:</p>
+                        {[
+                          "✨ Lifetime updates",
+                          "✨ No expiration",
+                          "✨ One-time payment",
+                          "Unlimited note generations",
+                          "Unlimited audio calls",
+                          "Unlimited videos & podcasts",
+                          "Unlimited quiz & flashcards",
+                          "100+ languages support",
+                          "24/7 Customer support"
+                        ].map((feature, index) => (
+                          <div key={index} className="mb-1.5 flex items-center">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="mr-2 h-[18px] w-[18px] text-green-500 flex-shrink-0"
+                            >
+                              <path d="M20 6 9 17l-5-5"></path>
+                            </svg>
+                            <span className="text-sm text-left text-gray-900">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <p className="mb-2.5 text-sm text-gray-600 font-medium">All premium features plus:</p>
-                    {[
-                      "✨ Lifetime updates",
-                      "✨ No expiration",
-                      "✨ One-time payment",
-                      "Unlimited note generations",
-                      "Unlimited audio calls",
-                      "Unlimited videos & podcasts",
-                      "Unlimited quiz & flashcards",
-                      "100+ languages support",
-                      "24/7 Customer support"
-                    ].map((feature, index) => (
-                      <div key={index} className="mb-1.5 flex items-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="mr-2 h-[18px] w-[18px] text-green-500 flex-shrink-0"
-                        >
-                          <path d="M20 6 9 17l-5-5"></path>
-                        </svg>
-                        <span className="text-sm text-left text-gray-900">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </DialogContent>
+            </DialogContent>
           </Dialog>
         )}
       </AnimatePresence>
@@ -961,9 +953,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                         <button
                           key={color}
                           onClick={() => setFolderColor(color)}
-                          className={`w-8 h-8 rounded-full transition-all ${
-                            folderColor === color ? "ring-2 ring-offset-2 ring-gray-900" : "hover:scale-110"
-                          }`}
+                          className={`w-8 h-8 rounded-full transition-all ${folderColor === color ? "ring-2 ring-offset-2 ring-gray-900" : "hover:scale-110"
+                            }`}
                           style={{ backgroundColor: color }}
                         />
                       ))}
@@ -985,11 +976,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                 <button
                   onClick={handleCreateFolder}
                   disabled={!folderName.trim()}
-                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium h-10 px-4 py-2 transition-colors ${
-                    folderName.trim()
+                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium h-10 px-4 py-2 transition-colors ${folderName.trim()
                       ? "bg-black text-white hover:bg-gray-900 cursor-pointer"
                       : "bg-gray-200 text-gray-400 cursor-not-allowed opacity-50"
-                  }`}
+                    }`}
                 >
                   Create
                 </button>
