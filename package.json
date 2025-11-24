@@ -9,7 +9,13 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@heroui/avatar": "^2.2.22",
+    "@heroui/button": "^2.2.27",
+    "@heroui/card": "^2.2.25",
+    "@heroui/checkbox": "^2.3.27",
+    "@heroui/chip": "^2.2.22",
     "@heroui/dropdown": "^2.3.27",
+    "@heroui/input": "^2.4.28",
     "@heroui/modal": "^2.2.24",
     "@heroui/progress": "^2.2.22",
     "@heroui/react": "^2.8.5",
