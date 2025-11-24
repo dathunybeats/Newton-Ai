@@ -35,11 +35,15 @@ import {
   Mic,
   MicOff,
   Globe,
-  Lock
+  Lock,
+  Menu
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSidebar } from "@/app/home/layout";
+
 
 export default function StudyRoomPage() {
+  const { setSidebarOpen } = useSidebar();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
   const [activeRoom, setActiveRoom] = useState<any>(null); // Track active room
@@ -276,14 +280,25 @@ export default function StudyRoomPage() {
         <div className="w-full h-full max-w-[1600px] mx-auto flex flex-col gap-6 p-4 lg:p-6">
           {/* Header & Tabs */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-                <BookOpen className="w-6 h-6 text-gray-900" />
-                Study Room
-              </h1>
-              <p className="text-sm text-gray-500 mt-1">
-                Focus on your goals and track your progress
-              </p>
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="hidden max-[872px]:flex items-center justify-center w-9 h-9 rounded-md bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors flex-shrink-0"
+                aria-label="Open menu"
+              >
+                <Menu className="w-5 h-5 text-gray-700" />
+              </button>
+
+              <div>
+                <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
+                  <BookOpen className="w-6 h-6 text-gray-900" />
+                  Study Room
+                </h1>
+                <p className="text-sm text-gray-500 mt-1">
+                  Focus on your goals and track your progress
+                </p>
+              </div>
             </div>
 
             <div className="flex items-center gap-4">
@@ -657,16 +672,21 @@ export default function StudyRoomPage() {
                   transition={{ duration: 0.2 }}
                   className="h-full overflow-y-auto custom-scrollbar"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {/* Live Room Cards */}
                     {liveRooms.map((room) => (
-                      <Card key={room.id} className="h-[240px] border-none shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group rounded-3xl overflow-hidden relative">
-                        <CardBody className="p-0 h-full relative">
+                      <Card
+                        key={room.id}
+                        className="h-[240px] border-none shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group rounded-3xl overflow-hidden relative"
+                        isPressable
+                        onPress={() => setActiveRoom(room)}
+                      >
+                        <CardBody className="p-0 h-full relative overflow-hidden">
                           {/* Background Image/Gradient */}
                           <div className={`absolute inset-0 ${room.image}`} />
 
                           {/* Content */}
-                          <div className="relative h-full flex flex-col justify-between p-6 text-white z-10">
+                          <div className="relative h-full flex flex-col justify-between p-6 pb-20 md:pb-6 text-white z-10">
                             <div className="flex justify-between items-start">
                               <div className="flex gap-2 flex-wrap">
                                 {room.tags.map((tag) => (
@@ -682,7 +702,7 @@ export default function StudyRoomPage() {
                               )}
                             </div>
 
-                            <div className="transform transition-transform duration-300 group-hover:-translate-y-12">
+                            <div className="transform transition-transform duration-300 md:group-hover:-translate-y-12">
                               <h3 className="text-xl font-bold mb-2 tracking-tight">{room.name}</h3>
                               <div className="flex items-center gap-3 text-sm text-white/60 font-medium">
                                 <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
@@ -690,14 +710,11 @@ export default function StudyRoomPage() {
                               </div>
                             </div>
 
-                            {/* Hover Overlay Button - Pushes content up */}
-                            <div className="absolute inset-x-0 bottom-0 p-6 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                              <button
-                                onClick={() => setActiveRoom(room)}
-                                className="w-full bg-white text-black py-2.5 rounded-xl font-bold text-sm hover:bg-gray-50 transition-colors shadow-lg cursor-pointer"
-                              >
+                            {/* Join Button - Visible on mobile, hover on desktop */}
+                            <div className="absolute inset-x-0 bottom-0 p-6 opacity-100 translate-y-0 md:opacity-0 md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-300">
+                              <div className="w-full bg-white text-black py-2.5 rounded-xl font-bold text-sm text-center shadow-lg">
                                 Join Session
-                              </button>
+                              </div>
                             </div>
                           </div>
                         </CardBody>

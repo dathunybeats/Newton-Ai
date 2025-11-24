@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useNoteContext } from "@/contexts/NoteContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const SidebarContext = createContext<{
   sidebarOpen: boolean;
@@ -24,6 +25,7 @@ export default function HomeLayout({
   const { user, loading } = useAuth();
   const router = useRouter();
   const { notes, isLoading: notesLoading, fetchNotes } = useNoteContext();
+  const { theme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -42,8 +44,8 @@ export default function HomeLayout({
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white text-black">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-gray-900"></div>
+      <div className={`flex min-h-screen items-center justify-center transition-colors ${theme === "dark" ? "dark bg-[var(--background)] text-white" : "bg-white text-black"}`}>
+        <div className={`h-8 w-8 animate-spin rounded-full border-4 ${theme === "dark" ? "border-gray-700 border-t-white" : "border-gray-300 border-t-gray-900"}`}></div>
       </div>
     );
   }
@@ -54,7 +56,7 @@ export default function HomeLayout({
 
   return (
     <SidebarContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
-      <div className="flex min-h-screen bg-white text-black w-full max-w-full overflow-x-hidden">
+      <div className={`flex min-h-screen w-full max-w-full overflow-x-hidden transition-colors ${theme === "dark" ? "dark bg-[var(--background)] text-white" : "bg-white text-black"}`}>
         <Sidebar
           notes={notes}
           notesCount={notes.length}

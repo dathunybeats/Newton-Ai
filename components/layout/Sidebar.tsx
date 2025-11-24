@@ -34,6 +34,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
 
   // Check if we're on a note page
   const isNotePage = pathname?.startsWith('/home/note/');
+  const isStudyRoomPage = pathname === '/home/study-room';
 
   // Folder management modals
   const [createFolderOpen, setCreateFolderOpen] = useState(false);
@@ -210,8 +211,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
 
   return (
     <>
-      {/* Mobile Menu Button - Hidden on note pages where inline button is used */}
-      {!isNotePage && (
+      {/* Mobile Menu Button - Hidden on note pages and study-room page where inline button is used */}
+      {!isNotePage && !isStudyRoomPage && (
         <button
           onClick={() => setSidebarOpen(true)}
           className="fixed top-4 left-4 z-40 hidden max-[872px]:flex items-center justify-center w-9 h-9 rounded-md bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
@@ -312,6 +313,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
               {/* All Notes */}
               <Link
                 href="/home"
+                onClick={() => setSidebarOpen(false)}
                 className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer ${pathname === '/home' && !activeFolderId
                   ? "bg-gray-100 hover:bg-gray-200"
                   : "hover:bg-gray-50"
@@ -342,6 +344,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                 <Link
                   key={folder.id}
                   href={`/home?folder=${folder.id}`}
+                  onClick={() => setSidebarOpen(false)}
                   className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer group ${activeFolderId === folder.id
                     ? "bg-gray-100 hover:bg-gray-200"
                     : "hover:bg-gray-50"
@@ -388,6 +391,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
             <div className="mt-4">
               <Link
                 href="/home/study-room"
+                onClick={() => setSidebarOpen(false)}
                 className={`inline-flex items-center whitespace-nowrap text-sm font-semibold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-11 rounded-md px-3 w-full justify-between cursor-pointer ${pathname === '/home/study-room'
                   ? "bg-gray-100 hover:bg-gray-200"
                   : "hover:bg-gray-50"

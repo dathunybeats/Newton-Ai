@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { NoteProvider } from "@/contexts/NoteContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
@@ -41,9 +42,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
       >
-        <NoteProvider>
-          {children}
-        </NoteProvider>
+        <ThemeProvider>
+          <NoteProvider>
+            {children}
+          </NoteProvider>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>
