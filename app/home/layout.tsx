@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useNoteContext } from "@/contexts/NoteContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { FocusSoundProvider } from "@/contexts/FocusSoundContext";
 
 const SidebarContext = createContext<{
   sidebarOpen: boolean;
@@ -55,19 +56,21 @@ export default function HomeLayout({
   }
 
   return (
-    <SidebarContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
-      <div className={`flex min-h-screen w-full max-w-full overflow-x-hidden transition-colors ${theme === "dark" ? "dark bg-[var(--background)] text-white" : "bg-white text-black"}`}>
-        <Sidebar
-          notes={notes}
-          notesCount={notes.length}
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-        />
-        {/* Main Content Area with left margin for sidebar */}
-        <div className="ml-[272px] max-[872px]:ml-0 flex-1 w-full max-w-full min-w-0">
-          {children}
+    <FocusSoundProvider>
+      <SidebarContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
+        <div className={`flex min-h-screen w-full max-w-full overflow-x-hidden transition-colors ${theme === "dark" ? "dark bg-[var(--background)] text-white" : "bg-white text-black"}`}>
+          <Sidebar
+            notes={notes}
+            notesCount={notes.length}
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+          />
+          {/* Main Content Area with left margin for sidebar */}
+          <div className="ml-[272px] max-[872px]:ml-0 flex-1 w-full max-w-full min-w-0">
+            {children}
+          </div>
         </div>
-      </div>
-    </SidebarContext.Provider>
+      </SidebarContext.Provider>
+    </FocusSoundProvider>
   );
 }
