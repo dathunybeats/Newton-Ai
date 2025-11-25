@@ -111,6 +111,8 @@ export default function StudyRoomPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      console.log('Fetching active challenge for user:', user.id);
+
       // Find a challenge the user is in that hasn't ended
       const { data: myChallenges } = await supabase
         .from('challenge_participants')
@@ -120,8 +122,19 @@ export default function StudyRoomPage() {
         .order('joined_at', { ascending: false })
         .limit(1);
 
+      console.log('My challenges:', myChallenges);
+
       if (myChallenges && myChallenges.length > 0) {
         const challenge = myChallenges[0].challenges;
+
+        // Check if challenge exists (could be null if deleted or join failed)
+        if (!challenge) {
+          setActiveChallenge(null);
+          localStorage.removeItem('newton_challenge_cache');
+          return;
+        }
+
+        console.log('Active challenge found:', challenge);
 
         // Fetch all participants
         const { data: participants } = await supabase
@@ -129,10 +142,14 @@ export default function StudyRoomPage() {
           .select('user_id, progress_seconds')
           .eq('challenge_id', challenge.id);
 
+        console.log('Challenge participants:', participants);
+
       if (participants) {
         // Map to UI format
         // We need names. For friends, we can look up in our friends list. For self, "You".
         // Ideally we'd join with profiles, but let's use what we have locally first to avoid complex joins if profiles aren't set up.
+
+        console.log('Current friends list:', friends);
 
         const formattedParticipants = participants.map((p: any, index: number) => {
           const isMe = p.user_id === user.id;
@@ -140,7 +157,8 @@ export default function StudyRoomPage() {
           if (isMe) {
             name = "You";
           } else {
-            const friend = friends.find(f => f.id === p.user_id);
+            const friend = friends.find(f => f.friendId === p.user_id);
+            console.log(`Looking for friend with id ${p.user_id}:`, friend);
             name = friend ? friend.name : "Friend";
           }
 
@@ -176,11 +194,13 @@ export default function StudyRoomPage() {
           dateRange: `${new Date(challenge.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} - ${new Date(challenge.end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`,
           participants: formattedParticipants
         };
+        console.log('Final challenge data:', challengeData);
         setActiveChallenge(challengeData);
         // Cache the challenge data
         localStorage.setItem('newton_challenge_cache', JSON.stringify(challengeData));
       }
     } else {
+      console.log('No active challenges found or no participants');
       setActiveChallenge(null);
       localStorage.removeItem('newton_challenge_cache');
     }
@@ -209,6 +229,8 @@ export default function StudyRoomPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    console.log('Creating challenge with selected friends:', selectedFriends);
+
     const goalHours = parseInt(newChallenge.goal);
     const goalSeconds = goalHours * 3600;
     const durationDays = parseInt(newChallenge.duration);
@@ -234,11 +256,17 @@ export default function StudyRoomPage() {
     }
 
     if (challenge) {
+      console.log('Challenge created:', challenge);
+
       // Add self
-      await supabase.from('challenge_participants').insert({
+      const { error: selfError } = await supabase.from('challenge_participants').insert({
         challenge_id: challenge.id,
         user_id: user.id
       });
+
+      if (selfError) {
+        console.error('Error adding self to challenge:', selfError);
+      }
 
       // Add selected friends
       if (selectedFriends.length > 0) {
@@ -246,11 +274,44 @@ export default function StudyRoomPage() {
           challenge_id: challenge.id,
           user_id: friendId
         }));
-        await supabase.from('challenge_participants').insert(friendsToAdd);
+        console.log('Adding friends to challenge:', friendsToAdd);
+        const { error: friendsError } = await supabase.from('challenge_participants').insert(friendsToAdd);
+
+        if (friendsError) {
+          console.error('Error adding friends to challenge:', friendsError);
+        } else {
+          console.log('Friends added successfully');
+        }
       }
 
       setShowChallengeModal(false);
+      setSelectedFriends([]); // Reset selected friends
       fetchActiveChallenge();
+    }
+  };
+
+  const handleEndChallenge = async () => {
+    if (!activeChallenge) return;
+
+    try {
+      const supabase = createClient();
+
+      // Update the challenge's end_date to now, effectively ending it
+      const { error } = await supabase
+        .from('challenges')
+        .update({ end_date: new Date().toISOString() })
+        .eq('id', activeChallenge.id);
+
+      if (error) {
+        console.error('Error ending challenge:', error);
+        return;
+      }
+
+      // Clear local state and cache
+      setActiveChallenge(null);
+      localStorage.removeItem('newton_challenge_cache');
+    } catch (error) {
+      console.error('Error ending challenge:', error);
     }
   };
 
@@ -1030,7 +1091,7 @@ export default function StudyRoomPage() {
                                 <span className="text-sm lg:text-xs font-semibold text-orange-600 uppercase tracking-wider">Active</span>
                               </div>
                               <button
-                                onClick={() => setActiveChallenge(null)}
+                                onClick={handleEndChallenge}
                                 className="text-sm lg:text-xs text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
                               >
                                 End
@@ -1396,12 +1457,12 @@ export default function StudyRoomPage() {
                               <span className="text-sm font-medium text-gray-900">{friend.name}</span>
                             </div>
                             <Checkbox
-                              isSelected={selectedFriends.includes(friend.id)}
+                              isSelected={selectedFriends.includes(friend.friendId)}
                               onValueChange={(isSelected) => {
                                 if (isSelected) {
-                                  setSelectedFriends([...selectedFriends, friend.id]);
+                                  setSelectedFriends([...selectedFriends, friend.friendId]);
                                 } else {
-                                  setSelectedFriends(selectedFriends.filter(id => id !== friend.id));
+                                  setSelectedFriends(selectedFriends.filter(id => id !== friend.friendId));
                                 }
                               }}
                               size="sm"
