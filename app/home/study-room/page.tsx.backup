@@ -106,28 +106,27 @@ export default function StudyRoomPage() {
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
 
   const fetchActiveChallenge = async () => {
-    try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
-      // Find a challenge the user is in that hasn't ended
-      const { data: myChallenges } = await supabase
+    // Find a challenge the user is in that hasn't ended
+    const { data: myChallenges } = await supabase
+      .from('challenge_participants')
+      .select('challenge_id, challenges(*)')
+      .eq('user_id', user.id)
+      .gt('challenges.end_date', new Date().toISOString())
+      .order('joined_at', { ascending: false })
+      .limit(1);
+
+    if (myChallenges && myChallenges.length > 0) {
+      const challenge = myChallenges[0].challenges;
+
+      // Fetch all participants
+      const { data: participants } = await supabase
         .from('challenge_participants')
-        .select('challenge_id, challenges(*)')
-        .eq('user_id', user.id)
-        .gt('challenges.end_date', new Date().toISOString())
-        .order('joined_at', { ascending: false })
-        .limit(1);
-
-      if (myChallenges && myChallenges.length > 0) {
-        const challenge = myChallenges[0].challenges;
-
-        // Fetch all participants
-        const { data: participants } = await supabase
-          .from('challenge_participants')
-          .select('user_id, progress_seconds')
-          .eq('challenge_id', challenge.id);
+        .select('user_id, progress_seconds')
+        .eq('challenge_id', challenge.id);
 
       if (participants) {
         // Map to UI format
@@ -170,37 +169,19 @@ export default function StudyRoomPage() {
           return b.progress - a.progress;
         });
 
-        const challengeData = {
+        setActiveChallenge({
           id: challenge.id,
           title: challenge.title,
           dateRange: `${new Date(challenge.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} - ${new Date(challenge.end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`,
           participants: formattedParticipants
-        };
-        setActiveChallenge(challengeData);
-        // Cache the challenge data
-        localStorage.setItem('newton_challenge_cache', JSON.stringify(challengeData));
+        });
       }
     } else {
       setActiveChallenge(null);
-      localStorage.removeItem('newton_challenge_cache');
-    }
-    } catch (error) {
-      console.error('Error fetching active challenge:', error);
     }
   };
 
   useEffect(() => {
-    // Load from cache first for instant display
-    const cachedChallenge = localStorage.getItem('newton_challenge_cache');
-    if (cachedChallenge) {
-      try {
-        setActiveChallenge(JSON.parse(cachedChallenge));
-      } catch (e) {
-        console.error('Error parsing cached challenge:', e);
-      }
-    }
-
-    // Then fetch fresh data
     fetchActiveChallenge();
   }, [friends, stats]); // Re-run when friends load or stats change (session stopped)
 
@@ -723,7 +704,7 @@ export default function StudyRoomPage() {
                   className="h-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-4 overflow-y-auto lg:overflow-hidden pr-1"
                 >
                   {/* Column 1: Timer & Tasks - 5/12 */}
-                  <div className="lg:col-span-5 h-fit lg:h-full flex flex-col gap-4 lg:gap-2 lg:min-h-0">
+                  <div className="lg:col-span-5 h-fit lg:h-full flex flex-col gap-6 lg:gap-4 lg:min-h-0">
                     {/* Timer Card - Flexible on Desktop, Fixed on Mobile */}
                     <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-gray-200 bg-white rounded-3xl shrink-0 lg:shrink lg:flex-[0.8] lg:min-h-0 overflow-visible lg:overflow-hidden">
                       <CardBody className="p-6 lg:p-4 flex flex-col items-center justify-center relative overflow-hidden h-full">
@@ -1027,19 +1008,19 @@ export default function StudyRoomPage() {
                                 <div className="p-1.5 lg:p-1 bg-orange-50 rounded-lg lg:rounded-md">
                                   <Trophy className="w-4 h-4 lg:w-3 lg:h-3 text-orange-500" />
                                 </div>
-                                <span className="text-sm lg:text-xs font-semibold text-orange-600 uppercase tracking-wider">Active</span>
+                                <span className="text-xs lg:text-[10px] font-semibold text-orange-600 uppercase tracking-wider">Active</span>
                               </div>
                               <button
                                 onClick={() => setActiveChallenge(null)}
-                                className="text-sm lg:text-xs text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+                                className="text-xs lg:text-[10px] text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
                               >
                                 End
                               </button>
                             </div>
-                            <h3 className="text-xl lg:text-lg font-bold text-gray-900 leading-tight">
+                            <h3 className="text-lg lg:text-sm font-bold text-gray-900 leading-tight">
                               {activeChallenge.title}
                             </h3>
-                            <p className="text-sm lg:text-xs font-medium text-gray-400">
+                            <p className="text-xs lg:text-[10px] font-medium text-gray-400">
                               {activeChallenge.dateRange}
                             </p>
                           </CardHeader>
@@ -1049,17 +1030,17 @@ export default function StudyRoomPage() {
                                 <div key={participant.id} className="flex flex-col gap-2 lg:gap-1.5">
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                      <div className={`w-7 h-7 lg:w-6 lg:h-6 rounded-full ${participant.color} shadow-sm`} />
-                                      <span className={`text-base lg:text-sm font-medium ${participant.isCurrentUser ? "text-gray-900" : "text-gray-600"}`}>
+                                      <div className={`w-6 h-6 lg:w-5 lg:h-5 rounded-full ${participant.color} shadow-sm`} />
+                                      <span className={`text-sm lg:text-xs font-medium ${participant.isCurrentUser ? "text-gray-900" : "text-gray-600"}`}>
                                         {participant.name}
                                       </span>
                                     </div>
                                     <div className="flex items-baseline gap-1">
-                                      <span className="text-base lg:text-sm font-bold text-gray-900">{participant.time}</span>
-                                      <span className="text-sm lg:text-xs text-gray-400">/ {participant.goal}</span>
+                                      <span className="text-sm lg:text-xs font-bold text-gray-900">{participant.time}</span>
+                                      <span className="text-xs lg:text-[10px] text-gray-400">/ {participant.goal}</span>
                                     </div>
                                   </div>
-                                  <div className="h-2.5 lg:h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                                  <div className="h-2 lg:h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                                     <motion.div
                                       initial={{ width: 0 }}
                                       animate={{ width: `${participant.progress}%` }}

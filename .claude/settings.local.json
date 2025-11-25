@@ -47,7 +47,9 @@
       "Bash(pnpm run build:*)",
       "Bash(timeout /t 3 /nobreak)",
       "Bash(start http://localhost:3000)",
-      "Bash(npx shadcn@latest add:*)"
+      "Bash(npx shadcn@latest add:*)",
+      "mcp__supabase__get_advisors",
+      "mcp__supabase__get_logs"
     ],
     "deny": [
       "Bash(npm run dev)",

@@ -13,6 +13,7 @@ import { AnimatePresence } from "framer-motion";
 import { useNoteContext } from "@/contexts/NoteContext";
 import { PLAN_IDS } from "@/lib/payments/whop";
 import { formatPlanName, type PlanTier } from "@/lib/subscriptions/types";
+import { ActiveSessionWidget } from "@/components/study/ActiveSessionWidget";
 
 interface SidebarProps {
   notes: any[];
@@ -421,32 +422,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
             </div>
           </div>
 
-          {/* Support Button */}
-          <div className="w-full justify-center items-center flex gap-5">
-            <Link href="mailto:support@newtonai.app" target="_blank">
-              <button className="active:scale-105 transition-all duration-100 cursor-pointer">
-                <div className="flex flex-col items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-gray-600"
-                  >
-                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                    <path d="M12 17h.01" />
-                  </svg>
-                  <small className="font-medium text-[10px] text-gray-600">Support</small>
-                </div>
-              </button>
-            </Link>
-          </div>
+          {/* Active Session Widget */}
+          <ActiveSessionWidget />
+
+
 
           {/* Separator */}
           <div className="shrink-0 bg-gray-200 height-[1px] w-full mb-4 mt-2" />
