@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getPlanForProduct, WHOP_USER_METADATA_KEY } from "@/lib/payments/whop";
 import { whopSdk } from "@/lib/whop-sdk";
+import { sendPaymentConfirmationEmail, updateLoopsContact } from "@/lib/loops";
 
 export const runtime = "nodejs";
 
@@ -147,6 +148,31 @@ export async function POST(request: Request) {
           periodEnd: toIsoDate(data.current_period_end ?? data.period_end),
           cancelAt: toIsoDate(data.cancel_at),
         });
+
+        // Send payment confirmation email
+        if (subscriptionId) {
+          try {
+            const { data: user } = await supabaseAdmin.auth.admin.getUserById(userId);
+            if (user?.user?.email) {
+              const plan = getPlanForProduct(productId);
+              await sendPaymentConfirmationEmail(
+                user.user.email,
+                plan?.name || "Pro",
+                plan?.interval || "monthly"
+              );
+
+              // Update contact in Loops with subscription info
+              await updateLoopsContact(user.user.email, {
+                userId: userId,
+                planName: plan?.name || "Pro",
+                status: "subscribed",
+              });
+            }
+          } catch (emailError) {
+            console.error("Failed to send payment confirmation email:", emailError);
+            // Don't fail the webhook if email fails
+          }
+        }
       } else {
         console.error("Webhook missing required fields:", { membershipId, userId, productId });
       }
