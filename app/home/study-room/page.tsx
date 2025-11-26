@@ -592,46 +592,74 @@ export default function StudyRoomPage() {
     }
   };
 
-  // Removed static challengeParticipants, now using activeChallenge state
+  // Live Rooms State
+  const [liveRooms, setLiveRooms] = useState<any[]>([]);
+  const [roomParticipants, setRoomParticipants] = useState<any[]>([]);
+  const [isLoadingRooms, setIsLoadingRooms] = useState(false);
 
-  // Mock Participants for Active Room
-  const roomParticipants = [
-    { id: 1, name: "You", avatar: "Y", isMuted: true, isVideoOff: false },
-    { id: 2, name: "Sarah", avatar: "S", isMuted: false, isVideoOff: false },
-    { id: 3, name: "Mike", avatar: "M", isMuted: true, isVideoOff: true },
-    { id: 4, name: "Alex", avatar: "A", isMuted: false, isVideoOff: false },
-    { id: 5, name: "Emma", avatar: "E", isMuted: true, isVideoOff: false },
-    { id: 6, name: "John", avatar: "J", isMuted: true, isVideoOff: true },
-  ];
+  // Fetch live rooms
+  const fetchLiveRooms = async () => {
+    setIsLoadingRooms(true);
+    try {
+      const response = await fetch('/api/rooms');
+      if (response.ok) {
+        const data = await response.json();
+        setLiveRooms(data.rooms || []);
+      } else {
+        console.error('Failed to fetch rooms');
+      }
+    } catch (error) {
+      console.error('Error fetching rooms:', error);
+    } finally {
+      setIsLoadingRooms(false);
+    }
+  };
 
-  // Live Rooms Mock Data
-  const [liveRooms, setLiveRooms] = useState([
-    { id: 1, name: "Deep Work 🌙", participants: 124, type: "public", tags: ["Silent", "Cam On"], image: "bg-gradient-to-br from-slate-900 to-slate-800" },
-    { id: 2, name: "Lo-Fi Beats 🎵", participants: 45, type: "public", tags: ["Music", "Chat"], image: "bg-gradient-to-br from-indigo-950 to-slate-900" },
-    { id: 3, name: "Pomodoro 25/5 🍅", participants: 28, type: "public", tags: ["Timer", "Guided"], image: "bg-gradient-to-br from-rose-950 to-slate-900" },
-    { id: 4, name: "Math Club 📐", participants: 8, type: "private", tags: ["Group", "Help"], image: "bg-gradient-to-br from-blue-950 to-slate-900" },
-    { id: 5, name: "Late Night 🌌", participants: 210, type: "public", tags: ["Chill", "Any"], image: "bg-gradient-to-br from-teal-950 to-slate-900" },
-  ]);
+  // Fetch rooms when switching to live tab
+  useEffect(() => {
+    if (activeTab === 'live') {
+      fetchLiveRooms();
+    }
+  }, [activeTab]);
 
-  const handleCreateRoom = () => {
+  const handleCreateRoom = async () => {
     if (!newRoomName.trim()) return;
 
-    const newRoom = {
-      id: liveRooms.length + 1,
-      name: newRoomName,
-      participants: 1, // You
-      type: newRoomPrivacy,
-      tags: [newRoomPrivacy === "public" ? "Open" : "Invite Only", "Study"],
-      image: "bg-gradient-to-br from-gray-900 to-slate-800", // Default dark gradient
-    };
+    try {
+      const response = await fetch('/api/rooms/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newRoomName.trim(),
+          privacy: newRoomPrivacy,
+          tags: [newRoomPrivacy === "public" ? "Open" : "Invite Only", "Study"],
+        }),
+      });
 
-    setLiveRooms([...liveRooms, newRoom]);
-    setShowCreateRoomModal(false);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Room created:', data.room);
 
-    // Reset form
-    setNewRoomName("");
-    setNewRoomPrivacy("public");
-    setCopiedLink(false);
+        // Refresh rooms list
+        await fetchLiveRooms();
+
+        // Reset form
+        setNewRoomName("");
+        setNewRoomPrivacy("public");
+        setCopiedLink(false);
+        setShowCreateRoomModal(false);
+
+        // Optionally join the room
+        // setActiveRoom(data.room);
+      } else {
+        const error = await response.json();
+        console.error('Failed to create room:', error.error);
+        alert(error.error || 'Failed to create room');
+      }
+    } catch (error) {
+      console.error('Error creating room:', error);
+      alert('An error occurred while creating the room');
+    }
   };
 
   const copyRoomLink = () => {
@@ -1074,7 +1102,12 @@ export default function StudyRoomPage() {
                             Push your limits. Set a goal.
                           </p>
                           <Button
-                            onPress={() => setShowChallengeModal(true)}
+                            onPress={() => {
+                              setChallengeStep(1);
+                              setSelectedFriends([]);
+                              setNewChallenge({ goal: "40h", duration: "8 days" });
+                              setShowChallengeModal(true);
+                            }}
                             className="bg-gray-900 text-white font-medium rounded-xl lg:rounded-lg px-6 lg:px-4 h-10 lg:h-8 text-sm lg:text-xs"
                           >
                             Create Challenge
@@ -1224,17 +1257,59 @@ export default function StudyRoomPage() {
                   className="h-full overflow-y-auto custom-scrollbar"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {/* Loading State */}
+                    {isLoadingRooms && (
+                      <div className="col-span-full flex items-center justify-center py-20">
+                        <div className="text-center">
+                          <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
+                          <p className="text-gray-500 text-sm">Loading live rooms...</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Empty State */}
+                    {!isLoadingRooms && liveRooms.length === 0 && (
+                      <div className="col-span-full flex items-center justify-center py-20">
+                        <div className="text-center max-w-md">
+                          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Users className="w-8 h-8 text-gray-400" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Live Rooms Yet</h3>
+                          <p className="text-sm text-gray-500 mb-6">
+                            Be the first to create a study room and invite others to join!
+                          </p>
+                          <Button
+                            onPress={() => setShowCreateRoomModal(true)}
+                            className="bg-gray-900 text-white font-medium rounded-xl px-6 h-10"
+                          >
+                            Create First Room
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Live Room Cards */}
-                    {liveRooms.map((room) => (
-                      <Card
-                        key={room.id}
-                        className="h-[240px] border-none shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group rounded-3xl overflow-hidden relative"
-                        isPressable
-                        onPress={() => setActiveRoom(room)}
-                      >
-                        <CardBody className="p-0 h-full relative overflow-hidden">
-                          {/* Background Image/Gradient */}
-                          <div className={`absolute inset-0 ${room.image}`} />
+                    {!isLoadingRooms && liveRooms.map((room, index) => {
+                      // Generate consistent gradient for each room
+                      const gradients = [
+                        "bg-gradient-to-br from-slate-900 to-slate-800",
+                        "bg-gradient-to-br from-indigo-950 to-slate-900",
+                        "bg-gradient-to-br from-rose-950 to-slate-900",
+                        "bg-gradient-to-br from-blue-950 to-slate-900",
+                        "bg-gradient-to-br from-teal-950 to-slate-900",
+                      ];
+                      const gradient = gradients[index % gradients.length];
+
+                      return (
+                        <Card
+                          key={room.id}
+                          className="h-[240px] border-none shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group rounded-3xl overflow-hidden relative"
+                          isPressable
+                          onPress={() => setActiveRoom(room)}
+                        >
+                          <CardBody className="p-0 h-full relative overflow-hidden">
+                            {/* Background Image/Gradient */}
+                            <div className={`absolute inset-0 ${gradient}`} />
 
                           {/* Content */}
                           <div className="relative h-full flex flex-col justify-between p-6 pb-20 md:pb-6 text-white z-10">
@@ -1270,7 +1345,8 @@ export default function StudyRoomPage() {
                           </div>
                         </CardBody>
                       </Card>
-                    ))}
+                    );
+                    })}
 
                     {/* Create Room Card - Now at the end */}
                     <button
@@ -1376,7 +1452,12 @@ export default function StudyRoomPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setShowChallengeModal(false)}
+              onClick={() => {
+                setShowChallengeModal(false);
+                setChallengeStep(1);
+                setSelectedFriends([]);
+                setNewChallenge({ goal: "40h", duration: "8 days" });
+              }}
               className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
             />
             <motion.div
@@ -1387,7 +1468,12 @@ export default function StudyRoomPage() {
             >
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold text-gray-900">New Challenge</h3>
-                <button onClick={() => setShowChallengeModal(false)} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
+                <button onClick={() => {
+                  setShowChallengeModal(false);
+                  setChallengeStep(1);
+                  setSelectedFriends([]);
+                  setNewChallenge({ goal: "40h", duration: "8 days" });
+                }} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
               </div>
