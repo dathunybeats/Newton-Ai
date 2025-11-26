@@ -40,6 +40,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          data-website-id="dfid_DbE9hAe2HvIhrNSRbC3WY"
+          data-domain="www.newtonstudy.app"
+          src="https://datafa.st/js/script.js"
+          strategy="afterInteractive"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
       >
@@ -49,12 +57,6 @@ export default function RootLayout({
           </NoteProvider>
         </ThemeProvider>
         <Analytics />
-        <Script
-          src="https://datafa.st/js/script.js"
-          data-website-id="dfid_DbE9hAe2HvIhrNSRbC3WY"
-          data-domain="www.newtonstudy.app"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   );
