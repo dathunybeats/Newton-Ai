@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 // POST /api/rooms/[id]/leave - Leave a room
 export async function POST(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const supabase = await createClient();
@@ -14,7 +14,7 @@ export async function POST(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const roomId = params.id;
+        const { id: roomId } = await params;
 
         // Mark participation as inactive
         const { error: leaveError } = await supabase

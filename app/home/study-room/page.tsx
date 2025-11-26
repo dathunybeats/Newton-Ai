@@ -125,7 +125,7 @@ export default function StudyRoomPage() {
       console.log('My challenges:', myChallenges);
 
       if (myChallenges && myChallenges.length > 0) {
-        const challenge = myChallenges[0].challenges;
+        const challenge = myChallenges[0].challenges as any;
 
         // Check if challenge exists (could be null if deleted or join failed)
         if (!challenge) {
@@ -1315,7 +1315,7 @@ export default function StudyRoomPage() {
                           <div className="relative h-full flex flex-col justify-between p-6 pb-20 md:pb-6 text-white z-10">
                             <div className="flex justify-between items-start">
                               <div className="flex gap-2 flex-wrap">
-                                {room.tags.map((tag) => (
+                                {room.tags.map((tag: string) => (
                                   <span key={tag} className="px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md text-[10px] font-medium border border-white/5">
                                     {tag}
                                   </span>
