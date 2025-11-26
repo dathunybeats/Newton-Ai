@@ -36,13 +36,6 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("Creating checkout configuration with:", {
-      planId,
-      userId,
-      email,
-      companyId: WHOP_COMPANY_ID,
-    });
-
     // Create checkout configuration with metadata using shared SDK
     // Using plan_id to reference existing plan (simpler approach)
     const checkoutConfig = await whopSdk.checkoutConfigurations.create({
@@ -54,11 +47,6 @@ export async function POST(request: Request) {
       redirect_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.newtonstudy.app"}/success`,
     });
 
-    console.log("Checkout configuration created:", {
-      id: checkoutConfig.id,
-      purchaseUrl: checkoutConfig.purchase_url,
-    });
-
     // Add email as query parameter to prefill in checkout
     // Try common parameter names that Whop might support
     const purchaseUrl = new URL(checkoutConfig.purchase_url, process.env.NEXT_PUBLIC_SITE_URL || "https://whop.com");
@@ -66,8 +54,6 @@ export async function POST(request: Request) {
     purchaseUrl.searchParams.set("prefilled_email", email);
 
     const finalPurchaseUrl = purchaseUrl.toString();
-
-    console.log("Final purchase URL with prefilled email:", finalPurchaseUrl);
 
     // Return the purchase URL
     return NextResponse.json({

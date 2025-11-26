@@ -29,14 +29,6 @@ export async function POST(request: NextRequest) {
     // Check subscription limits
     const noteCheck = await canCreateNote(user.id);
 
-    console.log("Note creation check:", {
-      userId: user.id,
-      allowed: noteCheck.allowed,
-      currentCount: noteCheck.currentCount,
-      limit: noteCheck.limit,
-      tier: noteCheck.tier
-    });
-
     if (!noteCheck.allowed) {
       return NextResponse.json(
         {
@@ -155,25 +147,15 @@ export async function POST(request: NextRequest) {
 
     if (fileType === "pdf") {
       try {
-        console.log("Extracting text from PDF...");
-
         // Extract text from PDF
         extractedText = await extractTextFromPDFFile(buffer);
 
-        console.log(
-          `Extracted ${extractedText.length} characters from PDF`
-        );
-
         // Generate AI notes from extracted text
-        console.log("Generating AI notes from PDF content...");
         noteContent = await generateNotesFromContent(extractedText, "pdf");
 
         // Generate better title and description
-        console.log("Generating title and description...");
         const { title } = await generateTitleAndDescription(extractedText);
         noteTitle = title;
-
-        console.log("PDF notes generated successfully");
       } catch (error: any) {
         console.error("PDF processing error:", error);
         // Continue with empty content rather than failing the entire upload
@@ -183,8 +165,6 @@ export async function POST(request: NextRequest) {
       }
     } else if (fileType === "audio") {
       try {
-        console.log("Transcribing audio file...");
-
         // Transcribe audio using OpenAI Whisper
         const audioFile = new File([buffer], file.name, { type: file.type });
         const transcription = await openai.audio.transcriptions.create({
@@ -193,18 +173,13 @@ export async function POST(request: NextRequest) {
         });
 
         extractedText = transcription.text;
-        console.log(`Transcribed ${extractedText.length} characters from audio`);
 
         // Generate AI notes from transcription
-        console.log("Generating AI notes from audio transcription...");
         noteContent = await generateNotesFromContent(extractedText, "pdf");
 
         // Generate better title
-        console.log("Generating title...");
         const { title } = await generateTitleAndDescription(extractedText);
         noteTitle = title;
-
-        console.log("Audio notes generated successfully");
       } catch (error: any) {
         console.error("Audio processing error:", error);
         noteContent = "";

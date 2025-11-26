@@ -76,20 +76,13 @@ export async function POST(request: NextRequest) {
     let transcriptText = "";
 
     try {
-      console.log("Initializing YouTube client...");
       const youtube = await Innertube.create();
-
-      console.log("Fetching video info...");
       const info = await youtube.getInfo(videoId);
-
-      console.log("Getting transcript...");
       const transcriptData = await info.getTranscript();
 
       if (!transcriptData || !transcriptData.transcript) {
         throw new Error("No transcript available");
       }
-
-      console.log("Transcript segments:", transcriptData.transcript.content?.body?.initial_segments?.length);
 
       // Extract text from transcript segments
       const segments = transcriptData.transcript.content?.body?.initial_segments || [];
@@ -97,9 +90,6 @@ export async function POST(request: NextRequest) {
         .map((segment: any) => segment.snippet?.text?.toString() || "")
         .filter((text: string) => text.trim().length > 0)
         .join(" ");
-
-      console.log("Transcript text length:", transcriptText.length);
-      console.log("First 200 chars:", transcriptText.substring(0, 200));
 
       if (!transcriptText || transcriptText.trim().length === 0) {
         throw new Error("Transcript is empty");
@@ -122,14 +112,12 @@ export async function POST(request: NextRequest) {
     }
 
     // 6. Generate notes with AI
-    console.log("Generating AI notes from transcript...");
     const generatedNotes = await generateNotesFromContent(
       transcriptText,
       "youtube"
     );
 
     // 7. Generate title and summary
-    console.log("Generating title and description...");
     const { title, description } = await generateTitleAndDescription(
       transcriptText
     );

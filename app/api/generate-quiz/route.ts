@@ -99,8 +99,6 @@ Return a JSON object with a "questions" field containing the array:
 
     const responseText = completion.choices[0]?.message?.content || "";
 
-    console.log("OpenAI Response (first 500 chars):", responseText.substring(0, 500));
-
     // Parse the JSON response
     let parsedResponse;
     let questions;
@@ -131,10 +129,7 @@ Return a JSON object with a "questions" field containing the array:
       throw new Error("Questions must be a non-empty array");
     }
 
-    console.log(`Successfully parsed ${questions.length} questions`);
-
     // Save quiz questions to the database
-    console.log("Saving quiz questions to database for note:", noteId);
     const { data: updateData, error: updateError } = await supabase
       .from("notes")
       .update({ quiz_questions: questions })
@@ -149,8 +144,6 @@ Return a JSON object with a "questions" field containing the array:
         { status: 500 }
       );
     }
-
-    console.log("Quiz questions saved successfully:", updateData);
 
     return NextResponse.json({ questions });
   } catch (error) {

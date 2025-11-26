@@ -112,15 +112,10 @@ export default function NotePage() {
 
   useEffect(() => {
     if (activeTab === "quiz" && note && !quizQuestions.length && !loadingQuiz) {
-      console.log("Quiz tab opened. Checking for saved questions...");
-      console.log("Note has quiz_questions?", note.quiz_questions ? `Yes (${note.quiz_questions.length} questions)` : "No");
-
       // Check if quiz questions already exist in the database
       if (note.quiz_questions && note.quiz_questions.length > 0) {
-        console.log("Loading saved quiz questions from database");
         setQuizQuestions(note.quiz_questions);
       } else {
-        console.log("No saved questions found. Generating new quiz...");
         generateQuizQuestions();
       }
     }

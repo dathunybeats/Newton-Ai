@@ -106,20 +106,15 @@ export async function POST(request: Request) {
 
     try {
       webhookData = whopSdk.webhooks.unwrap(rawBody, { headers: headersObject });
-      console.log("✅ Webhook signature verified by Whop SDK");
     } catch (error) {
       // Allow through if no webhook secret is configured (development/testing)
       if (!process.env.WHOP_WEBHOOK_SECRET) {
-        console.warn("⚠️ No webhook secret configured, parsing without verification");
         webhookData = JSON.parse(rawBody);
       } else {
-        console.error("❌ Webhook signature verification failed:", error);
+        console.error("Webhook signature verification failed:", error);
         return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
       }
     }
-
-    // LOG EVERYTHING WHOP SENDS (for testing)
-    console.log("🔔 WHOP WEBHOOK RECEIVED:", JSON.stringify(webhookData, null, 2));
 
     // Get event type (handle both 'type' and 'action' fields)
     const eventType = webhookData.type || (webhookData as any).action;
@@ -142,14 +137,6 @@ export async function POST(request: Request) {
       const userId = extractUserId(data);
       const productId = extractProductId(data);
 
-      console.log("Processing membership activation/payment:", {
-        eventType,
-        membershipId,
-        userId,
-        productId,
-        rawData: JSON.stringify(data, null, 2)
-      });
-
       if (membershipId && userId && productId) {
         subscriptionId = await upsertSubscription({
           membershipId,
@@ -160,17 +147,13 @@ export async function POST(request: Request) {
           periodEnd: toIsoDate(data.current_period_end ?? data.period_end),
           cancelAt: toIsoDate(data.cancel_at),
         });
-        console.log("✅ Subscription created/updated:", subscriptionId);
       } else {
-        console.error("❌ Missing required fields:", { membershipId, userId, productId });
-        console.error("Full webhook data:", JSON.stringify(data, null, 2));
+        console.error("Webhook missing required fields:", { membershipId, userId, productId });
       }
     } else if (eventType === "membership.went_invalid" || eventType === "membership_deactivated") {
       const membershipId = extractMembershipId(data);
       const userId = extractUserId(data);
       const productId = extractProductId(data);
-
-      console.log("Processing membership deactivation:", { membershipId, userId, productId });
 
       if (membershipId && userId && productId) {
         subscriptionId = await upsertSubscription({
@@ -182,7 +165,6 @@ export async function POST(request: Request) {
           periodEnd: toIsoDate(data.current_period_end ?? data.period_end),
           cancelAt: toIsoDate(data.cancel_at),
         });
-        console.log("✅ Subscription canceled:", subscriptionId);
       }
     }
 
@@ -192,7 +174,7 @@ export async function POST(request: Request) {
     // Return 200 quickly to avoid webhook retries
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("❌ Whop webhook handling failed:", error);
+    console.error("Whop webhook handling failed:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

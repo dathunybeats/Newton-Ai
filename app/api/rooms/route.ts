@@ -3,8 +3,6 @@ import { NextResponse } from "next/server";
 
 // GET /api/rooms - List all active rooms
 export async function GET(request: Request) {
-    console.log("=== Rooms API called ===");
-
     try {
         const supabase = await createClient();
 
@@ -58,7 +56,6 @@ export async function GET(request: Request) {
             })
         );
 
-        console.log(`Fetched ${roomsWithDetails.length} active rooms`);
         return NextResponse.json({ rooms: roomsWithDetails });
 
     } catch (error: any) {

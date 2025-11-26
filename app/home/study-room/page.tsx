@@ -111,8 +111,6 @@ export default function StudyRoomPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      console.log('Fetching active challenge for user:', user.id);
-
       // Find a challenge the user is in that hasn't ended
       const { data: myChallenges } = await supabase
         .from('challenge_participants')
@@ -121,8 +119,6 @@ export default function StudyRoomPage() {
         .gt('challenges.end_date', new Date().toISOString())
         .order('joined_at', { ascending: false })
         .limit(1);
-
-      console.log('My challenges:', myChallenges);
 
       if (myChallenges && myChallenges.length > 0) {
         const challenge = myChallenges[0].challenges as any;
@@ -134,22 +130,16 @@ export default function StudyRoomPage() {
           return;
         }
 
-        console.log('Active challenge found:', challenge);
-
         // Fetch all participants
         const { data: participants } = await supabase
           .from('challenge_participants')
           .select('user_id, progress_seconds')
           .eq('challenge_id', challenge.id);
 
-        console.log('Challenge participants:', participants);
-
       if (participants) {
         // Map to UI format
         // We need names. For friends, we can look up in our friends list. For self, "You".
         // Ideally we'd join with profiles, but let's use what we have locally first to avoid complex joins if profiles aren't set up.
-
-        console.log('Current friends list:', friends);
 
         const formattedParticipants = participants.map((p: any, index: number) => {
           const isMe = p.user_id === user.id;
@@ -158,7 +148,6 @@ export default function StudyRoomPage() {
             name = "You";
           } else {
             const friend = friends.find(f => f.friendId === p.user_id);
-            console.log(`Looking for friend with id ${p.user_id}:`, friend);
             name = friend ? friend.name : "Friend";
           }
 
@@ -194,13 +183,11 @@ export default function StudyRoomPage() {
           dateRange: `${new Date(challenge.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} - ${new Date(challenge.end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`,
           participants: formattedParticipants
         };
-        console.log('Final challenge data:', challengeData);
         setActiveChallenge(challengeData);
         // Cache the challenge data
         localStorage.setItem('newton_challenge_cache', JSON.stringify(challengeData));
       }
     } else {
-      console.log('No active challenges found or no participants');
       setActiveChallenge(null);
       localStorage.removeItem('newton_challenge_cache');
     }
@@ -256,8 +243,6 @@ export default function StudyRoomPage() {
     }
 
     if (challenge) {
-      console.log('Challenge created:', challenge);
-
       // Add self
       const { error: selfError } = await supabase.from('challenge_participants').insert({
         challenge_id: challenge.id,
@@ -274,13 +259,10 @@ export default function StudyRoomPage() {
           challenge_id: challenge.id,
           user_id: friendId
         }));
-        console.log('Adding friends to challenge:', friendsToAdd);
         const { error: friendsError } = await supabase.from('challenge_participants').insert(friendsToAdd);
 
         if (friendsError) {
           console.error('Error adding friends to challenge:', friendsError);
-        } else {
-          console.log('Friends added successfully');
         }
       }
 
@@ -638,7 +620,6 @@ export default function StudyRoomPage() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Room created:', data.room);
 
         // Refresh rooms list
         await fetchLiveRooms();

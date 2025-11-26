@@ -3,12 +3,8 @@ import { NextResponse } from "next/server";
 
 // POST /api/rooms/create - Create a new room
 export async function POST(request: Request) {
-    console.log("=== Create room API called ===");
-
     try {
         const body = await request.json();
-        console.log("Request body:", body);
-
         const { name, privacy = "public", tags = [] } = body;
 
         // Validation
@@ -24,8 +20,6 @@ export async function POST(request: Request) {
             console.error("Auth error:", authError);
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
-
-        console.log("Creating room for user:", user.id);
 
         // Create room
         const { data: room, error: roomError } = await supabase
@@ -45,8 +39,6 @@ export async function POST(request: Request) {
                 details: roomError.message
             }, { status: 500 });
         }
-
-        console.log("Room created:", room.id);
 
         // Add tags if provided
         if (tags.length > 0 && room) {

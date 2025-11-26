@@ -95,24 +95,19 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Generate educational content from the prompt
-    console.log("Generating educational content from prompt...");
     const educationalContent = await generateContentFromPrompt(prompt.trim());
 
     if (!educationalContent || educationalContent.trim().length === 0) {
       throw new Error("Failed to generate educational content");
     }
 
-    console.log(`Generated ${educationalContent.length} characters of educational content`);
-
     // 5. Generate structured notes from the educational content
-    console.log("Converting educational content to structured notes...");
     const structuredNotes = await generateNotesFromContent(
       educationalContent,
       "pdf"
     );
 
     // 6. Generate title and description
-    console.log("Generating title and description...");
     const { title, description } = await generateTitleAndDescription(
       educationalContent
     );
