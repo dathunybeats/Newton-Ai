@@ -12,6 +12,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import FolderAssignmentModal from "@/components/notes/FolderAssignmentModal";
 import { Upload, Mic, FileText, Image as ImageIcon, Paperclip, Plus, Youtube } from "lucide-react";
+import { useUserLocation } from "@/lib/hooks/useUserLocation";
 
 // Helper function to extract YouTube video ID
 const getYouTubeVideoId = (url: string) => {
@@ -47,6 +48,10 @@ export default function HomePage() {
     addNoteToCache,
     folders,
   } = useNoteContext();
+
+  // Track user location on page load
+  useUserLocation();
+
   const [youtubeModalOpen, setYoutubeModalOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [recordModalOpen, setRecordModalOpen] = useState(false);
