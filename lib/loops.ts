@@ -72,7 +72,7 @@ export async function updateLoopsContact(
   }
 ) {
   try {
-    const resp = await loops.updateContact(email, properties);
+    const resp = await loops.updateContact({ email, properties });
 
     if (!resp.success) {
       console.error('Failed to update contact:', resp);
