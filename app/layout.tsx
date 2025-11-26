@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { NoteProvider } from "@/contexts/NoteContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -48,6 +49,12 @@ export default function RootLayout({
           </NoteProvider>
         </ThemeProvider>
         <Analytics />
+        <Script
+          src="https://datafa.st/js/script.js"
+          data-website-id="dfid_DbE9hAe2HvIhrNSRbC3WY"
+          data-domain="www.newtonstudy.app"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

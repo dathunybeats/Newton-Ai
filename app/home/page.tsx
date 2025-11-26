@@ -11,6 +11,7 @@ import { useNoteContext } from "@/contexts/NoteContext";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import FolderAssignmentModal from "@/components/notes/FolderAssignmentModal";
+import { Upload, Mic, FileText, Image as ImageIcon, Paperclip, Plus, Youtube } from "lucide-react";
 
 // Helper function to extract YouTube video ID
 const getYouTubeVideoId = (url: string) => {
@@ -705,27 +706,74 @@ export default function HomePage() {
             )}
 
             <div
-              className="bg-white cursor-text overflow-clip p-2 grid grid-cols-[auto_1fr_auto] gap-2 items-center shadow-[0_0_0_1px_rgba(0,0,0,0.1)] hover:shadow-[0_0_0_2px_rgba(0,0,0,0.15)] transition-shadow duration-200"
-              style={{ borderRadius: '28px' }}
+              className="bg-white cursor-text overflow-hidden p-2 grid grid-cols-[auto_1fr_auto] gap-3 items-center border border-gray-200 hover:border-gray-300 focus-within:border-gray-400 focus-within:ring-1 focus-within:ring-gray-400 transition-all duration-200 ease-out"
+              style={{ borderRadius: '24px' }}
             >
               {/* Leading - Plus Button */}
-              <div className="flex items-center">
-                <button
-                  type="button"
-                  className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-gray-100 transition-colors duration-200"
-                  aria-label="Add files and more"
-                  title="Add files and more"
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="text-gray-700"
+              <div className="flex items-center pl-1">
+                <Dropdown>
+                  <DropdownTrigger>
+                    <button
+                      type="button"
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-all duration-200 active:scale-95"
+                      aria-label="Add content"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    aria-label="Add content actions"
+                    className="p-2 bg-white rounded-xl border border-gray-100 shadow-xl w-[200px]"
+                    itemClasses={{
+                      base: "rounded-lg data-[hover=true]:bg-gray-50 data-[hover=true]:text-black text-gray-600 transition-colors duration-200",
+                      title: "text-sm font-medium",
+                      description: "text-xs text-gray-400"
+                    }}
                   >
-                    <path d="M9.33496 16.5V10.665H3.5C3.13273 10.665 2.83496 10.3673 2.83496 10C2.83496 9.63273 3.13273 9.33496 3.5 9.33496H9.33496V3.5C9.33496 3.13273 9.63273 2.83496 10 2.83496C10.3673 2.83496 10.665 3.13273 10.665 3.5V9.33496H16.5L16.6338 9.34863C16.9369 9.41057 17.165 9.67857 17.165 10C17.165 10.3214 16.9369 10.5894 16.6338 10.6514L16.5 10.665H10.665V16.5C10.665 16.8673 10.3673 17.165 10 17.165C9.63273 17.165 9.33496 16.8673 9.33496 16.5Z" />
-                  </svg>
-                </button>
+                    <DropdownItem
+                      key="upload"
+                      startContent={<Upload className="w-4 h-4" />}
+                      onPress={() => {
+                        if (!canCreateNote()) {
+                          setUpgradeMessage("You've reached your limit of 3 notes on the free plan. Upgrade to create unlimited notes!");
+                          setUpgradeModalOpen(true);
+                        } else {
+                          setUploadModalOpen(true);
+                        }
+                      }}
+                    >
+                      Upload File
+                    </DropdownItem>
+                    <DropdownItem
+                      key="youtube"
+                      startContent={<Youtube className="w-4 h-4" />}
+                      onPress={() => {
+                        if (!canCreateNote()) {
+                          setUpgradeMessage("You've reached your limit of 3 notes on the free plan. Upgrade to create unlimited notes!");
+                          setUpgradeModalOpen(true);
+                        } else {
+                          setYoutubeModalOpen(true);
+                        }
+                      }}
+                    >
+                      YouTube Video
+                    </DropdownItem>
+                    <DropdownItem
+                      key="record"
+                      startContent={<Mic className="w-4 h-4" />}
+                      onPress={() => {
+                        if (!canCreateNote()) {
+                          setUpgradeMessage("You've reached your limit of 3 notes on the free plan. Upgrade to create unlimited notes!");
+                          setUpgradeModalOpen(true);
+                        } else {
+                          setRecordModalOpen(true);
+                        }
+                      }}
+                    >
+                      Record Audio
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
               </div>
 
               {/* Primary - Text Input */}
@@ -755,21 +803,22 @@ export default function HomePage() {
               {/* Trailing - Action Buttons */}
               <div className="flex items-center gap-1.5">
                 {/* Microphone Button */}
+                {/* Microphone Button */}
                 <button
                   type="button"
-                  className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-gray-100 transition-colors duration-200"
+                  onClick={() => {
+                    if (!canCreateNote()) {
+                      setUpgradeMessage("You've reached your limit of 3 notes on the free plan. Upgrade to create unlimited notes!");
+                      setUpgradeModalOpen(true);
+                    } else {
+                      setRecordModalOpen(true);
+                    }
+                  }}
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
                   aria-label="Voice input"
                   title="Voice input"
                 >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="text-gray-700"
-                  >
-                    <path d="M15.7806 10.1963C16.1326 10.3011 16.3336 10.6714 16.2288 11.0234L16.1487 11.2725C15.3429 13.6262 13.2236 15.3697 10.6644 15.6299L10.6653 16.835H12.0833L12.2171 16.8486C12.5202 16.9106 12.7484 17.1786 12.7484 17.5C12.7484 17.8214 12.5202 18.0894 12.2171 18.1514L12.0833 18.165H7.91632C7.5492 18.1649 7.25128 17.8672 7.25128 17.5C7.25128 17.1328 7.5492 16.8351 7.91632 16.835H9.33527L9.33429 15.6299C6.775 15.3697 4.6558 13.6262 3.84992 11.2725L3.76984 11.0234L3.74445 10.8906C3.71751 10.5825 3.91011 10.2879 4.21808 10.1963C4.52615 10.1047 4.84769 10.2466 4.99347 10.5195L5.04523 10.6436L5.10871 10.8418C5.8047 12.8745 7.73211 14.335 9.99933 14.335C12.3396 14.3349 14.3179 12.7789 14.9534 10.6436L15.0052 10.5195C15.151 10.2466 15.4725 10.1046 15.7806 10.1963ZM12.2513 5.41699C12.2513 4.17354 11.2437 3.16521 10.0003 3.16504C8.75675 3.16504 7.74835 4.17343 7.74835 5.41699V9.16699C7.74853 10.4104 8.75685 11.418 10.0003 11.418C11.2436 11.4178 12.2511 10.4103 12.2513 9.16699V5.41699ZM13.5814 9.16699C13.5812 11.1448 11.9781 12.7479 10.0003 12.748C8.02232 12.748 6.41845 11.1449 6.41828 9.16699V5.41699C6.41828 3.43889 8.02221 1.83496 10.0003 1.83496C11.9783 1.83514 13.5814 3.439 13.5814 5.41699V9.16699Z" />
-                  </svg>
+                  <Mic className="w-5 h-5" />
                 </button>
 
                 {/* Send Button */}
@@ -777,11 +826,10 @@ export default function HomePage() {
                   type="button"
                   onClick={handleSubmit}
                   disabled={!textInput.trim() || isProcessing}
-                  className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 ${
-                    textInput.trim() && !isProcessing
-                      ? 'bg-gray-900 hover:bg-gray-800 text-white'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
+                  className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 ${textInput.trim() && !isProcessing
+                    ? 'bg-gray-900 hover:bg-gray-800 text-white'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    }`}
                   aria-label="Send prompt"
                   title="Send prompt"
                 >
@@ -858,328 +906,328 @@ export default function HomePage() {
                           href={`/home/note/${note.id}`}
                           className="flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.02)] border-gray-200 hover:border-gray-300 bg-white cursor-pointer transition-all duration-200 rounded-2xl border group"
                         >
-                    <div className="relative cursor-pointer flex-col justify-center items-center rounded-lg transition duration-200 group hover:shadow-none w-full drop-shadow-none">
-                      {/* Options Menu */}
-                      <div className="absolute z-30 top-2.5 right-2.5">
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                              }}
-                              className="p-1.5 hover:scale-110 duration-200 cursor-pointer rounded-full lg:bg-transparent group-hover:bg-white transition-all"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="w-4 h-4 opacity-100 xl:opacity-0 group-hover:opacity-100 text-black"
-                              >
-                                <circle cx="12" cy="12" r="1"></circle>
-                                <circle cx="12" cy="5" r="1"></circle>
-                                <circle cx="12" cy="19" r="1"></circle>
-                              </svg>
-                            </button>
-                          </DropdownTrigger>
-                          <DropdownMenu
-                            aria-label="Note actions"
-                            className="bg-white min-w-[160px]"
-                            classNames={{
-                              base: "bg-white shadow-lg border border-gray-200 rounded-lg min-w-[160px]",
-                              list: "bg-white"
-                            }}
-                            onAction={(key) => {
-                              const action = String(key);
-                              if (action === "folder") {
-                                openFolderModal(note.id, note.folder_id ?? null);
-                              } else if (action === "rename") {
-                                openRenameModal(note.id, note.title);
-                              } else if (action === "delete") {
-                                openDeleteModal(note.id);
-                              }
-                            }}
-                          >
-                            <DropdownItem
-                              key="folder"
-                              className="text-black hover:bg-gray-100"
-                              classNames={{
-                                base: "text-black",
-                                title: "text-black"
-                              }}
-                              startContent={
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="text-black"
+                          <div className="relative cursor-pointer flex-col justify-center items-center rounded-lg transition duration-200 group hover:shadow-none w-full drop-shadow-none">
+                            {/* Options Menu */}
+                            <div className="absolute z-30 top-2.5 right-2.5">
+                              <Dropdown>
+                                <DropdownTrigger>
+                                  <button
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                    }}
+                                    className="p-1.5 hover:scale-110 duration-200 cursor-pointer rounded-full lg:bg-transparent group-hover:bg-white transition-all"
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      className="w-4 h-4 opacity-100 xl:opacity-0 group-hover:opacity-100 text-black"
+                                    >
+                                      <circle cx="12" cy="12" r="1"></circle>
+                                      <circle cx="12" cy="5" r="1"></circle>
+                                      <circle cx="12" cy="19" r="1"></circle>
+                                    </svg>
+                                  </button>
+                                </DropdownTrigger>
+                                <DropdownMenu
+                                  aria-label="Note actions"
+                                  className="bg-white min-w-[160px]"
+                                  classNames={{
+                                    base: "bg-white shadow-lg border border-gray-200 rounded-lg min-w-[160px]",
+                                    list: "bg-white"
+                                  }}
+                                  onAction={(key) => {
+                                    const action = String(key);
+                                    if (action === "folder") {
+                                      openFolderModal(note.id, note.folder_id ?? null);
+                                    } else if (action === "rename") {
+                                      openRenameModal(note.id, note.title);
+                                    } else if (action === "delete") {
+                                      openDeleteModal(note.id);
+                                    }
+                                  }}
                                 >
-                                  <path d="M3 19V6a2 2 0 0 1 2-2h3.6a2 2 0 0 1 1.6.8l1 1.2H19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
-                                  <path d="M3 10h18" />
-                                </svg>
-                              }
-                            >
-                              Add to folder
-                            </DropdownItem>
-                            <DropdownItem
-                              key="rename"
-                              className="text-black hover:bg-gray-100"
-                              classNames={{
-                                base: "text-black",
-                                title: "text-black"
-                              }}
-                              startContent={
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="text-black"
-                                >
-                                  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
-                                  <path d="m15 5 4 4"></path>
-                                </svg>
-                              }
-                            >
-                              Rename
-                            </DropdownItem>
-                            <DropdownItem
-                              key="delete"
-                              className="text-red-600 hover:bg-red-50"
-                              classNames={{
-                                base: "text-red-600",
-                                title: "text-red-600"
-                              }}
-                              color="danger"
-                              startContent={
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="text-red-600"
-                                >
-                                  <path d="M3 6h18"></path>
-                                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                                  <line x1="10" x2="10" y1="11" y2="17"></line>
-                                  <line x1="14" x2="14" y1="11" y2="17"></line>
-                                </svg>
-                              }
-                            >
-                              Delete
-                            </DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
-                      </div>
+                                  <DropdownItem
+                                    key="folder"
+                                    className="text-black hover:bg-gray-100"
+                                    classNames={{
+                                      base: "text-black",
+                                      title: "text-black"
+                                    }}
+                                    startContent={
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="text-black"
+                                      >
+                                        <path d="M3 19V6a2 2 0 0 1 2-2h3.6a2 2 0 0 1 1.6.8l1 1.2H19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
+                                        <path d="M3 10h18" />
+                                      </svg>
+                                    }
+                                  >
+                                    Add to folder
+                                  </DropdownItem>
+                                  <DropdownItem
+                                    key="rename"
+                                    className="text-black hover:bg-gray-100"
+                                    classNames={{
+                                      base: "text-black",
+                                      title: "text-black"
+                                    }}
+                                    startContent={
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="text-black"
+                                      >
+                                        <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
+                                        <path d="m15 5 4 4"></path>
+                                      </svg>
+                                    }
+                                  >
+                                    Rename
+                                  </DropdownItem>
+                                  <DropdownItem
+                                    key="delete"
+                                    className="text-red-600 hover:bg-red-50"
+                                    classNames={{
+                                      base: "text-red-600",
+                                      title: "text-red-600"
+                                    }}
+                                    color="danger"
+                                    startContent={
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="text-red-600"
+                                      >
+                                        <path d="M3 6h18"></path>
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                        <line x1="10" x2="10" y1="11" y2="17"></line>
+                                        <line x1="14" x2="14" y1="11" y2="17"></line>
+                                      </svg>
+                                    }
+                                  >
+                                    Delete
+                                  </DropdownItem>
+                                </DropdownMenu>
+                              </Dropdown>
+                            </div>
 
-                      {/* Thumbnail */}
-                      <div className="rounded-t-2xl overflow-hidden relative bg-gradient-to-br from-gray-50 to-gray-100">
-                        <div className="aspect-video w-full relative overflow-hidden flex items-center justify-center">
-                          {note.uploads?.file_type === "pdf" ? (
-                            // PDF Indicator with document preview style
-                            <div className="w-full h-full flex items-center justify-center p-8">
-                              <div className="relative">
+                            {/* Thumbnail */}
+                            <div className="rounded-t-2xl overflow-hidden relative bg-gradient-to-br from-gray-50 to-gray-100">
+                              <div className="aspect-video w-full relative overflow-hidden flex items-center justify-center">
+                                {note.uploads?.file_type === "pdf" ? (
+                                  // PDF Indicator with document preview style
+                                  <div className="w-full h-full flex items-center justify-center p-8">
+                                    <div className="relative">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="80"
+                                        height="80"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.5"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="text-gray-400"
+                                      >
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                        <polyline points="14 2 14 8 20 8" />
+                                        <line x1="8" y1="13" x2="16" y2="13" />
+                                        <line x1="8" y1="17" x2="16" y2="17" />
+                                        <line x1="8" y1="9" x2="10" y2="9" />
+                                      </svg>
+                                      <div className="absolute -bottom-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">
+                                        PDF
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : note.youtube_url ? (
+                                  // YouTube Thumbnail
+                                  (() => {
+                                    const videoId = getYouTubeVideoId(note.youtube_url);
+                                    return videoId ? (
+                                      <img
+                                        src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+                                        alt={note.title}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                          e.currentTarget.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center">
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          width="48"
+                                          height="48"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          className="text-gray-400"
+                                        >
+                                          <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                                        </svg>
+                                      </div>
+                                    );
+                                  })()
+                                ) : (
+                                  // Fallback for audio or unknown type
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="48"
+                                      height="48"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      className="text-gray-400"
+                                    >
+                                      {note.uploads?.file_type === "pdf" ? (
+                                        <>
+                                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                          <polyline points="14 2 14 8 20 8" />
+                                        </>
+                                      ) : (
+                                        <>
+                                          <path d="M9 18V5l12-2v13" />
+                                          <circle cx="6" cy="18" r="3" />
+                                          <circle cx="18" cy="16" r="3" />
+                                        </>
+                                      )}
+                                    </svg>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Content */}
+                            <div className="w-full my-2.5 flex gap-2 px-3 py-1 relative group items-center">
+                              {note.uploads?.file_type === "pdf" ? (
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
-                                  width="80"
-                                  height="80"
+                                  width="24"
+                                  height="24"
                                   viewBox="0 0 24 24"
                                   fill="none"
                                   stroke="currentColor"
-                                  strokeWidth="1.5"
+                                  strokeWidth="2"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
-                                  className="text-gray-400"
+                                  className="w-4 h-4 text-gray-500 flex-shrink-0 mr-1"
                                 >
-                                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                  <polyline points="14 2 14 8 20 8" />
-                                  <line x1="8" y1="13" x2="16" y2="13" />
-                                  <line x1="8" y1="17" x2="16" y2="17" />
-                                  <line x1="8" y1="9" x2="10" y2="9" />
+                                  <path d="M15 18H3"></path>
+                                  <path d="M17 6H3"></path>
+                                  <path d="M21 12H3"></path>
                                 </svg>
-                                <div className="absolute -bottom-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">
-                                  PDF
+                              ) : (
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="w-4 h-4 text-black flex-shrink-0 mr-1"
+                                >
+                                  <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                                </svg>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-col gap-1">
+                                  <div className="flex items-center gap-2 w-full">
+                                    <h5 className="text-sm font-semibold truncate tracking-wide flex-1 text-black group-hover:text-gray-900">
+                                      {note.title}
+                                    </h5>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        openRenameModal(note.id, note.title);
+                                      }}
+                                      className="p-1 rounded-full text-gray-400 opacity-100 xl:opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
+                                      aria-label="Rename note"
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="w-4 h-4"
+                                      >
+                                        <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
+                                        <path d="m15 5 4 4"></path>
+                                      </svg>
+                                    </button>
+                                  </div>
+                                  <div className="text-xs text-gray-500 flex items-center justify-between gap-1.5">
+                                    <span>{new Date(note.created_at).toLocaleDateString()}</span>
+                                    {note.youtube_url && (
+                                      <YoutubeIcon
+                                        width={18}
+                                        height={12}
+                                        className="-translate-x-0.5"
+                                        style={{ filter: "grayscale(1)" }}
+                                      />
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          ) : note.youtube_url ? (
-                            // YouTube Thumbnail
-                            (() => {
-                              const videoId = getYouTubeVideoId(note.youtube_url);
-                              return videoId ? (
-                                <img
-                                  src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
-                                  alt={note.title}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    e.currentTarget.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-                                  }}
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="48"
-                                    height="48"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="text-gray-400"
-                                  >
-                                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                                  </svg>
-                                </div>
-                              );
-                            })()
-                          ) : (
-                            // Fallback for audio or unknown type
-                            <div className="w-full h-full flex items-center justify-center">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="48"
-                                height="48"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="text-gray-400"
-                              >
-                                {note.uploads?.file_type === "pdf" ? (
-                                  <>
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                    <polyline points="14 2 14 8 20 8" />
-                                  </>
-                                ) : (
-                                  <>
-                                    <path d="M9 18V5l12-2v13" />
-                                    <circle cx="6" cy="18" r="3" />
-                                    <circle cx="18" cy="16" r="3" />
-                                  </>
-                                )}
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      <div className="w-full my-2.5 flex gap-2 px-3 py-1 relative group items-center">
-                        {note.uploads?.file_type === "pdf" ? (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="w-4 h-4 text-gray-500 flex-shrink-0 mr-1"
-                          >
-                            <path d="M15 18H3"></path>
-                            <path d="M17 6H3"></path>
-                            <path d="M21 12H3"></path>
-                          </svg>
-                        ) : (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="w-4 h-4 text-black flex-shrink-0 mr-1"
-                          >
-                            <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                          </svg>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2 w-full">
-                              <h5 className="text-sm font-semibold truncate tracking-wide flex-1 text-black group-hover:text-gray-900">
-                                {note.title}
-                              </h5>
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  openRenameModal(note.id, note.title);
-                                }}
-                                className="p-1 rounded-full text-gray-400 opacity-100 xl:opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
-                                aria-label="Rename note"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="20"
-                                  height="20"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="w-4 h-4"
-                                >
-                                  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
-                                  <path d="m15 5 4 4"></path>
-                                </svg>
-                              </button>
-                            </div>
-                            <div className="text-xs text-gray-500 flex items-center justify-between gap-1.5">
-                              <span>{new Date(note.created_at).toLocaleDateString()}</span>
-                              {note.youtube_url && (
-                                <YoutubeIcon
-                                  width={18}
-                                  height={12}
-                                  className="-translate-x-0.5"
-                                  style={{ filter: "grayscale(1)" }}
-                                />
-                              )}
-                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          )}
-        </motion.div>
-      )}
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                )}
+              </motion.div>
+            )}
             {!isLoadingNotes && activeFolderId && filteredNotes.length === 0 && (
               <div className="text-center text-sm text-gray-500 py-12">
                 No notes found in {activeFolderName ?? "this folder"} yet.
@@ -1194,133 +1242,132 @@ export default function HomePage() {
         {uploadModalOpen && (
           <Dialog open={uploadModalOpen} onOpenChange={setUploadModalOpen}>
             <DialogContent className="w-[92vw] max-w-lg p-5 sm:p-6 bg-white border border-gray-300 rounded-xl sm:rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="scroll-m-20 text-2xl tracking-tight font-bold text-black text-center">
-              Upload File
-            </DialogTitle>
-          </DialogHeader>
-          <div className="w-full flex flex-col items-center pt-3">
-            <div className="flex flex-col w-full items-start mt-1 gap-2">
-              {uploadError && (
-                <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-                  {uploadError}
-                </div>
-              )}
-
-              <div
-                tabIndex={0}
-                className="grid w-full focus:outline-none overflow-hidden"
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-              >
-                <div className="relative w-full cursor-pointer">
-                  <div
-                    className="w-full rounded-lg duration-300 ease-in-out border-gray-300"
-                    role="presentation"
-                    tabIndex={0}
-                    onClick={() => !isUploading && fileInputRef.current?.click()}
-                  >
-                    <div className="flex flex-col items-center justify-center h-32 w-full border-2 border-dashed bg-white rounded-md border-gray-300">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="40"
-                        height="40"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="lucide lucide-upload text-gray-400"
-                      >
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" x2="12" y1="3" y2="15"></line>
-                      </svg>
-                      <p className="text-gray-600 text-sm mt-1">
-                        Drag or click to upload your file
-                      </p>
-                      <p className="text-gray-500 text-xs">Supported formats: PDF, MP3, WAV, OGG, M4A, AAC</p>
+              <DialogHeader>
+                <DialogTitle className="scroll-m-20 text-2xl tracking-tight font-bold text-black text-center">
+                  Upload File
+                </DialogTitle>
+              </DialogHeader>
+              <div className="w-full flex flex-col items-center pt-3">
+                <div className="flex flex-col w-full items-start mt-1 gap-2">
+                  {uploadError && (
+                    <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                      {uploadError}
                     </div>
-                  </div>
-                  <input
-                    ref={fileInputRef}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                    accept="application/pdf,.pdf,audio/*,.mp3,.wav,.ogg,.m4a,.aac,.webm"
-                    tabIndex={-1}
-                    type="file"
-                    style={{ display: "none" }}
-                    onChange={handleFileChange}
-                    disabled={isUploading}
-                  />
-                </div>
-                <div className="w-full px-1" aria-description="content file holder">
-                  <div className="rounded-xl flex items-center flex-col gap-2">
-                    {uploadedFile && (
-                      <div className="mt-2 text-sm text-gray-600 w-full">
-                        <div className="flex items-center justify-between">
-                          <span>Selected: {uploadedFile.name}</span>
-                          <span className="text-xs text-gray-500">
-                            {(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB
-                          </span>
+                  )}
+
+                  <div
+                    tabIndex={0}
+                    className="grid w-full focus:outline-none overflow-hidden"
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                  >
+                    <div className="relative w-full cursor-pointer">
+                      <div
+                        className="w-full rounded-lg duration-300 ease-in-out border-gray-300"
+                        role="presentation"
+                        tabIndex={0}
+                        onClick={() => !isUploading && fileInputRef.current?.click()}
+                      >
+                        <div className="flex flex-col items-center justify-center h-32 w-full border-2 border-dashed bg-white rounded-md border-gray-300">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="40"
+                            height="40"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="lucide lucide-upload text-gray-400"
+                          >
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" x2="12" y1="3" y2="15"></line>
+                          </svg>
+                          <p className="text-gray-600 text-sm mt-1">
+                            Drag or click to upload your file
+                          </p>
+                          <p className="text-gray-500 text-xs">Supported formats: PDF, MP3, WAV, OGG, M4A, AAC</p>
                         </div>
                       </div>
-                    )}
-                    {isUploading && (
-                      <div className="w-full mt-2">
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm text-gray-600">Uploading...</span>
-                          <span className="text-sm text-gray-600">{uploadProgress}%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-gray-900 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${uploadProgress}%` }}
-                          ></div>
-                        </div>
+                      <input
+                        ref={fileInputRef}
+                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        accept="application/pdf,.pdf,audio/*,.mp3,.wav,.ogg,.m4a,.aac,.webm"
+                        tabIndex={-1}
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={handleFileChange}
+                        disabled={isUploading}
+                      />
+                    </div>
+                    <div className="w-full px-1" aria-description="content file holder">
+                      <div className="rounded-xl flex items-center flex-col gap-2">
+                        {uploadedFile && (
+                          <div className="mt-2 text-sm text-gray-600 w-full">
+                            <div className="flex items-center justify-between">
+                              <span>Selected: {uploadedFile.name}</span>
+                              <span className="text-xs text-gray-500">
+                                {(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                        {isUploading && (
+                          <div className="w-full mt-2">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-sm text-gray-600">Uploading...</span>
+                              <span className="text-sm text-gray-600">{uploadProgress}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div
+                                className="bg-gray-900 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${uploadProgress}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-            <button
-              onClick={handleGenerateFromFile}
-              disabled={!uploadedFile || isUploading}
-              className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 py-2 gap-2 mt-3 w-full ${
-                uploadedFile && !isUploading
-                  ? "bg-black text-white hover:bg-gray-900 cursor-pointer"
-                  : "bg-gray-200 text-black cursor-not-allowed opacity-50"
-              }`}
-            >
-              {isUploading ? (
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-sparkles"
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+                <button
+                  onClick={handleGenerateFromFile}
+                  disabled={!uploadedFile || isUploading}
+                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 py-2 gap-2 mt-3 w-full ${uploadedFile && !isUploading
+                    ? "bg-black text-white hover:bg-gray-900 cursor-pointer"
+                    : "bg-gray-200 text-black cursor-not-allowed opacity-50"
+                    }`}
                 >
-                  <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
-                  <path d="M20 3v4"></path>
-                  <path d="M22 5h-4"></path>
-                  <path d="M4 17v2"></path>
-                  <path d="M5 18H3"></path>
-                </svg>
-              )}
-              {isUploading ? "Uploading..." : "Generate note"}
-            </button>
-          </div>
-        </DialogContent>
+                  {isUploading ? (
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-sparkles"
+                    >
+                      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                      <path d="M20 3v4"></path>
+                      <path d="M22 5h-4"></path>
+                      <path d="M4 17v2"></path>
+                      <path d="M5 18H3"></path>
+                    </svg>
+                  )}
+                  {isUploading ? "Uploading..." : "Generate note"}
+                </button>
+              </div>
+            </DialogContent>
           </Dialog>
         )}
       </AnimatePresence>
@@ -1329,96 +1376,95 @@ export default function HomePage() {
       <AnimatePresence>
         {youtubeModalOpen && (
           <Dialog open={youtubeModalOpen} onOpenChange={setYoutubeModalOpen}>
-        <DialogContent className="w-[92vw] max-w-lg p-5 sm:p-6 bg-white border border-gray-300 rounded-xl sm:rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="scroll-m-20 text-2xl tracking-tight font-bold text-black text-center">
-              Youtube Video
-            </DialogTitle>
-          </DialogHeader>
-          <div className="w-full flex flex-col items-center pt-2">
-            <div className="flex flex-col w-full items-start gap-2">
-                {youtubeError && (
-                  <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-                    {youtubeError}
-                  </div>
-                )}
+            <DialogContent className="w-[92vw] max-w-lg p-5 sm:p-6 bg-white border border-gray-300 rounded-xl sm:rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="scroll-m-20 text-2xl tracking-tight font-bold text-black text-center">
+                  Youtube Video
+                </DialogTitle>
+              </DialogHeader>
+              <div className="w-full flex flex-col items-center pt-2">
+                <div className="flex flex-col w-full items-start gap-2">
+                  {youtubeError && (
+                    <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                      {youtubeError}
+                    </div>
+                  )}
 
-                <label
-                  htmlFor="youtubeLink"
-                  className="text-[16px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex flex-row items-center gap-1 text-black"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-link text-black"
+                  <label
+                    htmlFor="youtubeLink"
+                    className="text-[16px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex flex-row items-center gap-1 text-black"
                   >
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                  </svg>
-                  Youtube link
-                </label>
-                <input
-                  id="youtubeLink"
-                  name="youtubeLink"
-                  type="text"
-                  value={youtubeLink}
-                  onChange={(e) => setYoutubeLink(e.target.value)}
-                  disabled={isProcessing}
-                  className="flex w-full rounded-2xl border border-gray-300 bg-transparent px-3 py-1 text-[15px]  transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-300 disabled:cursor-not-allowed disabled:opacity-50 h-12 text-black"
-                  placeholder="Ex. https://www.youtube.com/watch/example"
-                />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-link text-black"
+                    >
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                    Youtube link
+                  </label>
+                  <input
+                    id="youtubeLink"
+                    name="youtubeLink"
+                    type="text"
+                    value={youtubeLink}
+                    onChange={(e) => setYoutubeLink(e.target.value)}
+                    disabled={isProcessing}
+                    className="flex w-full rounded-2xl border border-gray-300 bg-transparent px-3 py-1 text-[15px]  transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-300 disabled:cursor-not-allowed disabled:opacity-50 h-12 text-black"
+                    placeholder="Ex. https://www.youtube.com/watch/example"
+                  />
 
-                {isProcessing && processingMessage && (
-                  <div className="w-full flex items-center gap-2 text-sm text-gray-600">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
-                    <span>{processingMessage}</span>
-                  </div>
-                )}
-            </div>
-          </div>
-          <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-            <button
-              onClick={handleGenerateNote}
-              disabled={!youtubeLink.trim() || isProcessing}
-              className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 py-2 gap-2 mt-3 w-full ${
-                youtubeLink.trim() && !isProcessing
-                  ? 'bg-black text-white hover:bg-gray-900 cursor-pointer'
-                  : 'bg-gray-200 text-black cursor-not-allowed opacity-50'
-              }`}
-            >
-              {isProcessing ? (
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-sparkles"
+                  {isProcessing && processingMessage && (
+                    <div className="w-full flex items-center gap-2 text-sm text-gray-600">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
+                      <span>{processingMessage}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+                <button
+                  onClick={handleGenerateNote}
+                  disabled={!youtubeLink.trim() || isProcessing}
+                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 py-2 gap-2 mt-3 w-full ${youtubeLink.trim() && !isProcessing
+                    ? 'bg-black text-white hover:bg-gray-900 cursor-pointer'
+                    : 'bg-gray-200 text-black cursor-not-allowed opacity-50'
+                    }`}
                 >
-                  <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
-                  <path d="M20 3v4"></path>
-                  <path d="M22 5h-4"></path>
-                  <path d="M4 17v2"></path>
-                  <path d="M5 18H3"></path>
-                </svg>
-              )}
-              {isProcessing ? "Processing..." : "Generate Notes"}
+                  {isProcessing ? (
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-sparkles"
+                    >
+                      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                      <path d="M20 3v4"></path>
+                      <path d="M22 5h-4"></path>
+                      <path d="M4 17v2"></path>
+                      <path d="M5 18H3"></path>
+                    </svg>
+                  )}
+                  {isProcessing ? "Processing..." : "Generate Notes"}
                 </button>
-          </div>
-        </DialogContent>
+              </div>
+            </DialogContent>
           </Dialog>
         )}
       </AnimatePresence>
@@ -1478,8 +1524,8 @@ export default function HomePage() {
                       {isRecording
                         ? "Recording in progress..."
                         : audioBlob
-                        ? "Recording complete! Generate notes to continue."
-                        : "Click the button below to start recording"}
+                          ? "Recording complete! Generate notes to continue."
+                          : "Click the button below to start recording"}
                     </p>
                   </div>
 
@@ -1548,11 +1594,10 @@ export default function HomePage() {
                         <button
                           onClick={handleGenerateFromRecording}
                           disabled={isUploading}
-                          className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium h-10 px-4 py-2 gap-2 w-full ${
-                            isUploading
-                              ? 'bg-gray-200 text-black cursor-not-allowed opacity-50'
-                              : 'bg-black text-white hover:bg-gray-900 cursor-pointer'
-                          } transition-colors`}
+                          className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-[15px] font-medium h-10 px-4 py-2 gap-2 w-full ${isUploading
+                            ? 'bg-gray-200 text-black cursor-not-allowed opacity-50'
+                            : 'bg-black text-white hover:bg-gray-900 cursor-pointer'
+                            } transition-colors`}
                         >
                           {isUploading ? (
                             <div className="h-5 w-5 animate-spin rounded-full border-2 border-black border-t-transparent"></div>
@@ -1668,11 +1713,10 @@ export default function HomePage() {
                 <button
                   onClick={handleRenameNote}
                   disabled={!newNoteName.trim()}
-                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-colors h-10 px-4 ${
-                    newNoteName.trim()
-                      ? 'bg-black text-white hover:bg-gray-900 cursor-pointer'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
-                  }`}
+                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-colors h-10 px-4 ${newNoteName.trim()
+                    ? 'bg-black text-white hover:bg-gray-900 cursor-pointer'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                    }`}
                 >
                   Rename
                 </button>

@@ -36,28 +36,18 @@ export function ActiveSessionWidget() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 20, scale: 0.95 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="px-4 mb-4"
+                    className="mb-4"
                 >
                     <div
                         onClick={handleCardClick}
-                        className="group relative overflow-hidden bg-white border border-gray-200 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all cursor-pointer"
+                        className="group relative overflow-hidden bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md hover:border-gray-300 transition-all cursor-pointer"
                     >
                         {/* Animated Background Gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-purple-50/50 to-orange-50/50 opacity-50 group-hover:opacity-80 transition-opacity" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-gray-50/50 via-white to-gray-50/50 opacity-50 group-hover:opacity-100 transition-opacity" />
 
-                        {/* Progress Bar Background (Optional - could be tied to a goal) */}
-                        {isStudying && (
-                            <div className="absolute bottom-0 left-0 h-0.5 bg-gray-900/10 w-full">
-                                <motion.div
-                                    className="h-full bg-gray-900"
-                                    initial={{ width: "0%" }}
-                                    animate={{ width: "100%" }}
-                                    transition={{ duration: 60, repeat: Infinity, ease: "linear" }} // Just a visual pulse for now
-                                />
-                            </div>
-                        )}
 
-                        <div className="relative p-3 flex items-center justify-between gap-3">
+
+                        <div className="relative p-4 flex items-center justify-between gap-3">
                             {/* Left: Status & Timer */}
                             <div className="flex flex-col min-w-0">
                                 <div className="flex items-center gap-1.5 mb-0.5">
@@ -67,15 +57,15 @@ export function ActiveSessionWidget() {
                                             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                         </span>
                                     ) : (
-                                        <Sparkles className="w-3 h-3 text-orange-400" />
+                                        <Sparkles className="w-3 h-3 text-gray-400" />
                                     )}
-                                    <span className="text-[10px] uppercase tracking-wider font-semibold text-gray-500 truncate">
+                                    <span className="text-[10px] uppercase tracking-wider font-bold text-gray-500 truncate">
                                         {isStudying ? "Focusing" : seconds > 0 ? "Paused" : "Chilling"}
                                     </span>
                                 </div>
 
                                 <div className="flex items-baseline gap-1.5">
-                                    <span className="text-lg font-bold text-gray-900 font-mono leading-none tracking-tight">
+                                    <span className="text-lg font-bold text-black font-mono leading-none tracking-tight">
                                         {formatTime(seconds)}
                                     </span>
                                 </div>
@@ -106,7 +96,7 @@ export function ActiveSessionWidget() {
                                             e.stopPropagation();
                                             toggleStudying();
                                         }}
-                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-900 text-white hover:bg-gray-800 hover:scale-105 transition-all shadow-sm"
+                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 hover:scale-105 transition-all shadow-sm"
                                     >
                                         <Pause className="w-3.5 h-3.5 fill-current" />
                                     </button>
@@ -116,7 +106,7 @@ export function ActiveSessionWidget() {
                                             e.stopPropagation();
                                             toggleStudying();
                                         }}
-                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-900 text-white hover:bg-gray-800 hover:scale-105 transition-all shadow-sm"
+                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 hover:scale-105 transition-all shadow-sm"
                                     >
                                         <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
                                     </button>

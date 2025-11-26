@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AnimatePresence } from "framer-motion";
+import { PanelLeftClose, Folder, FileText, GraduationCap, Plus, Sparkles, MoreHorizontal, ChevronRight, User, LogOut, Settings } from "lucide-react";
 import { useNoteContext } from "@/contexts/NoteContext";
 import { PLAN_IDS } from "@/lib/payments/whop";
 import { formatPlanName, type PlanTier } from "@/lib/subscriptions/types";
@@ -246,337 +247,226 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed left-0 top-0 z-50 h-full w-[272px] border-r border-zinc-200 bg-white py-4 flex flex-col overflow-hidden transition-transform duration-300 ${sidebarOpen ? 'max-[872px]:translate-x-0' : 'max-[872px]:-translate-x-full'}`}>
-        <div className="flex h-full flex-col overflow-y-hidden">
+      <aside className={`fixed left-0 top-0 z-50 h-full w-[280px] border-r border-gray-200 bg-white flex flex-col transition-transform duration-300 ${sidebarOpen ? 'max-[872px]:translate-x-0' : 'max-[872px]:-translate-x-full'}`}>
+        <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex justify-center mb-7 max-[872px]:justify-between max-[872px]:px-4">
-            <Link href="/home" className="flex items-center gap-2 cursor-pointer">
+          <div className="flex items-center justify-between px-6 py-6">
+            <Link href="/home" className="flex items-center gap-3 group">
               <Image
                 src="/icon.svg"
                 alt="Newton AI"
-                width={36}
-                height={36}
-                className="object-contain w-9 h-9"
+                width={32}
+                height={32}
+                className="object-contain w-8 h-8 group-hover:scale-105 transition-transform duration-200"
                 priority
               />
-              <h4 className="scroll-m-20 tracking-tight text-2xl font-bold text-gray-900">
+              <h4 className="text-lg font-bold text-black tracking-tight">
                 Newton AI
               </h4>
             </Link>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="hidden max-[872px]:flex items-center justify-center w-9 h-9 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="hidden max-[872px]:flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-gray-900"
-              >
-                <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-                <path d="M9 3v18"></path>
-                <path d="m16 15-3-3 3-3"></path>
-              </svg>
+              <PanelLeftClose className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Folders Section */}
-          <small className="text-sm leading-none mb-2 font-bold flex items-center mx-4 text-gray-900">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mr-2"
-            >
-              <path d="M20 10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2.5a1 1 0 0 1-.8-.4l-.9-1.2A1 1 0 0 0 15 3h-2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z" />
-              <path d="M20 21a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-2.9a1 1 0 0 1-.88-.55l-.42-.85a1 1 0 0 0-.92-.6H13a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z" />
-              <path d="M3 5a2 2 0 0 0 2 2h3" />
-              <path d="M3 3v13a2 2 0 0 0 2 2h3" />
-            </svg>
-            Folders
-          </small>
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-6">
 
-          {/* Scrollable Navigation */}
-          <div className="flex-1 overflow-y-auto mx-4 pb-12">
-            <div className="flex flex-col gap-1">
-              {/* All Notes */}
+            {/* Main Navigation */}
+            <div className="space-y-1">
+              <div className="px-2 mb-2">
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Workspace</span>
+              </div>
+
               <Link
                 href="/home"
                 onClick={() => setSidebarOpen(false)}
-                className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer ${pathname === '/home' && !activeFolderId
-                  ? "bg-gray-100 hover:bg-gray-200"
-                  : "hover:bg-gray-50"
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${pathname === '/home' && !activeFolderId
+                  ? "bg-gray-100 text-black shadow-sm"
+                  : "text-gray-600 hover:text-black hover:bg-gray-100"
                   }`}
               >
-                <div className="flex items-center text-xs text-gray-900">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-2"
-                  >
-                    <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2" />
-                  </svg>
-                  All notes
-                </div>
-                <small className="font-medium text-gray-500 text-xs">({notesCount})</small>
+                <FileText className={`w-4 h-4 transition-colors ${pathname === '/home' && !activeFolderId ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+                <span className="flex-1">All notes</span>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${pathname === '/home' && !activeFolderId
+                  ? "bg-white text-black shadow-sm"
+                  : "bg-gray-100 text-gray-500 group-hover:bg-gray-200/50"
+                  }`}>
+                  {notesCount}
+                </span>
               </Link>
 
-              {/* Folders List */}
+              <Link
+                href="/home/study-room"
+                onClick={() => setSidebarOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${pathname === '/home/study-room'
+                  ? "bg-gray-100 text-black shadow-sm"
+                  : "text-gray-600 hover:text-black hover:bg-gray-100"
+                  }`}
+              >
+                <GraduationCap className={`w-4 h-4 transition-colors ${pathname === '/home/study-room' ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+                <span>Study Room</span>
+              </Link>
+            </div>
+
+            {/* Folders Section */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between px-2 mb-2 group/header">
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Folders</span>
+                <button
+                  onClick={() => setCreateFolderOpen(true)}
+                  className="p-1 rounded-md text-gray-500 hover:text-black hover:bg-gray-100 opacity-0 group-hover/header:opacity-100 transition-all duration-200"
+                  title="New Folder"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
               {folders.map((folder) => (
                 <Link
                   key={folder.id}
                   href={`/home?folder=${folder.id}`}
                   onClick={() => setSidebarOpen(false)}
-                  className={`inline-flex items-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 rounded-md px-3 w-full justify-between cursor-pointer group ${activeFolderId === folder.id
-                    ? "bg-gray-100 hover:bg-gray-200"
-                    : "hover:bg-gray-50"
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${activeFolderId === folder.id
+                    ? "bg-gray-100 text-black shadow-sm"
+                    : "text-gray-600 hover:text-black hover:bg-gray-100"
                     }`}
                 >
-                  <div className="flex items-center text-xs text-gray-900 flex-1 min-w-0">
-                    <div
-                      className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
-                      style={{ backgroundColor: folder.color }}
-                    />
-                    <span className="truncate">{folder.name}</span>
-                  </div>
-                  <small className="font-medium text-gray-500 text-xs ml-2">
-                    ({getFolderNoteCount(folder.id)})
-                  </small>
+                  <div
+                    className={`w-2 h-2 rounded-full shadow-sm ring-2 ring-offset-1 ring-offset-white transition-all ${activeFolderId === folder.id ? "ring-gray-200 scale-110" : "ring-transparent group-hover:ring-gray-100"
+                      }`}
+                    style={{ backgroundColor: folder.color }}
+                  />
+                  <span className="flex-1 truncate">{folder.name}</span>
+                  {getFolderNoteCount(folder.id) > 0 && (
+                    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-md ${activeFolderId === folder.id
+                      ? "bg-white text-black"
+                      : "bg-gray-100 text-gray-400 group-hover:bg-gray-200/50"
+                      }`}>
+                      {getFolderNoteCount(folder.id)}
+                    </span>
+                  )}
                 </Link>
               ))}
 
-              {/* New Folder Button */}
               <button
                 onClick={() => setCreateFolderOpen(true)}
-                className="inline-flex items-center whitespace-nowrap text-sm font-medium h-9 rounded-md px-3 w-full justify-start cursor-pointer hover:bg-gray-50 text-gray-600 hover:text-gray-900 transition-colors"
+                className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-gray-600 hover:text-black hover:bg-gray-100 transition-all duration-200 group dashed-border"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mr-2"
-                >
-                  <path d="M5 12h14"></path>
-                  <path d="M12 5v14"></path>
-                </svg>
-                <span className="text-xs">New folder</span>
+                <div className="flex items-center justify-center w-4 h-4 rounded border border-gray-400 border-dashed group-hover:border-gray-500">
+                  <Plus className="w-3 h-3" />
+                </div>
+                <span>New folder</span>
               </button>
             </div>
 
-            {/* Study Buddy Section */}
-            <div className="mt-4">
-              <Link
-                href="/home/study-room"
-                onClick={() => setSidebarOpen(false)}
-                className={`inline-flex items-center whitespace-nowrap text-sm font-semibold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-11 rounded-md px-3 w-full justify-between cursor-pointer ${pathname === '/home/study-room'
-                  ? "bg-gray-100 hover:bg-gray-200"
-                  : "hover:bg-gray-50"
-                  }`}
-              >
-                <div className="flex items-center text-sm text-gray-900">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-2"
-                  >
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                  </svg>
-                  Study Room
-                </div>
-              </Link>
-            </div>
+
           </div>
 
-          {/* Active Session Widget */}
-          <ActiveSessionWidget />
-
-
-
-          {/* Separator */}
-          <div className="shrink-0 bg-gray-200 height-[1px] w-full mb-4 mt-2" />
-
-          {/* Upgrade Plan Card - Only show for free users */}
-          {!isLoadingSubscription && userTier === "free" && (
-            <div className="mx-4 mb-3">
-              <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-                <div className="p-6 py-4 flex justify-center items-center flex-col px-3">
-                  <Button
-                    onClick={() => setPricingOpen(true)}
-                    className={`group relative w-full rounded-[11px] gap-2 overflow-hidden text-lg font-semibold text-white cursor-pointer active:scale-[0.98] ${notesCount >= 3
-                      ? "bg-orange-600 hover:bg-orange-700"
-                      : "hover:opacity-90"
-                      }`}
-                    style={notesCount < 3 ? { backgroundColor: '#171717' } : undefined}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-4 w-4"
+          {/* Footer Section */}
+          <div className="px-4 pb-4 pt-2 bg-white">
+            {/* Active Session Widget */}
+            <ActiveSessionWidget />
+            {/* Upgrade Plan Card */}
+            {!isLoadingSubscription && userTier === "free" && (
+              <div className="mb-4">
+                <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+                  <div className="p-6 py-4 flex justify-center items-center flex-col px-3">
+                    <button
+                      onClick={() => setPricingOpen(true)}
+                      className="inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary shadow hover:bg-primary/90 h-9 px-4 py-2 group relative w-full rounded-[11px] gap-2 overflow-hidden text-lg font-semibold text-white cursor-pointer active:scale-[0.98] hover:opacity-90"
+                      style={{ backgroundColor: 'rgb(23, 23, 23)' }}
                     >
-                      <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
-                      <path d="M5 21h14" />
-                    </svg>
-                    <p>Upgrade plan</p>
-                  </Button>
-                  <small className={`text-sm font-medium leading-none mt-4 text-center ${notesCount >= 3 ? "text-orange-600 font-bold" : "text-gray-500"
-                    }`}>
-                    {notesCount >= 3
-                      ? "Upgrade now to create unlimited notes"
-                      : "Get more features and unlimited access"
-                    }
-                  </small>
-                  <div className="w-full mt-4">
-                    <div className="flex justify-between mb-1">
-                      <div className="flex items-center gap-1">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className={notesCount >= 3 ? "text-orange-600" : "text-gray-600"}
-                        >
-                          <path d="M2 6h4" />
-                          <path d="M2 10h4" />
-                          <path d="M2 14h4" />
-                          <path d="M2 18h4" />
-                          <rect width="16" height="20" x="4" y="2" rx="2" />
-                          <path d="M16 2v20" />
-                        </svg>
-                        <span className={`text-xs ${notesCount >= 3 ? "text-orange-600 font-bold" : "text-gray-900"}`}>
-                          <span className="font-extrabold">{notesCount}</span> / 3 Notes free
-                        </span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                        <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+                        <path d="M5 21h14"></path>
+                      </svg>
+                      <p className="text-sm">Upgrade plan</p>
+                    </button>
+                    <small className="text-sm font-medium leading-none mt-4 text-center text-gray-500">Get more features and unlimited access</small>
+                    <div className="w-full mt-4">
+                      <div className="flex justify-between mb-1">
+                        <div className="flex items-center gap-1">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className={notesCount >= 3 ? "text-orange-600" : "text-gray-600"}
+                          >
+                            <path d="M2 6h4"></path>
+                            <path d="M2 10h4"></path>
+                            <path d="M2 14h4"></path>
+                            <path d="M2 18h4"></path>
+                            <rect width="16" height="20" x="4" y="2" rx="2"></rect>
+                            <path d="M16 2v20"></path>
+                          </svg>
+                          <span className={`text-xs ${notesCount >= 3 ? "text-orange-600 font-bold" : "text-gray-900"}`}>
+                            <span className="font-extrabold">{notesCount}</span> / 3 Notes free
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div className={`relative w-full overflow-hidden rounded-full h-1 ${notesCount >= 3 ? "bg-orange-200" : "bg-gray-200"
-                      }`}>
-                      <div
-                        className={`h-full transition-all ${notesCount >= 3 ? "bg-orange-600" : "bg-gray-900"
-                          }`}
-                        style={{ width: `${Math.min((notesCount / 3) * 100, 100)}%` }}
-                      />
+                      <div className={`relative w-full overflow-hidden rounded-full h-1 ${notesCount >= 3 ? "bg-orange-200" : "bg-gray-200"}`}>
+                        <div
+                          className={`h-full transition-all ${notesCount >= 3 ? "bg-orange-600" : "bg-gray-900"}`}
+                          style={{ width: `${Math.min((notesCount / 3) * 100, 100)}%` }}
+                        ></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* User Card */}
-          <div className="rounded-lg border border-gray-200 bg-white shadow-sm mb-4 mx-4">
-            <div className="flex items-center justify-between w-full p-3">
+            {/* User Profile */}
+            <div className="flex items-center gap-3 p-2 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer group" onClick={() => setSettingsOpen(true)}>
               {authLoading ? (
-                // Skeleton loader
-                <>
-                  <div className="flex flex-1 items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
-                    <div className="flex w-[140px] flex-col gap-2">
-                      <div className="h-3.5 bg-gray-200 rounded animate-pulse w-24" />
-                      <div className="h-3 bg-gray-200 rounded animate-pulse w-32" />
-                    </div>
+                <div className="flex items-center gap-3 w-full">
+                  <div className="w-9 h-9 rounded-full bg-gray-100 animate-pulse" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 w-20 bg-gray-100 rounded animate-pulse" />
+                    <div className="h-2 w-24 bg-gray-100 rounded animate-pulse" />
                   </div>
-                  <div className="w-5 h-5 rounded bg-gray-200 animate-pulse" />
-                </>
+                </div>
               ) : (
                 <>
-                  <div className="flex flex-1 items-center gap-2">
+                  <div className="relative">
                     {user?.user_metadata?.avatar_url ? (
-                      <span className="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8">
-                        <Image
-                          src={user.user_metadata.avatar_url}
-                          alt="User avatar"
-                          width={32}
-                          height={32}
-                          className="aspect-square h-full w-full rounded-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                          }}
-                        />
-                      </span>
+                      <Image
+                        src={user.user_metadata.avatar_url}
+                        alt="User"
+                        width={36}
+                        height={36}
+                        className="rounded-full object-cover ring-2 ring-white shadow-sm"
+                      />
                     ) : (
-                      <span className="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8">
-                        <div className="flex h-full w-full aspect-square items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 text-sm font-semibold text-white">
-                          {user?.email?.[0]?.toUpperCase() || "U"}
-                        </div>
-                      </span>
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 ring-2 ring-white shadow-sm">
+                        {user?.email?.[0]?.toUpperCase() || "U"}
+                      </div>
                     )}
-                    <div className="flex w-[140px] flex-col">
-                      <small className="truncate text-sm font-medium leading-none text-gray-900">
-                        <b>{user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}</b>
-                      </small>
-                      <small className="truncate text-xs font-medium text-gray-500">
-                        {user?.email}
-                      </small>
-                    </div>
+                    <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-500 ring-2 ring-white"></div>
                   </div>
-                  <button
-                    onClick={() => setSettingsOpen(true)}
-                    className="transition-all duration-100 active:scale-105 cursor-pointer"
-                    title="Settings"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-gray-900"
-                    >
-                      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  </button>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-black truncate">
+                      {user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {userTier === 'free' ? 'Free Plan' : 'Pro Member'}
+                    </p>
+                  </div>
+
+                  <div className="text-gray-400 group-hover:text-gray-600 transition-colors">
+                    <Settings className="w-4 h-4" />
+                  </div>
                 </>
               )}
             </div>
@@ -591,22 +481,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
             <DialogContent className="w-[95vw] max-w-2xl sm:max-w-3xl px-5 py-6 sm:px-10 sm:py-10 bg-white border border-gray-200 shadow-lg rounded-xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="flex items-center text-sm font-bold text-gray-900">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="size-5 mr-1 text-gray-900"
-                  >
-                    <path d="M18 20a6 6 0 0 0-12 0"></path>
-                    <circle cx="12" cy="10" r="4"></circle>
-                    <circle cx="12" cy="12" r="10"></circle>
-                  </svg>
+                  <User className="w-5 h-5 mr-2 text-black" />
                   My profile
                 </DialogTitle>
               </DialogHeader>
@@ -641,21 +516,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                         onClick={() => setPricingOpen(true)}
                         className="h-[32px] px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white active:scale-[0.98] transition-all duration-100 cursor-pointer"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="w-4 h-4 mr-1"
-                        >
-                          <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
-                          <path d="M5 21h14"></path>
-                        </svg>
+                        <Sparkles className="w-4 h-4 mr-2" />
                         <span className="text-sm font-bold">Upgrade plan</span>
                       </Button>
                     )}
@@ -670,22 +531,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                   onClick={handleSignOut}
                   className="active:scale-105 transition-all duration-100 flex items-center gap-1 text-red-500 hover:text-red-700 transition-all duration-150 cursor-pointer"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-4 h-4 mr-1"
-                  >
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" x2="9" y1="12" y2="12"></line>
-                  </svg>
+                  <LogOut className="w-4 h-4 mr-2" />
                   <span>Logout</span>
                 </button>
               </div>
