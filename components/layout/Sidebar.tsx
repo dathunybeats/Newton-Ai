@@ -79,11 +79,14 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
               : "text-gray-600 hover:text-black hover:bg-gray-100"
               }`}
           >
-            <BookOpen className={`w-4 h-4 transition-colors ${!searchParams.get("tool") ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+            <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 18 18" className={`w-4 h-4 transition-colors ${!searchParams.get("tool") ? "text-black" : "text-gray-500 group-hover:text-black"}`}>
+              <path d="M11,14H7v3.5c0,.202,.122,.385,.309,.462,.187,.079,.401,.035,.545-.108l1.146-1.146,1.146,1.146c.096,.096,.224,.146,.354,.146,.064,0,.13-.012,.191-.038,.187-.077,.309-.26,.309-.462v-3.5Z" fill="currentColor"></path>
+              <path d="M15.994,12.25h.006V2.25c0-.414-.336-.75-.75-.75H4.75c-1.517,0-2.75,1.233-2.75,2.75V14c0,1.378,1.122,2.5,2.5,2.5h.75c.414,0,.75-.336,.75-.75s-.336-.75-.75-.75h-.75c-.551,0-1-.449-1-1s.449-1,1-1H14.106c-.155,.629-.174,1.339-.014,2h-1.342c-.414,0-.75,.336,.75,.75s.336,.75,.75,.75h2.5c.286,0,.547-.163,.673-.419,.126-.256,.096-.562-.079-.789-.523-.679-.434-2.013,.003-2.589,.101-.133,.146-.293,.146-.454Zm-10.244-1.75c-.414,0-.75-.336-.75-.75s.336-.75,.75-.75,.75,.336,.75,.75-.336,.75-.75,.75Zm0-2.5c-.414,0-.75-.336-.75-.75s.336-.75,.75-.75,.75,.336,.75,.75-.336,.75-.75,.75Zm0-2.5c-.414,0-.75-.336-.75-.75s.336-.75,.75-.75,.75,.336,.75,.75-.336,.75-.75,.75Z" fill="currentColor"></path>
+            </svg>
             <span>Read Note</span>
           </Link>
 
-          <Link
+          {/* <Link
             href={`/home/note/${noteId}?tool=chat`}
             prefetch={true}
             scroll={false}
@@ -95,9 +98,9 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
           >
             <MessageSquare className={`w-4 h-4 transition-colors ${currentTool === "chat" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
             <span>Chat with Note</span>
-          </Link>
+          </Link> */}
 
-          <Link
+          {/* <Link
             href={`/home/note/${noteId}?tool=notes`}
             prefetch={true}
             scroll={false}
@@ -109,9 +112,9 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
           >
             <PenTool className={`w-4 h-4 transition-colors ${currentTool === "notes" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
             <span>Side Notes</span>
-          </Link>
+          </Link> */}
 
-          <Link
+          {/* <Link
             href={`/home/note/${noteId}?tool=podcast`}
             prefetch={true}
             scroll={false}
@@ -121,9 +124,12 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
               : "text-gray-600 hover:text-black hover:bg-gray-100"
               }`}
           >
-            <Headphones className={`w-4 h-4 transition-colors ${currentTool === "podcast" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+            <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 18 18" className={`w-4 h-4 transition-colors ${currentTool === "podcast" ? "text-black" : "text-gray-500 group-hover:text-black"}`}>
+              <path d="M10.709,17h-1.959c-.414,0-.75-.336-.75-.75s.336-.75,.75-.75h1.959c.586,0,1.087-.399,1.219-.971l.343-1.451c.095-.403,.498-.65,.902-.558,.402,.095,.652,.5,.557,.902l-.342,1.447c-.287,1.253-1.39,2.131-2.679,2.131Z" fill="currentColor"></path>
+              <path d="M14.137,14h-1.137c-.227,0-.441-.103-.584-.279-.143-.176-.197-.408-.149-.629l1.084-5c.104-.422,.149-.762,.149-1.091,0-2.481-2.019-4.5-4.5-4.5s-4.5,2.019-4.5,4.5c0,.329,.046,.669,.145,1.071l1.089,5.02c.048,.222-.007,.453-.149,.629-.143,.177-.357,.279-.584,.279h-1.137c-1.285,0-2.416-.912-2.688-2.167l-.335-1.545c-.265-1.224,.332-2.473,1.449-3.037l.712-.359c.059-3.258,2.727-5.891,5.999-5.891s5.94,2.633,5.999,5.891l.712,.359c1.117,.564,1.714,1.813,1.449,3.037l-.335,1.545c-.272,1.256-1.403,2.167-2.688,2.167Z" fill="currentColor"></path>
+            </svg>
             <span>Podcast</span>
-          </Link>
+          </Link> */}
 
           <Link
             href={`/home/note/${noteId}?tool=quiz`}
