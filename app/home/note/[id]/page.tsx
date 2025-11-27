@@ -307,7 +307,7 @@ export default function NotePage() {
     <main className="flex-1 flex justify-center bg-white w-full max-w-full min-w-0 h-screen max-h-screen overflow-hidden box-border px-1 sm:px-3 lg:px-4 py-2 sm:py-4 lg:py-6">
 
 
-  <div className="w-full flex flex-col gap-4 sm:gap-6 text-black min-w-0 flex-1 min-h-0">
+      <div className="w-full flex flex-col gap-4 sm:gap-6 text-black min-w-0 flex-1 min-h-0">
         <div className="w-full sticky top-0 z-20 bg-white flex flex-col gap-4 sm:gap-6 pt-1 pb-2 sm:pb-3">
           {/* Breadcrumb Navigation */}
           <div className="flex items-center gap-2 text-sm max-[872px]:text-base text-gray-600 min-w-0 w-full overflow-hidden">
@@ -389,117 +389,113 @@ export default function NotePage() {
           <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 bg-gray-100 rounded-xl p-1 border border-gray-200 overflow-hidden">
             <button
               onClick={() => setActiveTab("note")}
-              className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${
-                activeTab === "note"
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${activeTab === "note"
                   ? "bg-gray-900 text-white"
                   : "bg-white text-gray-700 hover:bg-gray-50"
-              }`}
-          >
-            <svg
-              className="mr-0.5 sm:mr-1 flex-shrink-0"
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
+                }`}
             >
-              <path
-                d="M20 8.25V18c0 3-1.79 4-4 4H8c-2.21 0-4-1-4-4V8.25c0-3.25 1.79-4 4-4 0 .62.25 1.18.66 1.59.41.41.97.66 1.59.66h3.5C14.99 6.5 16 5.49 16 4.25c2.21 0 4 .75 4 4Z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              ></path>
-              <path
-                d="M16 4.25c0 1.24-1.01 2.25-2.25 2.25h-3.5c-.62 0-1.18-.25-1.59-.66C8.25 5.43 8 4.87 8 4.25 8 3.01 9.01 2 10.25 2h3.5c.62 0 1.18.25 1.59.66.41.41.66.97.66 1.59ZM8 13h4M8 17h8"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              ></path>
-            </svg>
-            <span className="hidden xs:inline">Note</span>
-          </button>
-            <button
-              onClick={() => setActiveTab("quiz")}
-              className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${
-              activeTab === "quiz"
-                ? "bg-gray-900 text-white"
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mr-0.5 sm:mr-1 flex-shrink-0"
-            >
-              <path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"></path>
-              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-              <circle cx="17.5" cy="17.5" r="3.5"></circle>
-            </svg>
-            <span className="hidden xs:inline">Quiz</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("flashcards")}
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${
-              activeTab === "flashcards"
-                ? "bg-gray-900 text-white"
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <div className="flex items-center h-5 w-4 rounded justify-center border border-current mr-0.5 sm:mr-1 flex-shrink-0">
               <svg
+                className="mr-0.5 sm:mr-1 flex-shrink-0"
                 xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
               >
                 <path
-                  d="M6.09 13.28h3.09v7.2c0 1.68.91 2.02 2.02.76l7.57-8.6c.93-1.05.54-1.92-.87-1.92h-3.09v-7.2c0-1.68-.91-2.02-2.02-.76l-7.57 8.6c-.92 1.06-.53 1.92.87 1.92Z"
+                  d="M20 8.25V18c0 3-1.79 4-4 4H8c-2.21 0-4-1-4-4V8.25c0-3.25 1.79-4 4-4 0 .62.25 1.18.66 1.59.41.41.97.66 1.59.66h3.5C14.99 6.5 16 5.49 16 4.25c2.21 0 4 .75 4 4Z"
                   stroke="currentColor"
                   strokeWidth="1.5"
-                  strokeMiterlimit="10"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                ></path>
+                <path
+                  d="M16 4.25c0 1.24-1.01 2.25-2.25 2.25h-3.5c-.62 0-1.18-.25-1.59-.66C8.25 5.43 8 4.87 8 4.25 8 3.01 9.01 2 10.25 2h3.5c.62 0 1.18.25 1.59.66.41.41.66.97.66 1.59ZM8 13h4M8 17h8"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 ></path>
               </svg>
-            </div>
-            <span className="hidden xs:inline">Flashcards</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("transcript")}
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${
-              activeTab === "transcript"
-                ? "bg-gray-900 text-white"
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mr-0.5 sm:mr-1 flex-shrink-0"
+              <span className="hidden xs:inline">Note</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("quiz")}
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${activeTab === "quiz"
+                  ? "bg-gray-900 text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+                }`}
             >
-              <rect width="18" height="14" x="3" y="5" rx="2" ry="2"></rect>
-              <path d="M7 15h4M15 15h2M7 11h2M13 11h4"></path>
-            </svg>
-            <span className="hidden xs:inline">Transcript</span>
-          </button>
-        </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-0.5 sm:mr-1 flex-shrink-0"
+              >
+                <path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"></path>
+                <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                <circle cx="17.5" cy="17.5" r="3.5"></circle>
+              </svg>
+              <span className="hidden xs:inline">Quiz</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("flashcards")}
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${activeTab === "flashcards"
+                  ? "bg-gray-900 text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+                }`}
+            >
+              <div className="flex items-center h-5 w-4 rounded justify-center border border-current mr-0.5 sm:mr-1 flex-shrink-0">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M6.09 13.28h3.09v7.2c0 1.68.91 2.02 2.02.76l7.57-8.6c.93-1.05.54-1.92-.87-1.92h-3.09v-7.2c0-1.68-.91-2.02-2.02-.76l-7.57 8.6c-.92 1.06-.53 1.92.87 1.92Z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeMiterlimit="10"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  ></path>
+                </svg>
+              </div>
+              <span className="hidden xs:inline">Flashcards</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("transcript")}
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm max-[872px]:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 h-10 px-2 sm:px-4 py-2 ${activeTab === "transcript"
+                  ? "bg-gray-900 text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+                }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-0.5 sm:mr-1 flex-shrink-0"
+              >
+                <rect width="18" height="14" x="3" y="5" rx="2" ry="2"></rect>
+                <path d="M7 15h4M15 15h2M7 11h2M13 11h4"></path>
+              </svg>
+              <span className="hidden xs:inline">Transcript</span>
+            </button>
+          </div>
 
         </div>
 
@@ -507,7 +503,7 @@ export default function NotePage() {
         <div className={`rounded-lg bg-white text-gray-900 border border-gray-200 w-full self-center flex-1 min-h-0 overflow-y-auto scrollbar-visible ${activeTab === 'quiz' ? 'p-3 sm:p-4 lg:p-2' : 'p-3 sm:p-4 lg:p-6'}`}>
 
 
-        <div className={`flex flex-col w-full max-w-2xl mx-auto min-w-0 ${activeTab === 'flashcards' ? 'md:h-full md:justify-center space-y-3' : 'space-y-4 sm:space-y-6 lg:space-y-8'}`}>
+          <div className={`flex flex-col w-full max-w-2xl mx-auto min-w-0 ${activeTab === 'flashcards' ? 'md:h-full md:justify-center space-y-3' : 'space-y-4 sm:space-y-6 lg:space-y-8'}`}>
 
             {activeTab === "note" && (
               <>
@@ -531,39 +527,39 @@ export default function NotePage() {
 
                 {/* Action Bar */}
                 <section className="flex flex-wrap items-start justify-between gap-2 sm:gap-3 min-w-0 w-full">
-                <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
-                                <button
-                                  type="button"
-                                  onClick={() => setIsFolderModalOpen(true)}
-                                  className="justify-center whitespace-nowrap text-xs sm:text-sm font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 h-9 px-2 sm:px-3 flex items-center rounded-md"
-                                >
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1 flex-shrink-0">
-                                    <path d="M12 10v6"></path>
-                                    <path d="M9 13h6"></path>
-                                    <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
-                                  </svg>
-                                  <span className="text-xs sm:text-sm font-medium leading-none">Add folder</span>
-                                </button>
-                                {note.youtube_url && (
-                                  <div className="flex items-center gap-1">
-                                    <svg className="flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                      <path fill="red" d="M17 4H7C4 4 2 6 2 9v6c0 3 2 5 5 5h10c3 0 5-2 5-5V9c0-3-2-5-5-5zm-3.11 9.03l-2.47 1.48c-1 .6-1.82.14-1.82-1.03v-2.97c0-1.17.82-1.63 1.82-1.03l2.47 1.48c.95.58.95 1.5 0 2.07z"></path>
-                                    </svg>
-                                    <span className="text-xs sm:text-sm font-medium leading-none whitespace-nowrap">Youtube video</span>
-                                  </div>
+                  <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
+                    <button
+                      type="button"
+                      onClick={() => setIsFolderModalOpen(true)}
+                      className="justify-center whitespace-nowrap text-xs sm:text-sm font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 h-9 px-2 sm:px-3 flex items-center rounded-md"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1 flex-shrink-0">
+                        <path d="M12 10v6"></path>
+                        <path d="M9 13h6"></path>
+                        <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
+                      </svg>
+                      <span className="text-xs sm:text-sm font-medium leading-none">Add folder</span>
+                    </button>
+                    {note.youtube_url && (
+                      <div className="flex items-center gap-1">
+                        <svg className="flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path fill="red" d="M17 4H7C4 4 2 6 2 9v6c0 3 2 5 5 5h10c3 0 5-2 5-5V9c0-3-2-5-5-5zm-3.11 9.03l-2.47 1.48c-1 .6-1.82.14-1.82-1.03v-2.97c0-1.17.82-1.63 1.82-1.03l2.47 1.48c.95.58.95 1.5 0 2.07z"></path>
+                        </svg>
+                        <span className="text-xs sm:text-sm font-medium leading-none whitespace-nowrap">Youtube video</span>
+                      </div>
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                                <button
-                                  onClick={() => setIsDeleteModalOpen(true)}
-                                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-red-500 hover:bg-red-600 text-white size-9 cursor-pointer hover:shadow-md"
-                                >
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M3 6h18"></path>
-                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                                    <line x1="10" x2="10" y1="11" y2="17"></line>
-                                    <line x1="14" x2="14" y1="11" y2="17"></line>
+                    <button
+                      onClick={() => setIsDeleteModalOpen(true)}
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-red-500 hover:bg-red-600 text-white size-9 cursor-pointer hover:shadow-md"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        <line x1="10" x2="10" y1="11" y2="17"></line>
+                        <line x1="14" x2="14" y1="11" y2="17"></line>
                       </svg>
                     </button>
                   </div>
@@ -591,15 +587,15 @@ export default function NotePage() {
 
                 {/* Note Content */}
                 {note.content ? (
-                        <section id="note-content" data-color-mode="light" className="min-w-0 w-full max-w-full">
-        <MarkdownPreview
-          source={note.content}
-          className="wmde-markdown wmde-markdown-color markdown !btransparent"
-          wrapperElement={{
-            "data-color-mode": "light"
-          }}
-        />
-      </section>
+                  <section id="note-content" data-color-mode="light" className="min-w-0 w-full max-w-full">
+                    <MarkdownPreview
+                      source={note.content}
+                      className="wmde-markdown wmde-markdown-color markdown !btransparent"
+                      wrapperElement={{
+                        "data-color-mode": "light"
+                      }}
+                    />
+                  </section>
                 ) : (
                   <div className="text-center py-12">
                     <svg
@@ -845,8 +841,8 @@ function parseParagraphTranscript(payload: string): TranscriptSegment[] {
       id: `paragraph-${index}`,
       timeLabel: timeMatch
         ? `${normalizeTimeLabel(timeMatch[1])} : ${normalizeTimeLabel(
-            timeMatch[2]
-          )}`
+          timeMatch[2]
+        )}`
         : undefined,
       text: timeMatch ? paragraph.replace(timeMatch[0], "").trim() : paragraph,
     };
