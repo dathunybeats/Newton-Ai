@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
@@ -53,6 +53,109 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
   const noteId = params?.id as string;
   const currentNote = isNotePage && noteId ? getNote(noteId) : null;
   const currentTool = searchParams.get("tool") || "read";
+
+  // Memoize the note tools section to prevent re-renders on tool changes
+  const noteToolsSection = useMemo(() => {
+    if (!isNotePage || !noteId) return null;
+
+    return (
+      <div className="space-y-2">
+        <Link
+          href="/home"
+          className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black transition-colors px-3 py-2 rounded-lg hover:bg-gray-50 mb-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
+        </Link>
+
+        <div className="space-y-1">
+          <Link
+            href={`/home/note/${noteId}`}
+            prefetch={true}
+            scroll={false}
+            onClick={() => setSidebarOpen(false)}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${!searchParams.get("tool")
+              ? "bg-gray-100 text-black shadow-sm"
+              : "text-gray-600 hover:text-black hover:bg-gray-100"
+              }`}
+          >
+            <BookOpen className={`w-4 h-4 transition-colors ${!searchParams.get("tool") ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+            <span>Read Note</span>
+          </Link>
+
+          <Link
+            href={`/home/note/${noteId}?tool=chat`}
+            prefetch={true}
+            scroll={false}
+            onClick={() => setSidebarOpen(false)}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "chat"
+              ? "bg-gray-100 text-black shadow-sm"
+              : "text-gray-600 hover:text-black hover:bg-gray-100"
+              }`}
+          >
+            <MessageSquare className={`w-4 h-4 transition-colors ${currentTool === "chat" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+            <span>Chat with Note</span>
+          </Link>
+
+          <Link
+            href={`/home/note/${noteId}?tool=notes`}
+            prefetch={true}
+            scroll={false}
+            onClick={() => setSidebarOpen(false)}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "notes"
+              ? "bg-gray-100 text-black shadow-sm"
+              : "text-gray-600 hover:text-black hover:bg-gray-100"
+              }`}
+          >
+            <PenTool className={`w-4 h-4 transition-colors ${currentTool === "notes" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+            <span>Side Notes</span>
+          </Link>
+
+          <Link
+            href={`/home/note/${noteId}?tool=podcast`}
+            prefetch={true}
+            scroll={false}
+            onClick={() => setSidebarOpen(false)}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "podcast"
+              ? "bg-gray-100 text-black shadow-sm"
+              : "text-gray-600 hover:text-black hover:bg-gray-100"
+              }`}
+          >
+            <Headphones className={`w-4 h-4 transition-colors ${currentTool === "podcast" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+            <span>Podcast</span>
+          </Link>
+
+          <Link
+            href={`/home/note/${noteId}?tool=quiz`}
+            prefetch={true}
+            scroll={false}
+            onClick={() => setSidebarOpen(false)}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "quiz"
+              ? "bg-gray-100 text-black shadow-sm"
+              : "text-gray-600 hover:text-black hover:bg-gray-100"
+              }`}
+          >
+            <Brain className={`w-4 h-4 transition-colors ${currentTool === "quiz" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+            <span>Quiz</span>
+          </Link>
+
+          <Link
+            href={`/home/note/${noteId}?tool=flashcards`}
+            prefetch={true}
+            scroll={false}
+            onClick={() => setSidebarOpen(false)}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "flashcards"
+              ? "bg-gray-100 text-black shadow-sm"
+              : "text-gray-600 hover:text-black hover:bg-gray-100"
+              }`}
+          >
+            <Layers className={`w-4 h-4 transition-colors ${currentTool === "flashcards" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+            <span>Flashcards</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }, [noteId, currentTool, isNotePage, searchParams]);
 
   // Fetch folders on mount
   useEffect(() => {
@@ -281,106 +384,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
           {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-6">
 
-            {isNotePage ? (
-              /* Note Specific Sidebar */
-              <div className="space-y-2">
-                <Link
-                  href="/home"
-                  className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black transition-colors px-3 py-2 rounded-lg hover:bg-gray-50 mb-2"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to Home
-                </Link>
-
-
-
-                <div className="space-y-1">
-                  <Link
-                    href={`/home/note/${noteId}`}
-                    prefetch={true}
-                    scroll={false}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${!searchParams.get("tool")
-                      ? "bg-gray-100 text-black shadow-sm"
-                      : "text-gray-600 hover:text-black hover:bg-gray-100"
-                      }`}
-                  >
-                    <BookOpen className={`w-4 h-4 transition-colors ${!searchParams.get("tool") ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
-                    <span>Read Note</span>
-                  </Link>
-
-                  <Link
-                    href={`/home/note/${noteId}?tool=chat`}
-                    prefetch={true}
-                    scroll={false}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "chat"
-                      ? "bg-gray-100 text-black shadow-sm"
-                      : "text-gray-600 hover:text-black hover:bg-gray-100"
-                      }`}
-                  >
-                    <MessageSquare className={`w-4 h-4 transition-colors ${currentTool === "chat" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
-                    <span>Chat with Note</span>
-                  </Link>
-
-                  <Link
-                    href={`/home/note/${noteId}?tool=notes`}
-                    prefetch={true}
-                    scroll={false}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "notes"
-                      ? "bg-gray-100 text-black shadow-sm"
-                      : "text-gray-600 hover:text-black hover:bg-gray-100"
-                      }`}
-                  >
-                    <PenTool className={`w-4 h-4 transition-colors ${currentTool === "notes" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
-                    <span>Side Notes</span>
-                  </Link>
-
-                  <Link
-                    href={`/home/note/${noteId}?tool=podcast`}
-                    prefetch={true}
-                    scroll={false}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "podcast"
-                      ? "bg-gray-100 text-black shadow-sm"
-                      : "text-gray-600 hover:text-black hover:bg-gray-100"
-                      }`}
-                  >
-                    <Headphones className={`w-4 h-4 transition-colors ${currentTool === "podcast" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
-                    <span>Podcast</span>
-                  </Link>
-
-                  <Link
-                    href={`/home/note/${noteId}?tool=quiz`}
-                    prefetch={true}
-                    scroll={false}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "quiz"
-                      ? "bg-gray-100 text-black shadow-sm"
-                      : "text-gray-600 hover:text-black hover:bg-gray-100"
-                      }`}
-                  >
-                    <Brain className={`w-4 h-4 transition-colors ${currentTool === "quiz" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
-                    <span>Quiz</span>
-                  </Link>
-
-                  <Link
-                    href={`/home/note/${noteId}?tool=flashcards`}
-                    prefetch={true}
-                    scroll={false}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "flashcards"
-                      ? "bg-gray-100 text-black shadow-sm"
-                      : "text-gray-600 hover:text-black hover:bg-gray-100"
-                      }`}
-                  >
-                    <Layers className={`w-4 h-4 transition-colors ${currentTool === "flashcards" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
-                    <span>Flashcards</span>
-                  </Link>
-                </div>
-              </div>
-            ) : (
+            {noteToolsSection || (
               /* Standard Sidebar Content */
               <>
                 {/* Main Navigation */}
