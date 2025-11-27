@@ -297,6 +297,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                 <div className="space-y-1">
                   <Link
                     href={`/home/note/${noteId}`}
+                    prefetch={true}
+                    scroll={false}
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${!searchParams.get("tool")
                       ? "bg-gray-100 text-black shadow-sm"
@@ -309,6 +311,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
 
                   <Link
                     href={`/home/note/${noteId}?tool=chat`}
+                    prefetch={true}
+                    scroll={false}
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "chat"
                       ? "bg-gray-100 text-black shadow-sm"
@@ -321,6 +325,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
 
                   <Link
                     href={`/home/note/${noteId}?tool=notes`}
+                    prefetch={true}
+                    scroll={false}
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "notes"
                       ? "bg-gray-100 text-black shadow-sm"
@@ -333,6 +339,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
 
                   <Link
                     href={`/home/note/${noteId}?tool=podcast`}
+                    prefetch={true}
+                    scroll={false}
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "podcast"
                       ? "bg-gray-100 text-black shadow-sm"
@@ -345,6 +353,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
 
                   <Link
                     href={`/home/note/${noteId}?tool=quiz`}
+                    prefetch={true}
+                    scroll={false}
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "quiz"
                       ? "bg-gray-100 text-black shadow-sm"
@@ -357,6 +367,8 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
 
                   <Link
                     href={`/home/note/${noteId}?tool=flashcards`}
+                    prefetch={true}
+                    scroll={false}
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "flashcards"
                       ? "bg-gray-100 text-black shadow-sm"

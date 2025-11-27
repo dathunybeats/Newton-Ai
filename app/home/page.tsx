@@ -909,6 +909,7 @@ export default function HomePage() {
                       >
                         <Link
                           href={`/home/note/${note.id}`}
+                          prefetch={true}
                           className="flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.02)] border-gray-200 hover:border-gray-300 bg-white cursor-pointer transition-all duration-200 rounded-2xl border group"
                         >
                           <div className="relative cursor-pointer flex-col justify-center items-center rounded-lg transition duration-200 group hover:shadow-none w-full drop-shadow-none">
