@@ -86,7 +86,7 @@ export async function generateTitleAndDescription(
   const preview = content.substring(0, 2000);
 
   const { text } = await generateText({
-    model: openai('gpt-4o-mini'),
+    model: openai('gpt-4o-mini', { structuredOutputs: true }),
     messages: [
       {
         role: "system",
@@ -100,10 +100,9 @@ export async function generateTitleAndDescription(
     ],
     temperature: 0.7,
     maxOutputTokens: 200,
-    output: 'object',
   });
 
-  const result = text as { title?: string; description?: string };
+  const result = JSON.parse(text) as { title?: string; description?: string };
   return {
     title: result.title || "Untitled Note",
     description: result.description || "",

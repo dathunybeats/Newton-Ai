@@ -82,7 +82,7 @@ Return ONLY a JSON array of objects with "question" and "answer" fields. No addi
 Example format: [{"question": "What is...", "answer": "It is..."}, ...]`;
 
     const { text } = await generateText({
-      model: openai('gpt-4o-mini'),
+      model: openai('gpt-4o-mini', { structuredOutputs: true }),
       messages: [
         {
           role: "system",
@@ -96,10 +96,9 @@ Example format: [{"question": "What is...", "answer": "It is..."}, ...]`;
       ],
       temperature: 0.7,
       maxOutputTokens: 2000,
-      output: 'array',
     });
 
-    const flashcards = text as Flashcard[];
+    const flashcards = JSON.parse(text) as Flashcard[];
 
     if (!flashcards || !Array.isArray(flashcards)) {
       throw new Error("Invalid response format from AI");

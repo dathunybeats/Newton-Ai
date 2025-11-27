@@ -78,7 +78,7 @@ Return a JSON object with a "questions" field containing the array:
 }`;
 
     const { text } = await generateText({
-      model: openai('gpt-4o'),
+      model: openai('gpt-4o', { structuredOutputs: true }),
       messages: [
         {
           role: "system",
@@ -91,11 +91,10 @@ Return a JSON object with a "questions" field containing the array:
       ],
       temperature: 0.7,
       maxOutputTokens: 4096,
-      output: 'object',
     });
 
-    // Extract questions from the response
-    const parsedResponse = text as { questions?: any[] } | any[];
+    // Parse JSON response
+    const parsedResponse = JSON.parse(text) as { questions?: any[] } | any[];
     let questions;
 
     if (Array.isArray(parsedResponse)) {

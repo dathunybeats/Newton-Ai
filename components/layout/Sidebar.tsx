@@ -4,13 +4,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, useSearchParams, usePathname, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AnimatePresence } from "framer-motion";
-import { PanelLeftClose, Folder, FileText, GraduationCap, Plus, Sparkles, MoreHorizontal, ChevronRight, User, LogOut, Settings } from "lucide-react";
+import { PanelLeftClose, Folder, FileText, GraduationCap, Plus, Sparkles, MoreHorizontal, ChevronRight, User, LogOut, Settings, ArrowLeft, MessageSquare, PenTool, Headphones, Brain, Layers, BookOpen } from "lucide-react";
 import { useNoteContext } from "@/contexts/NoteContext";
 import { PLAN_IDS } from "@/lib/payments/whop";
 import { formatPlanName, type PlanTier } from "@/lib/subscriptions/types";
@@ -28,7 +28,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { folders, fetchFolders, createFolder, updateFolderInCache, deleteFolderFromCache } = useNoteContext();
+  const { folders, fetchFolders, createFolder, updateFolderInCache, deleteFolderFromCache, getNote } = useNoteContext();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pricingOpen, setPricingOpen] = useState(false);
   const [isYearly, setIsYearly] = useState(true);
@@ -49,6 +49,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(true);
 
   const activeFolderId = searchParams.get("folder");
+  const params = useParams();
+  const noteId = params?.id as string;
+  const currentNote = isNotePage && noteId ? getNote(noteId) : null;
+  const currentTool = searchParams.get("tool") || "read";
 
   // Fetch folders on mount
   useEffect(() => {
@@ -272,97 +276,190 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
             </button>
           </div>
 
+
+
           {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-6">
 
-            {/* Main Navigation */}
-            <div className="space-y-1">
-              <div className="px-2 mb-2">
-                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Workspace</span>
-              </div>
-
-              <Link
-                href="/home"
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${pathname === '/home' && !activeFolderId
-                  ? "bg-gray-100 text-black shadow-sm"
-                  : "text-gray-600 hover:text-black hover:bg-gray-100"
-                  }`}
-              >
-                <FileText className={`w-4 h-4 transition-colors ${pathname === '/home' && !activeFolderId ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
-                <span className="flex-1">All notes</span>
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${pathname === '/home' && !activeFolderId
-                  ? "bg-white text-black shadow-sm"
-                  : "bg-gray-100 text-gray-500 group-hover:bg-gray-200/50"
-                  }`}>
-                  {notesCount}
-                </span>
-              </Link>
-
-              <Link
-                href="/home/study-room"
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${pathname === '/home/study-room'
-                  ? "bg-gray-100 text-black shadow-sm"
-                  : "text-gray-600 hover:text-black hover:bg-gray-100"
-                  }`}
-              >
-                <GraduationCap className={`w-4 h-4 transition-colors ${pathname === '/home/study-room' ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
-                <span>Study Room</span>
-              </Link>
-            </div>
-
-            {/* Folders Section */}
-            <div className="space-y-1">
-              <div className="flex items-center justify-between px-2 mb-2 group/header">
-                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Folders</span>
-                <button
-                  onClick={() => setCreateFolderOpen(true)}
-                  className="p-1 rounded-md text-gray-500 hover:text-black hover:bg-gray-100 opacity-0 group-hover/header:opacity-100 transition-all duration-200"
-                  title="New Folder"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {folders.map((folder) => (
+            {isNotePage ? (
+              /* Note Specific Sidebar */
+              <div className="space-y-2">
                 <Link
-                  key={folder.id}
-                  href={`/home?folder=${folder.id}`}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${activeFolderId === folder.id
-                    ? "bg-gray-100 text-black shadow-sm"
-                    : "text-gray-600 hover:text-black hover:bg-gray-100"
-                    }`}
+                  href="/home"
+                  className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black transition-colors px-3 py-2 rounded-lg hover:bg-gray-50 mb-2"
                 >
-                  <div
-                    className={`w-2 h-2 rounded-full shadow-sm ring-2 ring-offset-1 ring-offset-white transition-all ${activeFolderId === folder.id ? "ring-gray-200 scale-110" : "ring-transparent group-hover:ring-gray-100"
-                      }`}
-                    style={{ backgroundColor: folder.color }}
-                  />
-                  <span className="flex-1 truncate">{folder.name}</span>
-                  {getFolderNoteCount(folder.id) > 0 && (
-                    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-md ${activeFolderId === folder.id
-                      ? "bg-white text-black"
-                      : "bg-gray-100 text-gray-400 group-hover:bg-gray-200/50"
-                      }`}>
-                      {getFolderNoteCount(folder.id)}
-                    </span>
-                  )}
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Home
                 </Link>
-              ))}
 
-              <button
-                onClick={() => setCreateFolderOpen(true)}
-                className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-gray-600 hover:text-black hover:bg-gray-100 transition-all duration-200 group dashed-border"
-              >
-                <div className="flex items-center justify-center w-4 h-4 rounded border border-gray-400 border-dashed group-hover:border-gray-500">
-                  <Plus className="w-3 h-3" />
+
+
+                <div className="space-y-1">
+                  <Link
+                    href={`/home/note/${noteId}`}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${!searchParams.get("tool")
+                      ? "bg-gray-100 text-black shadow-sm"
+                      : "text-gray-600 hover:text-black hover:bg-gray-100"
+                      }`}
+                  >
+                    <BookOpen className={`w-4 h-4 transition-colors ${!searchParams.get("tool") ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+                    <span>Read Note</span>
+                  </Link>
+
+                  <Link
+                    href={`/home/note/${noteId}?tool=chat`}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "chat"
+                      ? "bg-gray-100 text-black shadow-sm"
+                      : "text-gray-600 hover:text-black hover:bg-gray-100"
+                      }`}
+                  >
+                    <MessageSquare className={`w-4 h-4 transition-colors ${currentTool === "chat" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+                    <span>Chat with Note</span>
+                  </Link>
+
+                  <Link
+                    href={`/home/note/${noteId}?tool=notes`}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "notes"
+                      ? "bg-gray-100 text-black shadow-sm"
+                      : "text-gray-600 hover:text-black hover:bg-gray-100"
+                      }`}
+                  >
+                    <PenTool className={`w-4 h-4 transition-colors ${currentTool === "notes" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+                    <span>Side Notes</span>
+                  </Link>
+
+                  <Link
+                    href={`/home/note/${noteId}?tool=podcast`}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "podcast"
+                      ? "bg-gray-100 text-black shadow-sm"
+                      : "text-gray-600 hover:text-black hover:bg-gray-100"
+                      }`}
+                  >
+                    <Headphones className={`w-4 h-4 transition-colors ${currentTool === "podcast" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+                    <span>Podcast</span>
+                  </Link>
+
+                  <Link
+                    href={`/home/note/${noteId}?tool=quiz`}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "quiz"
+                      ? "bg-gray-100 text-black shadow-sm"
+                      : "text-gray-600 hover:text-black hover:bg-gray-100"
+                      }`}
+                  >
+                    <Brain className={`w-4 h-4 transition-colors ${currentTool === "quiz" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+                    <span>Quiz</span>
+                  </Link>
+
+                  <Link
+                    href={`/home/note/${noteId}?tool=flashcards`}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "flashcards"
+                      ? "bg-gray-100 text-black shadow-sm"
+                      : "text-gray-600 hover:text-black hover:bg-gray-100"
+                      }`}
+                  >
+                    <Layers className={`w-4 h-4 transition-colors ${currentTool === "flashcards" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+                    <span>Flashcards</span>
+                  </Link>
                 </div>
-                <span>New folder</span>
-              </button>
-            </div>
+              </div>
+            ) : (
+              /* Standard Sidebar Content */
+              <>
+                {/* Main Navigation */}
+                <div className="space-y-1">
+                  <div className="px-2 mb-2">
+                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Workspace</span>
+                  </div>
 
+                  <Link
+                    href="/home"
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${pathname === '/home' && !activeFolderId
+                      ? "bg-gray-100 text-black shadow-sm"
+                      : "text-gray-600 hover:text-black hover:bg-gray-100"
+                      }`}
+                  >
+                    <FileText className={`w-4 h-4 transition-colors ${pathname === '/home' && !activeFolderId ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+                    <span className="flex-1">All notes</span>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${pathname === '/home' && !activeFolderId
+                      ? "bg-white text-black shadow-sm"
+                      : "bg-gray-100 text-gray-500 group-hover:bg-gray-200/50"
+                      }`}>
+                      {notesCount}
+                    </span>
+                  </Link>
+
+                  <Link
+                    href="/home/study-room"
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${pathname === '/home/study-room'
+                      ? "bg-gray-100 text-black shadow-sm"
+                      : "text-gray-600 hover:text-black hover:bg-gray-100"
+                      }`}
+                  >
+                    <GraduationCap className={`w-4 h-4 transition-colors ${pathname === '/home/study-room' ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+                    <span>Study Room</span>
+                  </Link>
+                </div>
+
+                {/* Folders Section */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between px-2 mb-2 group/header">
+                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Folders</span>
+                    <button
+                      onClick={() => setCreateFolderOpen(true)}
+                      className="p-1 rounded-md text-gray-500 hover:text-black hover:bg-gray-100 opacity-0 group-hover/header:opacity-100 transition-all duration-200"
+                      title="New Folder"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  {folders.map((folder) => (
+                    <Link
+                      key={folder.id}
+                      href={`/home?folder=${folder.id}`}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${activeFolderId === folder.id
+                        ? "bg-gray-100 text-black shadow-sm"
+                        : "text-gray-600 hover:text-black hover:bg-gray-100"
+                        }`}
+                    >
+                      <div
+                        className={`w-2 h-2 rounded-full shadow-sm ring-2 ring-offset-1 ring-offset-white transition-all ${activeFolderId === folder.id ? "ring-gray-200 scale-110" : "ring-transparent group-hover:ring-gray-100"
+                          }`}
+                        style={{ backgroundColor: folder.color }}
+                      />
+                      <span className="flex-1 truncate">{folder.name}</span>
+                      {getFolderNoteCount(folder.id) > 0 && (
+                        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-md ${activeFolderId === folder.id
+                          ? "bg-white text-black"
+                          : "bg-gray-100 text-gray-400 group-hover:bg-gray-200/50"
+                          }`}>
+                          {getFolderNoteCount(folder.id)}
+                        </span>
+                      )}
+                    </Link>
+                  ))}
+
+                  <button
+                    onClick={() => setCreateFolderOpen(true)}
+                    className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-gray-600 hover:text-black hover:bg-gray-100 transition-all duration-200 group dashed-border"
+                  >
+                    <div className="flex items-center justify-center w-4 h-4 rounded border border-gray-400 border-dashed group-hover:border-gray-500">
+                      <Plus className="w-3 h-3" />
+                    </div>
+                    <span>New folder</span>
+                  </button>
+                </div>
+              </>
+            )}
 
           </div>
 
@@ -472,351 +569,357 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
             </div>
           </div>
         </div>
-      </aside>
+      </aside >
 
       {/* Settings Dialog */}
       <AnimatePresence>
-        {settingsOpen && (
-          <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-            <DialogContent className="w-[95vw] max-w-2xl sm:max-w-3xl px-5 py-6 sm:px-10 sm:py-10 bg-white border border-gray-200 shadow-lg rounded-xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="flex items-center text-sm font-bold text-gray-900">
-                  <User className="w-5 h-5 mr-2 text-black" />
-                  My profile
-                </DialogTitle>
-              </DialogHeader>
+        {
+          settingsOpen && (
+            <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+              <DialogContent className="w-[95vw] max-w-2xl sm:max-w-3xl px-5 py-6 sm:px-10 sm:py-10 bg-white border border-gray-200 shadow-lg rounded-xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center text-sm font-bold text-gray-900">
+                    <User className="w-5 h-5 mr-2 text-black" />
+                    My profile
+                  </DialogTitle>
+                </DialogHeader>
 
-              <Separator className="my-2" />
+                <Separator className="my-2" />
 
-              {/* Profile Info */}
-              <div className="flex flex-col gap-3">
-                <div className="flex justify-between items-center">
-                  <small className="font-medium text-sm text-gray-900">Display name</small>
-                  <small className="font-medium text-sm text-gray-900">
-                    {user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}
-                  </small>
-                </div>
-                <div className="flex justify-between items-center">
-                  <small className="font-medium text-sm text-gray-900">Email</small>
-                  <small className="font-medium text-sm text-gray-900">{user?.email}</small>
-                </div>
-                <div className="flex justify-between items-center">
-                  <small className="font-medium text-sm text-gray-900">Active plan</small>
-                  <div className="flex items-center gap-2">
-                    <Badge className={`px-2 py-1 rounded-full border shadow-none ${userTier === "free"
-                      ? "text-gray-900 border-gray-200"
-                      : userTier === "lifetime"
-                        ? "text-purple-900 border-purple-300 bg-purple-50"
-                        : "text-blue-900 border-blue-300 bg-blue-50"
-                      }`}>
-                      {isLoadingSubscription ? "..." : userTier}
-                    </Badge>
-                    {!isLoadingSubscription && userTier === "free" && (
-                      <Button
-                        onClick={() => setPricingOpen(true)}
-                        className="h-[32px] px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white active:scale-[0.98] transition-all duration-100 cursor-pointer"
-                      >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        <span className="text-sm font-bold">Upgrade plan</span>
-                      </Button>
-                    )}
+                {/* Profile Info */}
+                <div className="flex flex-col gap-3">
+                  <div className="flex justify-between items-center">
+                    <small className="font-medium text-sm text-gray-900">Display name</small>
+                    <small className="font-medium text-sm text-gray-900">
+                      {user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}
+                    </small>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <small className="font-medium text-sm text-gray-900">Email</small>
+                    <small className="font-medium text-sm text-gray-900">{user?.email}</small>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <small className="font-medium text-sm text-gray-900">Active plan</small>
+                    <div className="flex items-center gap-2">
+                      <Badge className={`px-2 py-1 rounded-full border shadow-none ${userTier === "free"
+                        ? "text-gray-900 border-gray-200"
+                        : userTier === "lifetime"
+                          ? "text-purple-900 border-purple-300 bg-purple-50"
+                          : "text-blue-900 border-blue-300 bg-blue-50"
+                        }`}>
+                        {isLoadingSubscription ? "..." : userTier}
+                      </Badge>
+                      {!isLoadingSubscription && userTier === "free" && (
+                        <Button
+                          onClick={() => setPricingOpen(true)}
+                          className="h-[32px] px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white active:scale-[0.98] transition-all duration-100 cursor-pointer"
+                        >
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          <span className="text-sm font-bold">Upgrade plan</span>
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <Separator className="my-4" />
+                <Separator className="my-4" />
 
-              <div className="flex justify-end">
-                <button
-                  onClick={handleSignOut}
-                  className="active:scale-105 transition-all duration-100 flex items-center gap-1 text-red-500 hover:text-red-700 transition-all duration-150 cursor-pointer"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
-      </AnimatePresence>
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleSignOut}
+                    className="active:scale-105 transition-all duration-100 flex items-center gap-1 text-red-500 hover:text-red-700 transition-all duration-150 cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )
+        }
+      </AnimatePresence >
 
       {/* Pricing Dialog - Content remains the same as in your original code */}
       <AnimatePresence>
-        {pricingOpen && (
-          <Dialog open={pricingOpen} onOpenChange={setPricingOpen}>
-            <DialogContent className="w-[95vw] max-w-3xl sm:max-w-4xl px-5 py-5 sm:px-6 sm:py-6 bg-white border border-gray-200 shadow-lg rounded-xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="sr-only">Choose Your Plan</DialogTitle>
-              </DialogHeader>
-              <div className="py-2">
-                {/* Yearly/Monthly Toggle */}
-                <div className="flex items-center justify-center mx-auto mb-5 w-full">
-                  <div className="relative flex w-fit items-center rounded-full border border-gray-200 p-2 bg-gray-50">
-                    {/* Sliding background */}
-                    <div
-                      className="absolute inset-y-2 rounded-full bg-gray-900 transition-all duration-300 ease-in-out"
-                      style={{
-                        left: isYearly ? '0.5rem' : '60%',
-                        width: isYearly ? '60%' : 'calc(40% - 0.5rem)',
-                      }}
-                    ></div>
+        {
+          pricingOpen && (
+            <Dialog open={pricingOpen} onOpenChange={setPricingOpen}>
+              <DialogContent className="w-[95vw] max-w-3xl sm:max-w-4xl px-5 py-5 sm:px-6 sm:py-6 bg-white border border-gray-200 shadow-lg rounded-xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="sr-only">Choose Your Plan</DialogTitle>
+                </DialogHeader>
+                <div className="py-2">
+                  {/* Yearly/Monthly Toggle */}
+                  <div className="flex items-center justify-center mx-auto mb-5 w-full">
+                    <div className="relative flex w-fit items-center rounded-full border border-gray-200 p-2 bg-gray-50">
+                      {/* Sliding background */}
+                      <div
+                        className="absolute inset-y-2 rounded-full bg-gray-900 transition-all duration-300 ease-in-out"
+                        style={{
+                          left: isYearly ? '0.5rem' : '60%',
+                          width: isYearly ? '60%' : 'calc(40% - 0.5rem)',
+                        }}
+                      ></div>
 
-                    <button
-                      onClick={() => setIsYearly(true)}
-                      className="relative px-7 py-2.5 rounded-full transition-all duration-300 cursor-pointer z-10"
-                    >
-                      <span className={`relative block text-base font-medium transition-all duration-300 ${isYearly ? 'text-white' : 'text-gray-700'}`}>
-                        Yearly
-                        <span className="ml-2 text-sm font-bold text-green-400 transition-all duration-300">
-                          Save 60%
+                      <button
+                        onClick={() => setIsYearly(true)}
+                        className="relative px-7 py-2.5 rounded-full transition-all duration-300 cursor-pointer z-10"
+                      >
+                        <span className={`relative block text-base font-medium transition-all duration-300 ${isYearly ? 'text-white' : 'text-gray-700'}`}>
+                          Yearly
+                          <span className="ml-2 text-sm font-bold text-green-400 transition-all duration-300">
+                            Save 60%
+                          </span>
                         </span>
-                      </span>
-                    </button>
-                    <button
-                      onClick={() => setIsYearly(false)}
-                      className="relative px-7 py-2.5 rounded-full transition-all duration-300 cursor-pointer z-10"
-                    >
-                      <span className={`relative block text-base font-medium transition-all duration-300 ${!isYearly ? 'text-white' : 'text-gray-700'}`}>
-                        Monthly
-                      </span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Pricing Cards */}
-                <div className="mx-auto mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {/* Monthly/Yearly Plan */}
-                  <div className="flex flex-col shadow-none border border-gray-200 rounded-lg">
-                    <div className="flex flex-grow flex-col p-5">
-                      <div className="flex flex-col">
-                        <h3 className="text-xl font-bold text-gray-900 mb-1.5">
-                          {isYearly ? "Yearly Plan" : "Monthly Plan"}
-                        </h3>
-                        <p className="text-gray-600 text-sm mb-2.5">
-                          All features included
-                        </p>
-                        <div className="flex-1 flex flex-col justify-end">
-                          <div className="mb-2.5">
-                            <span className="text-3xl font-bold text-gray-900">
-                              ${isYearly ? "31.99" : "7.99"}
-                            </span>
-                            <span className="text-sm font-medium text-gray-600 ml-1.5">
-                              / {isYearly ? "year" : "month"}
-                            </span>
-                          </div>
-                          <Button
-                            className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-gray-900 hover:bg-gray-800 text-white py-2.5"
-                            onClick={() => handleCheckout(isYearly ? "yearly" : "monthly")}
-                            disabled={isCreatingCheckout}
-                          >
-                            {isCreatingCheckout ? "Creating checkout..." : "Upgrade plan"}
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="ml-2 h-4 w-4"
-                            >
-                              <path d="M5 12h14"></path>
-                              <path d="m12 5 7 7-7 7"></path>
-                            </svg>
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="mt-4">
-                        <p className="mb-2.5 text-sm text-gray-600 font-medium">Everything in free plan plus:</p>
-                        {[
-                          "Unlimited note generations",
-                          "Unlimited audio calls",
-                          "Unlimited videos & podcasts",
-                          "Unlimited quiz & flashcards",
-                          "100+ languages support",
-                          "24/7 Customer support"
-                        ].map((feature, index) => (
-                          <div key={index} className="mb-1.5 flex items-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="18"
-                              height="18"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="mr-2 h-[18px] w-[18px] text-green-500 flex-shrink-0"
-                            >
-                              <path d="M20 6 9 17l-5-5"></path>
-                            </svg>
-                            <span className="text-sm text-left text-gray-900">{feature}</span>
-                          </div>
-                        ))}
-                      </div>
+                      </button>
+                      <button
+                        onClick={() => setIsYearly(false)}
+                        className="relative px-7 py-2.5 rounded-full transition-all duration-300 cursor-pointer z-10"
+                      >
+                        <span className={`relative block text-base font-medium transition-all duration-300 ${!isYearly ? 'text-white' : 'text-gray-700'}`}>
+                          Monthly
+                        </span>
+                      </button>
                     </div>
                   </div>
 
-                  {/* Lifetime Plan */}
-                  <div className="flex flex-col shadow-none border border-blue-300 relative rounded-lg">
-                    <div className="absolute -top-2 right-4 bg-blue-500 text-white px-2.5 py-1 rounded-full text-[11px] font-bold">
-                      BEST VALUE
-                    </div>
-                    <div className="flex flex-grow flex-col p-5">
-                      <div className="flex flex-col">
-                        <h3 className="text-xl font-bold text-gray-900 mb-1.5">Lifetime Access</h3>
-                        <p className="text-gray-600 text-sm mb-2.5">
-                          Pay once, own forever
-                        </p>
-                        <div className="flex-1 flex flex-col justify-end">
-                          <div className="mb-2.5">
-                            <span className="text-3xl font-bold text-gray-900">$99.99</span>
-                            <span className="text-sm font-medium text-gray-600 ml-1.5">one-time</span>
-                          </div>
-                          <Button
-                            className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-blue-500 hover:bg-blue-600 text-white py-2.5"
-                            onClick={() => handleCheckout("lifetime")}
-                            disabled={isCreatingCheckout}
-                          >
-                            {isCreatingCheckout ? "Creating checkout..." : "Get Lifetime Access"}
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="ml-2 h-4 w-4"
+                  {/* Pricing Cards */}
+                  <div className="mx-auto mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {/* Monthly/Yearly Plan */}
+                    <div className="flex flex-col shadow-none border border-gray-200 rounded-lg">
+                      <div className="flex flex-grow flex-col p-5">
+                        <div className="flex flex-col">
+                          <h3 className="text-xl font-bold text-gray-900 mb-1.5">
+                            {isYearly ? "Yearly Plan" : "Monthly Plan"}
+                          </h3>
+                          <p className="text-gray-600 text-sm mb-2.5">
+                            All features included
+                          </p>
+                          <div className="flex-1 flex flex-col justify-end">
+                            <div className="mb-2.5">
+                              <span className="text-3xl font-bold text-gray-900">
+                                ${isYearly ? "31.99" : "7.99"}
+                              </span>
+                              <span className="text-sm font-medium text-gray-600 ml-1.5">
+                                / {isYearly ? "year" : "month"}
+                              </span>
+                            </div>
+                            <Button
+                              className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-gray-900 hover:bg-gray-800 text-white py-2.5"
+                              onClick={() => handleCheckout(isYearly ? "yearly" : "monthly")}
+                              disabled={isCreatingCheckout}
                             >
-                              <path d="M5 12h14"></path>
-                              <path d="m12 5 7 7-7 7"></path>
-                            </svg>
-                          </Button>
+                              {isCreatingCheckout ? "Creating checkout..." : "Upgrade plan"}
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="ml-2 h-4 w-4"
+                              >
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                              </svg>
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="mt-4">
+                          <p className="mb-2.5 text-sm text-gray-600 font-medium">Everything in free plan plus:</p>
+                          {[
+                            "Unlimited note generations",
+                            "Unlimited audio calls",
+                            "Unlimited videos & podcasts",
+                            "Unlimited quiz & flashcards",
+                            "100+ languages support",
+                            "24/7 Customer support"
+                          ].map((feature, index) => (
+                            <div key={index} className="mb-1.5 flex items-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="mr-2 h-[18px] w-[18px] text-green-500 flex-shrink-0"
+                              >
+                                <path d="M20 6 9 17l-5-5"></path>
+                              </svg>
+                              <span className="text-sm text-left text-gray-900">{feature}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                      <div className="mt-4">
-                        <p className="mb-2.5 text-sm text-gray-600 font-medium">All premium features plus:</p>
-                        {[
-                          "✨ Lifetime updates",
-                          "✨ No expiration",
-                          "✨ One-time payment",
-                          "Unlimited note generations",
-                          "Unlimited audio calls",
-                          "Unlimited videos & podcasts",
-                          "Unlimited quiz & flashcards",
-                          "100+ languages support",
-                          "24/7 Customer support"
-                        ].map((feature, index) => (
-                          <div key={index} className="mb-1.5 flex items-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="18"
-                              height="18"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="mr-2 h-[18px] w-[18px] text-green-500 flex-shrink-0"
+                    </div>
+
+                    {/* Lifetime Plan */}
+                    <div className="flex flex-col shadow-none border border-blue-300 relative rounded-lg">
+                      <div className="absolute -top-2 right-4 bg-blue-500 text-white px-2.5 py-1 rounded-full text-[11px] font-bold">
+                        BEST VALUE
+                      </div>
+                      <div className="flex flex-grow flex-col p-5">
+                        <div className="flex flex-col">
+                          <h3 className="text-xl font-bold text-gray-900 mb-1.5">Lifetime Access</h3>
+                          <p className="text-gray-600 text-sm mb-2.5">
+                            Pay once, own forever
+                          </p>
+                          <div className="flex-1 flex flex-col justify-end">
+                            <div className="mb-2.5">
+                              <span className="text-3xl font-bold text-gray-900">$99.99</span>
+                              <span className="text-sm font-medium text-gray-600 ml-1.5">one-time</span>
+                            </div>
+                            <Button
+                              className="w-full mt-2.5 gap-2 text-base font-semibold cursor-pointer bg-blue-500 hover:bg-blue-600 text-white py-2.5"
+                              onClick={() => handleCheckout("lifetime")}
+                              disabled={isCreatingCheckout}
                             >
-                              <path d="M20 6 9 17l-5-5"></path>
-                            </svg>
-                            <span className="text-sm text-left text-gray-900">{feature}</span>
+                              {isCreatingCheckout ? "Creating checkout..." : "Get Lifetime Access"}
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="ml-2 h-4 w-4"
+                              >
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                              </svg>
+                            </Button>
                           </div>
-                        ))}
+                        </div>
+                        <div className="mt-4">
+                          <p className="mb-2.5 text-sm text-gray-600 font-medium">All premium features plus:</p>
+                          {[
+                            "✨ Lifetime updates",
+                            "✨ No expiration",
+                            "✨ One-time payment",
+                            "Unlimited note generations",
+                            "Unlimited audio calls",
+                            "Unlimited videos & podcasts",
+                            "Unlimited quiz & flashcards",
+                            "100+ languages support",
+                            "24/7 Customer support"
+                          ].map((feature, index) => (
+                            <div key={index} className="mb-1.5 flex items-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="mr-2 h-[18px] w-[18px] text-green-500 flex-shrink-0"
+                              >
+                                <path d="M20 6 9 17l-5-5"></path>
+                              </svg>
+                              <span className="text-sm text-left text-gray-900">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
-      </AnimatePresence>
+              </DialogContent>
+            </Dialog>
+          )
+        }
+      </AnimatePresence >
 
       {/* Create Folder Modal */}
       <AnimatePresence>
-        {createFolderOpen && (
-          <Dialog open={createFolderOpen} onOpenChange={setCreateFolderOpen}>
-            <DialogContent className="max-w-md w-[90vw] sm:w-full p-6 bg-white border border-gray-300 rounded-2xl">
-              <DialogHeader>
-                <DialogTitle className="text-2xl tracking-tight font-bold text-black text-center">
-                  Create Folder
-                </DialogTitle>
-              </DialogHeader>
-              <div className="w-full flex flex-col items-center pt-3">
-                <div className="flex flex-col w-full items-start gap-3">
-                  <div className="w-full">
-                    <label htmlFor="folderName" className="text-sm font-medium leading-none text-black mb-2 block">
-                      Folder name
-                    </label>
-                    <input
-                      id="folderName"
-                      type="text"
-                      value={folderName}
-                      onChange={(e) => setFolderName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && folderName.trim()) {
-                          handleCreateFolder();
-                        }
-                      }}
-                      autoComplete="off"
-                      className="flex w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2 text-base transition-colors placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 disabled:cursor-not-allowed disabled:opacity-50 text-black"
-                      placeholder="e.g. Work, Study, Personal"
-                      autoFocus
-                    />
-                  </div>
-                  <div className="w-full">
-                    <label className="text-sm font-medium leading-none text-black mb-2 block">
-                      Color
-                    </label>
-                    <div className="flex gap-2 flex-wrap">
-                      {["#d1d5db", "#3b82f6", "#10b981", "#ef4444", "#f59e0b", "#8b5cf6", "#ec4899"].map((color) => (
-                        <button
-                          key={color}
-                          onClick={() => setFolderColor(color)}
-                          className={`w-8 h-8 rounded-full transition-all ${folderColor === color ? "ring-2 ring-offset-2 ring-gray-900" : "hover:scale-110"
-                            }`}
-                          style={{ backgroundColor: color }}
-                        />
-                      ))}
+        {
+          createFolderOpen && (
+            <Dialog open={createFolderOpen} onOpenChange={setCreateFolderOpen}>
+              <DialogContent className="max-w-md w-[90vw] sm:w-full p-6 bg-white border border-gray-300 rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl tracking-tight font-bold text-black text-center">
+                    Create Folder
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="w-full flex flex-col items-center pt-3">
+                  <div className="flex flex-col w-full items-start gap-3">
+                    <div className="w-full">
+                      <label htmlFor="folderName" className="text-sm font-medium leading-none text-black mb-2 block">
+                        Folder name
+                      </label>
+                      <input
+                        id="folderName"
+                        type="text"
+                        value={folderName}
+                        onChange={(e) => setFolderName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && folderName.trim()) {
+                            handleCreateFolder();
+                          }
+                        }}
+                        autoComplete="off"
+                        className="flex w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2 text-base transition-colors placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 disabled:cursor-not-allowed disabled:opacity-50 text-black"
+                        placeholder="e.g. Work, Study, Personal"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label className="text-sm font-medium leading-none text-black mb-2 block">
+                        Color
+                      </label>
+                      <div className="flex gap-2 flex-wrap">
+                        {["#d1d5db", "#3b82f6", "#10b981", "#ef4444", "#f59e0b", "#8b5cf6", "#ec4899"].map((color) => (
+                          <button
+                            key={color}
+                            onClick={() => setFolderColor(color)}
+                            className={`w-8 h-8 rounded-full transition-all ${folderColor === color ? "ring-2 ring-offset-2 ring-gray-900" : "hover:scale-110"
+                              }`}
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <button
-                  onClick={() => {
-                    setCreateFolderOpen(false);
-                    setFolderName("");
-                    setFolderColor("#d1d5db");
-                  }}
-                  className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium h-10 px-4 py-2 bg-gray-200 text-black hover:bg-gray-300 cursor-pointer transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleCreateFolder}
-                  disabled={!folderName.trim()}
-                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium h-10 px-4 py-2 transition-colors ${folderName.trim()
-                    ? "bg-black text-white hover:bg-gray-900 cursor-pointer"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed opacity-50"
-                    }`}
-                >
-                  Create
-                </button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
-      </AnimatePresence>
+                <div className="flex justify-end gap-2 mt-4">
+                  <button
+                    onClick={() => {
+                      setCreateFolderOpen(false);
+                      setFolderName("");
+                      setFolderColor("#d1d5db");
+                    }}
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium h-10 px-4 py-2 bg-gray-200 text-black hover:bg-gray-300 cursor-pointer transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleCreateFolder}
+                    disabled={!folderName.trim()}
+                    className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium h-10 px-4 py-2 transition-colors ${folderName.trim()
+                      ? "bg-black text-white hover:bg-gray-900 cursor-pointer"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed opacity-50"
+                      }`}
+                  >
+                    Create
+                  </button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )
+        }
+      </AnimatePresence >
     </>
   );
 }
