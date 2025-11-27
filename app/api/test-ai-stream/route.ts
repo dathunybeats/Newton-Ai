@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       maxOutputTokens: 1000,
     });
 
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
   } catch (error: any) {
     console.error('AI Stream error:', error);
     return new Response(
