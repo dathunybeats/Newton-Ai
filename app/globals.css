@@ -87,12 +87,12 @@ body {
 
 /* Custom text selection color */
 ::selection {
-  background-color: #7DFF97;
+  background-color: #93C5FD;
   color: #000000;
 }
 
 ::-moz-selection {
-  background-color: #7DFF97;
+  background-color: #93C5FD;
   color: #000000;
 }
 
