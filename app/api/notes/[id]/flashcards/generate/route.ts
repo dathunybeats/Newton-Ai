@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { openai } from '@ai-sdk/openai';
+import { generateText } from 'ai';
 
 interface Flashcard {
   question: string;
@@ -84,8 +81,8 @@ ${note.content}
 Return ONLY a JSON array of objects with "question" and "answer" fields. No additional text.
 Example format: [{"question": "What is...", "answer": "It is..."}, ...]`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+    const { text } = await generateText({
+      model: openai('gpt-4o-mini'),
       messages: [
         {
           role: "system",
@@ -98,30 +95,14 @@ Example format: [{"question": "What is...", "answer": "It is..."}, ...]`;
         },
       ],
       temperature: 0.7,
-      max_tokens: 2000,
+      maxOutputTokens: 2000,
+      output: 'array',
     });
 
-    const responseText = completion.choices[0].message.content?.trim();
-    if (!responseText) {
-      throw new Error("No response from OpenAI");
-    }
+    const flashcards = text as Flashcard[];
 
-    // Parse the JSON response (handle markdown code blocks)
-    let flashcards: Flashcard[];
-    try {
-      // Remove markdown code blocks if present
-      let cleanedResponse = responseText;
-      if (responseText.startsWith('```')) {
-        cleanedResponse = responseText
-          .replace(/^```json\n?/, '')
-          .replace(/^```\n?/, '')
-          .replace(/\n?```$/, '')
-          .trim();
-      }
-      flashcards = JSON.parse(cleanedResponse);
-    } catch (parseError) {
-      console.error("Failed to parse OpenAI response:", responseText);
-      throw new Error("Invalid JSON response from AI");
+    if (!flashcards || !Array.isArray(flashcards)) {
+      throw new Error("Invalid response format from AI");
     }
 
     // Validate flashcards

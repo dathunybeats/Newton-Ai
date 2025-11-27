@@ -1,8 +1,5 @@
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "",
-});
+import { openai } from '@ai-sdk/openai';
+import { generateText } from 'ai';
 
 /**
  * Generate comprehensive study notes from text content
@@ -17,8 +14,8 @@ export async function generateNotesFromContent(
   const sourceContext =
     contentType === "youtube" ? "video transcript" : "PDF document";
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+  const { text } = await generateText({
+    model: openai('gpt-4o-mini'),
     messages: [
       {
         role: "system",
@@ -72,10 +69,10 @@ Generate notes that are professional, comprehensive, and perfect for studying or
       },
     ],
     temperature: 0.7,
-    max_tokens: 4000,
+    maxOutputTokens: 4000,
   });
 
-  return completion.choices[0]?.message?.content || "";
+  return text;
 }
 
 /**
@@ -88,8 +85,8 @@ export async function generateTitleAndDescription(
 ): Promise<{ title: string; description: string }> {
   const preview = content.substring(0, 2000);
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+  const { text } = await generateText({
+    model: openai('gpt-4o-mini'),
     messages: [
       {
         role: "system",
@@ -102,11 +99,11 @@ export async function generateTitleAndDescription(
       },
     ],
     temperature: 0.7,
-    max_tokens: 200,
-    response_format: { type: "json_object" },
+    maxOutputTokens: 200,
+    output: 'object',
   });
 
-  const result = JSON.parse(completion.choices[0]?.message?.content || "{}");
+  const result = text as { title?: string; description?: string };
   return {
     title: result.title || "Untitled Note",
     description: result.description || "",

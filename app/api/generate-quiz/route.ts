@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
 import { createClient } from "@/lib/supabase/server";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { openai } from '@ai-sdk/openai';
+import { generateText } from 'ai';
 
 export async function POST(request: NextRequest) {
   try {
@@ -80,8 +77,8 @@ Return a JSON object with a "questions" field containing the array:
   ]
 }`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+    const { text } = await generateText({
+      model: openai('gpt-4o'),
       messages: [
         {
           role: "system",
@@ -93,34 +90,21 @@ Return a JSON object with a "questions" field containing the array:
         },
       ],
       temperature: 0.7,
-      max_tokens: 4096,
-      response_format: { type: "json_object" },
+      maxOutputTokens: 4096,
+      output: 'object',
     });
 
-    const responseText = completion.choices[0]?.message?.content || "";
-
-    // Parse the JSON response
-    let parsedResponse;
+    // Extract questions from the response
+    const parsedResponse = text as { questions?: any[] } | any[];
     let questions;
 
-    try {
-      // Parse the JSON object
-      parsedResponse = JSON.parse(responseText);
-
-      // Extract questions array from the response
-      if (parsedResponse.questions && Array.isArray(parsedResponse.questions)) {
-        questions = parsedResponse.questions;
-      } else if (Array.isArray(parsedResponse)) {
-        // In case it returns an array directly
-        questions = parsedResponse;
-      } else {
-        console.error("Unexpected response format:", parsedResponse);
-        throw new Error("Response does not contain a questions array");
-      }
-    } catch (parseError) {
-      console.error("Failed to parse OpenAI response:", parseError);
-      console.error("Response text:", responseText);
-      throw new Error("Failed to parse quiz questions from OpenAI response");
+    if (Array.isArray(parsedResponse)) {
+      questions = parsedResponse;
+    } else if (parsedResponse.questions && Array.isArray(parsedResponse.questions)) {
+      questions = parsedResponse.questions;
+    } else {
+      console.error("Unexpected response format:", parsedResponse);
+      throw new Error("Response does not contain a questions array");
     }
 
     // Validate the questions format

@@ -6,18 +6,15 @@ import {
   generateTitleAndDescription,
 } from "@/lib/openai-helpers";
 import { checkRateLimit } from "@/lib/rate-limit";
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { openai } from '@ai-sdk/openai';
+import { generateText } from 'ai';
 
 /**
  * Generate educational content from a user prompt
  */
 async function generateContentFromPrompt(prompt: string): Promise<string> {
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+  const { text } = await generateText({
+    model: openai('gpt-4o-mini'),
     messages: [
       {
         role: "system",
@@ -49,10 +46,10 @@ Remember: You're creating the educational material that will be studied, not the
       },
     ],
     temperature: 0.7,
-    max_tokens: 3000,
+    maxOutputTokens: 3000,
   });
 
-  return completion.choices[0]?.message?.content || "";
+  return text;
 }
 
 export async function POST(request: NextRequest) {
