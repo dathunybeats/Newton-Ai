@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { canCreateNote } from "@/lib/subscriptions";
+import { canCreateNote, hasActiveSubscription } from "@/lib/subscriptions";
 import {
   generateNotesFromContent,
   generateTitleAndDescription,
 } from "@/lib/openai-helpers";
+import { checkRateLimit } from "@/lib/rate-limit";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -67,7 +68,40 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2. Check subscription limits
+    // 2. Check rate limit
+    const isPaid = await hasActiveSubscription(user.id);
+    const rateLimitResult = await checkRateLimit(user.id, isPaid, "note");
+
+    if (!rateLimitResult.success) {
+      const resetDate = new Date(rateLimitResult.reset);
+      const minutesUntilReset = Math.ceil(
+        (resetDate.getTime() - Date.now()) / 1000 / 60
+      );
+
+      return NextResponse.json(
+        {
+          error: "Rate limit exceeded",
+          message: `You've reached your limit of ${rateLimitResult.limit} notes per hour. ${
+            isPaid ? "Please try again" : "Upgrade for higher limits"
+          } in ${minutesUntilReset} minutes.`,
+          limit: rateLimitResult.limit,
+          remaining: rateLimitResult.remaining,
+          reset: rateLimitResult.reset,
+          resetIn: minutesUntilReset,
+          upgradeRequired: !isPaid,
+        },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": rateLimitResult.limit.toString(),
+            "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+            "X-RateLimit-Reset": rateLimitResult.reset.toString(),
+          },
+        }
+      );
+    }
+
+    // 3. Check subscription limits (total notes)
     const noteCheck = await canCreateNote(user.id);
 
     if (!noteCheck.allowed) {
@@ -84,7 +118,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Get prompt from request
+    // 4. Get prompt from request
     const { prompt } = await request.json();
 
     if (!prompt || !prompt.trim()) {
@@ -94,25 +128,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Generate educational content from the prompt
+    // 5. Generate educational content from the prompt
     const educationalContent = await generateContentFromPrompt(prompt.trim());
 
     if (!educationalContent || educationalContent.trim().length === 0) {
       throw new Error("Failed to generate educational content");
     }
 
-    // 5. Generate structured notes from the educational content
+    // 6. Generate structured notes from the educational content
     const structuredNotes = await generateNotesFromContent(
       educationalContent,
       "pdf"
     );
 
-    // 6. Generate title and description
+    // 7. Generate title and description
     const { title, description } = await generateTitleAndDescription(
       educationalContent
     );
 
-    // 7. Save to database
+    // 8. Save to database
     const { data: note, error: dbError } = await supabase
       .from("notes")
       .insert({
@@ -132,7 +166,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 8. Return success
+    // 9. Return success
     return NextResponse.json({
       success: true,
       noteId: note.id,
