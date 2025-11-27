@@ -82,12 +82,12 @@ Return ONLY a JSON array of objects with "question" and "answer" fields. No addi
 Example format: [{"question": "What is...", "answer": "It is..."}, ...]`;
 
     const { text } = await generateText({
-      model: openai('gpt-4o-mini', { structuredOutputs: true }),
+      model: openai('gpt-4o-mini'),
       messages: [
         {
           role: "system",
           content:
-            "You are a helpful study assistant that creates educational flashcards. Return only valid JSON arrays.",
+            "You are a helpful study assistant that creates educational flashcards. Return only valid JSON arrays. Do not include markdown code blocks.",
         },
         {
           role: "user",
@@ -98,7 +98,16 @@ Example format: [{"question": "What is...", "answer": "It is..."}, ...]`;
       maxOutputTokens: 2000,
     });
 
-    const flashcards = JSON.parse(text) as Flashcard[];
+    // Clean response of any markdown code blocks
+    let cleanedText = text.trim();
+    if (cleanedText.startsWith('```')) {
+      cleanedText = cleanedText
+        .replace(/^```json?\n?/, '')
+        .replace(/\n?```$/, '')
+        .trim();
+    }
+
+    const flashcards = JSON.parse(cleanedText) as Flashcard[];
 
     if (!flashcards || !Array.isArray(flashcards)) {
       throw new Error("Invalid response format from AI");

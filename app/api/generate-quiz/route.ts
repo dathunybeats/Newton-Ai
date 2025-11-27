@@ -78,7 +78,7 @@ Return a JSON object with a "questions" field containing the array:
 }`;
 
     const { text } = await generateText({
-      model: openai('gpt-4o', { structuredOutputs: true }),
+      model: openai('gpt-4o'),
       messages: [
         {
           role: "system",
@@ -93,8 +93,17 @@ Return a JSON object with a "questions" field containing the array:
       maxOutputTokens: 4096,
     });
 
+    // Clean response of any markdown code blocks
+    let cleanedText = text.trim();
+    if (cleanedText.startsWith('```')) {
+      cleanedText = cleanedText
+        .replace(/^```json?\n?/, '')
+        .replace(/\n?```$/, '')
+        .trim();
+    }
+
     // Parse JSON response
-    const parsedResponse = JSON.parse(text) as { questions?: any[] } | any[];
+    const parsedResponse = JSON.parse(cleanedText) as { questions?: any[] } | any[];
     let questions;
 
     if (Array.isArray(parsedResponse)) {

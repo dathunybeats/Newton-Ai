@@ -86,12 +86,12 @@ export async function generateTitleAndDescription(
   const preview = content.substring(0, 2000);
 
   const { text } = await generateText({
-    model: openai('gpt-4o-mini', { structuredOutputs: true }),
+    model: openai('gpt-4o-mini'),
     messages: [
       {
         role: "system",
         content:
-          "Generate a concise title (max 60 characters) and a brief description (max 160 characters) for this content. Return the response as a JSON object with 'title' and 'description' fields.",
+          "Generate a concise title (max 60 characters) and a brief description (max 160 characters) for this content. Return ONLY a valid JSON object with 'title' and 'description' fields. Do not include any markdown formatting or code blocks.",
       },
       {
         role: "user",
@@ -102,7 +102,16 @@ export async function generateTitleAndDescription(
     maxOutputTokens: 200,
   });
 
-  const result = JSON.parse(text) as { title?: string; description?: string };
+  // Clean response of any markdown code blocks
+  let cleanedText = text.trim();
+  if (cleanedText.startsWith('```')) {
+    cleanedText = cleanedText
+      .replace(/^```json?\n?/, '')
+      .replace(/\n?```$/, '')
+      .trim();
+  }
+
+  const result = JSON.parse(cleanedText) as { title?: string; description?: string };
   return {
     title: result.title || "Untitled Note",
     description: result.description || "",
