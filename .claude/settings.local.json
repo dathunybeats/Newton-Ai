@@ -50,7 +50,8 @@
       "Bash(npx shadcn@latest add:*)",
       "mcp__supabase__get_advisors",
       "mcp__supabase__get_logs",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "WebFetch(domain:ai-sdk.dev)"
     ],
     "deny": [
       "Bash(npm run dev)",
