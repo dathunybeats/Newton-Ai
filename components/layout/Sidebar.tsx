@@ -15,6 +15,7 @@ import { useNoteContext } from "@/contexts/NoteContext";
 import { PLAN_IDS } from "@/lib/payments/whop";
 import { formatPlanName, type PlanTier } from "@/lib/subscriptions/types";
 import { ActiveSessionWidget } from "@/components/study/ActiveSessionWidget";
+import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 
 interface SidebarProps {
   notes: any[];
@@ -62,7 +63,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
       <div className="space-y-2">
         <Link
           href="/home"
-          className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black transition-colors px-3 py-2 rounded-lg hover:bg-gray-50 mb-2"
+          className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-lg hover:bg-accent mb-2"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Home
@@ -75,61 +76,61 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
             scroll={false}
             onClick={() => setSidebarOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${!searchParams.get("tool")
-              ? "bg-gray-100 text-black shadow-sm"
-              : "text-gray-600 hover:text-black hover:bg-gray-100"
+              ? "bg-accent text-accent-foreground shadow-sm"
+              : "text-foreground hover:text-accent-foreground hover:bg-accent"
               }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 18 18" className={`w-4 h-4 transition-colors ${!searchParams.get("tool") ? "text-black" : "text-gray-500 group-hover:text-black"}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 18 18" className={`w-4 h-4 transition-colors ${!searchParams.get("tool") ? "text-accent-foreground" : "text-muted-foreground group-hover:text-accent-foreground"}`}>
               <path d="M11,14H7v3.5c0,.202,.122,.385,.309,.462,.187,.079,.401,.035,.545-.108l1.146-1.146,1.146,1.146c.096,.096,.224,.146,.354,.146,.064,0,.13-.012,.191-.038,.187-.077,.309-.26,.309-.462v-3.5Z" fill="currentColor"></path>
               <path d="M15.994,12.25h.006V2.25c0-.414-.336-.75-.75-.75H4.75c-1.517,0-2.75,1.233-2.75,2.75V14c0,1.378,1.122,2.5,2.5,2.5h.75c.414,0,.75-.336,.75-.75s-.336-.75-.75-.75h-.75c-.551,0-1-.449-1-1s.449-1,1-1H14.106c-.155,.629-.174,1.339-.014,2h-1.342c-.414,0-.75,.336,.75,.75s.336,.75,.75,.75h2.5c.286,0,.547-.163,.673-.419,.126-.256,.096-.562-.079-.789-.523-.679-.434-2.013,.003-2.589,.101-.133,.146-.293,.146-.454Zm-10.244-1.75c-.414,0-.75-.336-.75-.75s.336-.75,.75-.75,.75,.336,.75,.75-.336,.75-.75,.75Zm0-2.5c-.414,0-.75-.336-.75-.75s.336-.75,.75-.75,.75,.336,.75,.75-.336,.75-.75,.75Zm0-2.5c-.414,0-.75-.336-.75-.75s.336-.75,.75-.75,.75,.336,.75,.75-.336,.75-.75,.75Z" fill="currentColor"></path>
             </svg>
             <span>Read Note</span>
           </Link>
 
-          {/* <Link
+          <Link
             href={`/home/note/${noteId}?tool=chat`}
             prefetch={true}
             scroll={false}
             onClick={() => setSidebarOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "chat"
-              ? "bg-gray-100 text-black shadow-sm"
-              : "text-gray-600 hover:text-black hover:bg-gray-100"
+              ? "bg-accent text-accent-foreground shadow-sm"
+              : "text-foreground hover:text-accent-foreground hover:bg-accent"
               }`}
           >
-            <MessageSquare className={`w-4 h-4 transition-colors ${currentTool === "chat" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+            <MessageSquare className={`w-4 h-4 transition-colors ${currentTool === "chat" ? "text-accent-foreground" : "text-muted-foreground group-hover:text-accent-foreground"}`} />
             <span>Chat with Note</span>
-          </Link> */}
+          </Link>
 
-          {/* <Link
+          <Link
             href={`/home/note/${noteId}?tool=notes`}
             prefetch={true}
             scroll={false}
             onClick={() => setSidebarOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "notes"
-              ? "bg-gray-100 text-black shadow-sm"
-              : "text-gray-600 hover:text-black hover:bg-gray-100"
+              ? "bg-accent text-accent-foreground shadow-sm"
+              : "text-foreground hover:text-accent-foreground hover:bg-accent"
               }`}
           >
-            <PenTool className={`w-4 h-4 transition-colors ${currentTool === "notes" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+            <PenTool className={`w-4 h-4 transition-colors ${currentTool === "notes" ? "text-accent-foreground" : "text-muted-foreground group-hover:text-accent-foreground"}`} />
             <span>Side Notes</span>
-          </Link> */}
+          </Link>
 
-          {/* <Link
+          <Link
             href={`/home/note/${noteId}?tool=podcast`}
             prefetch={true}
             scroll={false}
             onClick={() => setSidebarOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "podcast"
-              ? "bg-gray-100 text-black shadow-sm"
-              : "text-gray-600 hover:text-black hover:bg-gray-100"
+              ? "bg-accent text-accent-foreground shadow-sm"
+              : "text-foreground hover:text-accent-foreground hover:bg-accent"
               }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 18 18" className={`w-4 h-4 transition-colors ${currentTool === "podcast" ? "text-black" : "text-gray-500 group-hover:text-black"}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 18 18" className={`w-4 h-4 transition-colors ${currentTool === "podcast" ? "text-accent-foreground" : "text-muted-foreground group-hover:text-accent-foreground"}`}>
               <path d="M10.709,17h-1.959c-.414,0-.75-.336-.75-.75s.336-.75,.75-.75h1.959c.586,0,1.087-.399,1.219-.971l.343-1.451c.095-.403,.498-.65,.902-.558,.402,.095,.652,.5,.557,.902l-.342,1.447c-.287,1.253-1.39,2.131-2.679,2.131Z" fill="currentColor"></path>
               <path d="M14.137,14h-1.137c-.227,0-.441-.103-.584-.279-.143-.176-.197-.408-.149-.629l1.084-5c.104-.422,.149-.762,.149-1.091,0-2.481-2.019-4.5-4.5-4.5s-4.5,2.019-4.5,4.5c0,.329,.046,.669,.145,1.071l1.089,5.02c.048,.222-.007,.453-.149,.629-.143,.177-.357,.279-.584,.279h-1.137c-1.285,0-2.416-.912-2.688-2.167l-.335-1.545c-.265-1.224,.332-2.473,1.449-3.037l.712-.359c.059-3.258,2.727-5.891,5.999-5.891s5.94,2.633,5.999,5.891l.712,.359c1.117,.564,1.714,1.813,1.449,3.037l-.335,1.545c-.272,1.256-1.403,2.167-2.688,2.167Z" fill="currentColor"></path>
             </svg>
             <span>Podcast</span>
-          </Link> */}
+          </Link>
 
           <Link
             href={`/home/note/${noteId}?tool=quiz`}
@@ -137,11 +138,11 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
             scroll={false}
             onClick={() => setSidebarOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "quiz"
-              ? "bg-gray-100 text-black shadow-sm"
-              : "text-gray-600 hover:text-black hover:bg-gray-100"
+              ? "bg-accent text-accent-foreground shadow-sm"
+              : "text-foreground hover:text-accent-foreground hover:bg-accent"
               }`}
           >
-            <Brain className={`w-4 h-4 transition-colors ${currentTool === "quiz" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+            <Brain className={`w-4 h-4 transition-colors ${currentTool === "quiz" ? "text-accent-foreground" : "text-muted-foreground group-hover:text-accent-foreground"}`} />
             <span>Quiz</span>
           </Link>
 
@@ -151,11 +152,11 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
             scroll={false}
             onClick={() => setSidebarOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${currentTool === "flashcards"
-              ? "bg-gray-100 text-black shadow-sm"
-              : "text-gray-600 hover:text-black hover:bg-gray-100"
+              ? "bg-accent text-accent-foreground shadow-sm"
+              : "text-foreground hover:text-accent-foreground hover:bg-accent"
               }`}
           >
-            <Layers className={`w-4 h-4 transition-colors ${currentTool === "flashcards" ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+            <Layers className={`w-4 h-4 transition-colors ${currentTool === "flashcards" ? "text-accent-foreground" : "text-muted-foreground group-hover:text-accent-foreground"}`} />
             <span>Flashcards</span>
           </Link>
         </div>
@@ -360,7 +361,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed left-0 top-0 z-50 h-full w-[280px] border-r border-gray-200 bg-white flex flex-col transition-transform duration-300 ${sidebarOpen ? 'max-[872px]:translate-x-0' : 'max-[872px]:-translate-x-full'}`}>
+      <aside className={`fixed left-0 top-0 z-50 h-full w-[280px] border-r border-border bg-card flex flex-col transition-transform duration-300 ${sidebarOpen ? 'max-[872px]:translate-x-0' : 'max-[872px]:-translate-x-full'}`}>
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex items-center justify-between px-6 py-6">
@@ -373,13 +374,13 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                 className="object-contain w-8 h-8 group-hover:scale-105 transition-transform duration-200"
                 priority
               />
-              <h4 className="text-lg font-bold text-black tracking-tight">
+              <h4 className="text-lg font-bold text-foreground tracking-tight">
                 Newton AI
               </h4>
             </Link>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="hidden max-[872px]:flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors"
+              className="hidden max-[872px]:flex items-center justify-center w-8 h-8 rounded-lg bg-secondary hover:bg-secondary/80 text-muted-foreground transition-colors"
             >
               <PanelLeftClose className="w-5 h-5" />
             </button>
@@ -396,22 +397,22 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                 {/* Main Navigation */}
                 <div className="space-y-1">
                   <div className="px-2 mb-2">
-                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Workspace</span>
+                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Workspace</span>
                   </div>
 
                   <Link
                     href="/home"
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${pathname === '/home' && !activeFolderId
-                      ? "bg-gray-100 text-black shadow-sm"
-                      : "text-gray-600 hover:text-black hover:bg-gray-100"
+                      ? "bg-accent text-accent-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
                       }`}
                   >
-                    <FileText className={`w-4 h-4 transition-colors ${pathname === '/home' && !activeFolderId ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+                    <FileText className={`w-4 h-4 transition-colors ${pathname === '/home' && !activeFolderId ? "text-accent-foreground" : "text-muted-foreground group-hover:text-foreground"}`} />
                     <span className="flex-1">All notes</span>
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${pathname === '/home' && !activeFolderId
-                      ? "bg-white text-black shadow-sm"
-                      : "bg-gray-100 text-gray-500 group-hover:bg-gray-200/50"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "bg-secondary text-muted-foreground group-hover:bg-secondary/80"
                       }`}>
                       {notesCount}
                     </span>
@@ -419,13 +420,14 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
 
                   <Link
                     href="/home/study-room"
+                    prefetch={true}
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${pathname === '/home/study-room'
-                      ? "bg-gray-100 text-black shadow-sm"
-                      : "text-gray-600 hover:text-black hover:bg-gray-100"
+                      ? "bg-accent text-accent-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
                       }`}
                   >
-                    <GraduationCap className={`w-4 h-4 transition-colors ${pathname === '/home/study-room' ? "text-black" : "text-gray-500 group-hover:text-black"}`} />
+                    <GraduationCap className={`w-4 h-4 transition-colors ${pathname === '/home/study-room' ? "text-accent-foreground" : "text-muted-foreground group-hover:text-foreground"}`} />
                     <span>Study Room</span>
                   </Link>
                 </div>
@@ -433,10 +435,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                 {/* Folders Section */}
                 <div className="space-y-1">
                   <div className="flex items-center justify-between px-2 mb-2 group/header">
-                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Folders</span>
+                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Folders</span>
                     <button
                       onClick={() => setCreateFolderOpen(true)}
-                      className="p-1 rounded-md text-gray-500 hover:text-black hover:bg-gray-100 opacity-0 group-hover/header:opacity-100 transition-all duration-200"
+                      className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent opacity-0 group-hover/header:opacity-100 transition-all duration-200"
                       title="New Folder"
                     >
                       <Plus className="w-3.5 h-3.5" />
@@ -449,20 +451,20 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                       href={`/home?folder=${folder.id}`}
                       onClick={() => setSidebarOpen(false)}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${activeFolderId === folder.id
-                        ? "bg-gray-100 text-black shadow-sm"
-                        : "text-gray-600 hover:text-black hover:bg-gray-100"
+                        ? "bg-accent text-accent-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
                         }`}
                     >
                       <div
-                        className={`w-2 h-2 rounded-full shadow-sm ring-2 ring-offset-1 ring-offset-white transition-all ${activeFolderId === folder.id ? "ring-gray-200 scale-110" : "ring-transparent group-hover:ring-gray-100"
+                        className={`w-2 h-2 rounded-full shadow-sm ring-2 ring-offset-1 ring-offset-card transition-all ${activeFolderId === folder.id ? "ring-border scale-110" : "ring-transparent group-hover:ring-border/50"
                           }`}
                         style={{ backgroundColor: folder.color }}
                       />
                       <span className="flex-1 truncate">{folder.name}</span>
                       {getFolderNoteCount(folder.id) > 0 && (
                         <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-md ${activeFolderId === folder.id
-                          ? "bg-white text-black"
-                          : "bg-gray-100 text-gray-400 group-hover:bg-gray-200/50"
+                          ? "bg-background text-foreground"
+                          : "bg-secondary text-muted-foreground group-hover:bg-secondary/80"
                           }`}>
                           {getFolderNoteCount(folder.id)}
                         </span>
@@ -472,9 +474,9 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
 
                   <button
                     onClick={() => setCreateFolderOpen(true)}
-                    className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-gray-600 hover:text-black hover:bg-gray-100 transition-all duration-200 group dashed-border"
+                    className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 group"
                   >
-                    <div className="flex items-center justify-center w-4 h-4 rounded border border-gray-400 border-dashed group-hover:border-gray-500">
+                    <div className="flex items-center justify-center w-4 h-4 rounded border border-muted-foreground border-dashed group-hover:border-foreground">
                       <Plus className="w-3 h-3" />
                     </div>
                     <span>New folder</span>
@@ -486,18 +488,17 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
           </div>
 
           {/* Footer Section */}
-          <div className="px-4 pb-4 pt-2 bg-white">
+          <div className="px-4 pb-4 pt-2 bg-card">
             {/* Active Session Widget */}
             <ActiveSessionWidget />
             {/* Upgrade Plan Card */}
             {!isLoadingSubscription && userTier === "free" && (
               <div className="mb-4">
-                <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+                <div className="rounded-2xl border border-border bg-card shadow-sm">
                   <div className="p-6 py-4 flex justify-center items-center flex-col px-3">
                     <button
                       onClick={() => setPricingOpen(true)}
-                      className="inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary shadow hover:bg-primary/90 h-9 px-4 py-2 group relative w-full rounded-[11px] gap-2 overflow-hidden text-lg font-semibold text-white cursor-pointer active:scale-[0.98] hover:opacity-90"
-                      style={{ backgroundColor: 'rgb(23, 23, 23)' }}
+                      className="inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 group relative w-full rounded-[11px] gap-2 overflow-hidden text-lg font-semibold cursor-pointer active:scale-[0.98] hover:opacity-90"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
                         <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
@@ -505,7 +506,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                       </svg>
                       <p className="text-sm">Upgrade plan</p>
                     </button>
-                    <small className="text-sm font-medium leading-none mt-4 text-center text-gray-500">Get more features and unlimited access</small>
+                    <small className="text-sm font-medium leading-none mt-4 text-center text-muted-foreground">Get more features and unlimited access</small>
                     <div className="w-full mt-4">
                       <div className="flex justify-between mb-1">
                         <div className="flex items-center gap-1">
@@ -519,7 +520,7 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className={notesCount >= 3 ? "text-orange-600" : "text-gray-600"}
+                            className={notesCount >= 3 ? "text-orange-600 dark:text-orange-500" : "text-foreground"}
                           >
                             <path d="M2 6h4"></path>
                             <path d="M2 10h4"></path>
@@ -528,14 +529,14 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                             <rect width="16" height="20" x="4" y="2" rx="2"></rect>
                             <path d="M16 2v20"></path>
                           </svg>
-                          <span className={`text-xs ${notesCount >= 3 ? "text-orange-600 font-bold" : "text-gray-900"}`}>
+                          <span className={`text-xs ${notesCount >= 3 ? "text-orange-600 dark:text-orange-500 font-bold" : "text-foreground"}`}>
                             <span className="font-extrabold">{notesCount}</span> / 3 Notes free
                           </span>
                         </div>
                       </div>
-                      <div className={`relative w-full overflow-hidden rounded-full h-1 ${notesCount >= 3 ? "bg-orange-200" : "bg-gray-200"}`}>
+                      <div className={`relative w-full overflow-hidden rounded-full h-1 ${notesCount >= 3 ? "bg-orange-200 dark:bg-orange-900/30" : "bg-secondary"}`}>
                         <div
-                          className={`h-full transition-all ${notesCount >= 3 ? "bg-orange-600" : "bg-gray-900"}`}
+                          className={`h-full transition-all ${notesCount >= 3 ? "bg-orange-600 dark:bg-orange-500" : "bg-primary"}`}
                           style={{ width: `${Math.min((notesCount / 3) * 100, 100)}%` }}
                         ></div>
                       </div>
@@ -546,13 +547,13 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
             )}
 
             {/* User Profile */}
-            <div className="flex items-center gap-3 p-2 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer group" onClick={() => setSettingsOpen(true)}>
+            <div className="flex items-center gap-3 p-2 rounded-xl border border-border hover:bg-accent transition-colors cursor-pointer group" onClick={() => setSettingsOpen(true)}>
               {authLoading ? (
                 <div className="flex items-center gap-3 w-full">
-                  <div className="w-9 h-9 rounded-full bg-gray-100 animate-pulse" />
+                  <div className="w-9 h-9 rounded-full bg-secondary animate-pulse" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-3 w-20 bg-gray-100 rounded animate-pulse" />
-                    <div className="h-2 w-24 bg-gray-100 rounded animate-pulse" />
+                    <div className="h-3 w-20 bg-secondary rounded animate-pulse" />
+                    <div className="h-2 w-24 bg-secondary rounded animate-pulse" />
                   </div>
                 </div>
               ) : (
@@ -564,26 +565,26 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                         alt="User"
                         width={36}
                         height={36}
-                        className="rounded-full object-cover ring-2 ring-white shadow-sm"
+                        className="rounded-full object-cover ring-2 ring-card shadow-sm"
                       />
                     ) : (
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 ring-2 ring-white shadow-sm">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-secondary to-muted flex items-center justify-center text-sm font-bold text-foreground ring-2 ring-card shadow-sm">
                         {user?.email?.[0]?.toUpperCase() || "U"}
                       </div>
                     )}
-                    <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-500 ring-2 ring-white"></div>
+                    <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-500 ring-2 ring-card"></div>
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-black truncate">
+                    <p className="text-sm font-semibold text-foreground truncate">
                       {user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">
+                    <p className="text-xs text-muted-foreground truncate">
                       {userTier === 'free' ? 'Free Plan' : 'Pro Member'}
                     </p>
                   </div>
 
-                  <div className="text-gray-400 group-hover:text-gray-600 transition-colors">
+                  <div className="text-muted-foreground group-hover:text-foreground transition-colors">
                     <Settings className="w-4 h-4" />
                   </div>
                 </>
@@ -598,10 +599,10 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
         {
           settingsOpen && (
             <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-              <DialogContent className="w-[95vw] max-w-2xl sm:max-w-3xl px-5 py-6 sm:px-10 sm:py-10 bg-white border border-gray-200 shadow-lg rounded-xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="w-[95vw] max-w-2xl sm:max-w-3xl px-5 py-6 sm:px-10 sm:py-10 bg-card border border-border shadow-lg rounded-xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="flex items-center text-sm font-bold text-gray-900">
-                    <User className="w-5 h-5 mr-2 text-black" />
+                  <DialogTitle className="flex items-center text-sm font-bold text-foreground">
+                    <User className="w-5 h-5 mr-2 text-foreground" />
                     My profile
                   </DialogTitle>
                 </DialogHeader>
@@ -611,17 +612,17 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                 {/* Profile Info */}
                 <div className="flex flex-col gap-3">
                   <div className="flex justify-between items-center">
-                    <small className="font-medium text-sm text-gray-900">Display name</small>
-                    <small className="font-medium text-sm text-gray-900">
+                    <small className="font-medium text-sm text-foreground">Display name</small>
+                    <small className="font-medium text-sm text-foreground">
                       {user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}
                     </small>
                   </div>
                   <div className="flex justify-between items-center">
-                    <small className="font-medium text-sm text-gray-900">Email</small>
-                    <small className="font-medium text-sm text-gray-900">{user?.email}</small>
+                    <small className="font-medium text-sm text-foreground">Email</small>
+                    <small className="font-medium text-sm text-foreground">{user?.email}</small>
                   </div>
                   <div className="flex justify-between items-center">
-                    <small className="font-medium text-sm text-gray-900">Active plan</small>
+                    <small className="font-medium text-sm text-foreground">Active plan</small>
                     <div className="flex items-center gap-2">
                       <Badge className={`px-2 py-1 rounded-full border shadow-none ${userTier === "free"
                         ? "text-gray-900 border-gray-200"
@@ -642,6 +643,14 @@ export function Sidebar({ notes, notesCount, sidebarOpen, setSidebarOpen }: Side
                       )}
                     </div>
                   </div>
+                </div>
+
+                <Separator className="my-4" />
+
+                {/* Theme Switcher */}
+                <div className="space-y-3">
+                  <small className="font-medium text-sm text-foreground">Theme</small>
+                  <ThemeSwitcher />
                 </div>
 
                 <Separator className="my-4" />

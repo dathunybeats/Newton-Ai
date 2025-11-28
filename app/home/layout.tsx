@@ -27,7 +27,7 @@ export default function HomeLayout({
   const { user, loading } = useAuth();
   const router = useRouter();
   const { notes, isLoading: notesLoading, fetchNotes } = useNoteContext();
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -46,8 +46,8 @@ export default function HomeLayout({
 
   if (loading) {
     return (
-      <div className={`flex min-h-screen items-center justify-center transition-colors ${theme === "dark" ? "dark bg-[var(--background)] text-white" : "bg-white text-black"}`}>
-        <div className={`h-8 w-8 animate-spin rounded-full border-4 ${theme === "dark" ? "border-gray-700 border-t-white" : "border-gray-300 border-t-gray-900"}`}></div>
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground transition-colors">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-foreground"></div>
       </div>
     );
   }
@@ -60,7 +60,7 @@ export default function HomeLayout({
     <FocusSoundProvider>
       <StudySessionProvider>
         <SidebarContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
-          <div className={`flex min-h-screen w-full max-w-full overflow-x-hidden transition-colors ${theme === "dark" ? "dark bg-[var(--background)] text-white" : "bg-white text-black"}`}>
+          <div className="flex min-h-screen w-full max-w-full overflow-x-hidden bg-background text-foreground transition-colors">
             <Sidebar
               notes={notes}
               notesCount={notes.length}

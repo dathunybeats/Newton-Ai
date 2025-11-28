@@ -53,7 +53,7 @@ export function FlashcardViewer({ flashcards, title }: FlashcardViewerProps) {
 
   if (displayedCards.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-muted-foreground">
         No flashcards available.
       </div>
     );
@@ -64,7 +64,7 @@ export function FlashcardViewer({ flashcards, title }: FlashcardViewerProps) {
   return (
     <div className="flex flex-col w-full space-y-3">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-        <h2 className="text-2xl font-bold text-gray-900 flex-1">{title}</h2>
+        <h2 className="text-2xl font-bold text-foreground flex-1">{title}</h2>
 
         {/* Reset and Shuffle Buttons */}
         <div className="flex gap-2 flex-shrink-0 self-end sm:self-auto">
@@ -136,7 +136,7 @@ export function FlashcardViewer({ flashcards, title }: FlashcardViewerProps) {
         {currentIndex > 0 && (
           <Button
             onClick={handlePrevious}
-            className="absolute left-0 bg-gray-900 text-white hover:bg-gray-800 h-10 px-4 py-2 animate-fade-up duration-200"
+            className="absolute left-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 animate-fade-up duration-200"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -158,7 +158,7 @@ export function FlashcardViewer({ flashcards, title }: FlashcardViewerProps) {
         )}
 
         {/* Card Counter */}
-        <small className="text-sm font-semibold text-gray-600">
+        <small className="text-sm font-semibold text-muted-foreground">
           Card {currentIndex + 1} of {displayedCards.length}
         </small>
 
@@ -166,7 +166,7 @@ export function FlashcardViewer({ flashcards, title }: FlashcardViewerProps) {
         {currentIndex < displayedCards.length - 1 && (
           <Button
             onClick={handleNext}
-            className="absolute right-0 bg-gray-900 text-white hover:bg-gray-800 h-10 px-4 py-2 animate-fade-up duration-200"
+            className="absolute right-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 animate-fade-up duration-200"
           >
             Next
             <svg

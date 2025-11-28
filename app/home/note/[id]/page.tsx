@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNoteContext } from "@/contexts/NoteContext";
 import { useSidebar } from "@/app/home/layout";
+import { useTheme } from "@/contexts/ThemeContext";
 import Link from "next/link";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import FolderAssignmentModal from "@/components/notes/FolderAssignmentModal";
@@ -76,8 +77,8 @@ const ChatPanel = ({ note }: { note: Note }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white/50 backdrop-blur-sm sticky top-0 z-10">
-        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+      <div className="p-4 border-b border-border flex items-center justify-between bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+        <h3 className="font-semibold text-foreground flex items-center gap-2">
           <MessageSquare className="w-4 h-4 text-blue-500" />
           Chat
         </h3>
@@ -88,7 +89,7 @@ const ChatPanel = ({ note }: { note: Note }) => {
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${msg.role === 'user'
               ? 'bg-blue-600 text-white rounded-tr-sm'
-              : 'bg-gray-100 text-gray-800 rounded-tl-sm'
+              : 'bg-secondary text-foreground rounded-tl-sm'
               }`}>
               {msg.content}
             </div>
@@ -96,14 +97,14 @@ const ChatPanel = ({ note }: { note: Note }) => {
         ))}
       </div>
 
-      <div className="p-4 border-t border-gray-100 bg-white">
+      <div className="p-4 border-t border-border bg-card">
         <div className="relative">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Ask a question..."
-            className="pr-10 rounded-full bg-gray-50 border-gray-200 focus:bg-white transition-all"
+            className="pr-10 rounded-full bg-secondary border-border focus:bg-background transition-all"
           />
           <button
             onClick={handleSend}
@@ -122,8 +123,8 @@ const SideNotesPanel = ({ note }: { note: Note }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white/50 backdrop-blur-sm sticky top-0 z-10">
-        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+      <div className="p-4 border-b border-border flex items-center justify-between bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+        <h3 className="font-semibold text-foreground flex items-center gap-2">
           <PenTool className="w-4 h-4 text-purple-500" />
           Side Notes
         </h3>
@@ -146,8 +147,8 @@ const PodcastPanel = ({ note }: { note: Note }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white/50 backdrop-blur-sm sticky top-0 z-10">
-        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+      <div className="p-4 border-b border-border flex items-center justify-between bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+        <h3 className="font-semibold text-foreground flex items-center gap-2">
           <Headphones className="w-4 h-4 text-orange-500" />
           Podcast
         </h3>
@@ -159,12 +160,12 @@ const PodcastPanel = ({ note }: { note: Note }) => {
         </div>
 
         <div className="space-y-2">
-          <h4 className="font-bold text-lg text-gray-900 line-clamp-2">{note.title}</h4>
-          <p className="text-sm text-gray-500">AI Generated Podcast</p>
+          <h4 className="font-bold text-lg text-foreground line-clamp-2">{note.title}</h4>
+          <p className="text-sm text-muted-foreground">AI Generated Podcast</p>
         </div>
 
         <div className="w-full space-y-4">
-          <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+          <div className="w-full bg-secondary rounded-full h-1.5 overflow-hidden">
             <div className="bg-orange-500 h-full rounded-full" style={{ width: `${progress}%` }} />
           </div>
 
@@ -185,7 +186,7 @@ const PodcastPanel = ({ note }: { note: Note }) => {
         </div>
       </div>
 
-      <div className="p-4 border-t border-gray-100">
+      <div className="p-4 border-t border-border">
         <Button className="w-full bg-gray-900 text-white hover:bg-gray-800 rounded-xl h-11">
           Generate New Episode
         </Button>
@@ -206,6 +207,7 @@ export default function NotePage() {
   const { user, loading: authLoading } = useAuth();
   const { prefetchedNote, setPrefetchedNote, getNote } = useNoteContext();
   const { setSidebarOpen } = useSidebar();
+  const { resolvedTheme } = useTheme();
 
   const [note, setNote] = useState<Note | null>(null);
   const [loading, setLoading] = useState(true);
@@ -359,17 +361,17 @@ export default function NotePage() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-gray-900"></div>
+      <div className="flex min-h-screen items-center justify-center bg-secondary">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-gray-900"></div>
       </div>
     );
   }
 
   if (error || !note) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-secondary">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{error || "Note not found"}</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">{error || "Note not found"}</h2>
           <Button onClick={() => router.push("/home")} variant="outline">Go back home</Button>
         </div>
       </div>
@@ -380,17 +382,17 @@ export default function NotePage() {
   const isFullPageTool = tool === "quiz" || tool === "flashcards";
 
   return (
-    <main className="flex h-screen w-full bg-gray-50 overflow-hidden">
+    <main className="flex h-screen w-full bg-secondary overflow-hidden">
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
 
         {/* Top Bar (Mobile Only / Minimal) */}
-        <header className="h-14 border-b border-gray-200 bg-white/50 backdrop-blur-sm flex items-center justify-between px-4 shrink-0 lg:hidden">
+        <header className="h-14 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between px-4 shrink-0 lg:hidden">
           <button onClick={() => setSidebarOpen(true)} className="p-2 -ml-2 text-gray-600">
             <MoreVertical className="w-5 h-5" />
           </button>
-          <span className="font-semibold text-gray-900 truncate">{note.title}</span>
+          <span className="font-semibold text-foreground truncate">{note.title}</span>
           <div className="w-8" /> {/* Spacer */}
         </header>
 
@@ -401,12 +403,12 @@ export default function NotePage() {
             {tool === "quiz" ? (
               <div className="h-full flex flex-col">
                 <div className="mb-6">
-                  <h1 className="text-2xl font-bold text-gray-900">Quiz</h1>
-                  <p className="text-gray-500">Test your knowledge on {note.title}</p>
+                  <h1 className="text-2xl font-bold text-foreground">Quiz</h1>
+                  <p className="text-muted-foreground">Test your knowledge on {note.title}</p>
                 </div>
                 {loadingQuiz ? (
                   <div className="flex-1 flex items-center justify-center">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-gray-900"></div>
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-gray-900"></div>
                   </div>
                 ) : (
                   <NoteQuiz topic={note.title} questions={quizQuestions} />
@@ -415,12 +417,12 @@ export default function NotePage() {
             ) : tool === "flashcards" ? (
               <div className="h-full flex flex-col">
                 <div className="mb-6">
-                  <h1 className="text-2xl font-bold text-gray-900">Flashcards</h1>
-                  <p className="text-gray-500">Master concepts from {note.title}</p>
+                  <h1 className="text-2xl font-bold text-foreground">Flashcards</h1>
+                  <p className="text-muted-foreground">Master concepts from {note.title}</p>
                 </div>
                 {loadingFlashcards ? (
                   <div className="flex-1 flex items-center justify-center">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-gray-900"></div>
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-gray-900"></div>
                   </div>
                 ) : (
                   <FlashcardViewer flashcards={flashcards} title={`${note.title} Flashcards`} />
@@ -432,7 +434,7 @@ export default function NotePage() {
                 {/* Header */}
                 <div className="space-y-4">
                   <div className="flex items-start justify-between gap-4">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-tight">
+                    <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight leading-tight">
                       {note.title}
                     </h1>
                     <div className="flex items-center gap-2 shrink-0">
@@ -440,7 +442,7 @@ export default function NotePage() {
                         variant="ghost"
                         size="icon"
                         onClick={() => setIsFolderModalOpen(true)}
-                        className="text-gray-500 hover:text-gray-900"
+                        className="text-muted-foreground hover:text-foreground"
                         title="Move to folder"
                       >
                         <FolderInput className="w-5 h-5" />
@@ -449,14 +451,14 @@ export default function NotePage() {
                         variant="ghost"
                         size="icon"
                         onClick={() => setIsDeleteModalOpen(true)}
-                        className="text-gray-500 hover:text-red-600"
+                        className="text-muted-foreground hover:text-red-600"
                         title="Delete note"
                       >
                         <Trash2 className="w-5 h-5" />
                       </Button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-gray-500">
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
                     <span>{new Date(note.created_at).toLocaleDateString(undefined, { dateStyle: 'medium' })}</span>
                     {note.youtube_url && (
                       <>
@@ -471,7 +473,7 @@ export default function NotePage() {
 
                 {/* YouTube Embed */}
                 {note.youtube_url && (
-                  <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-black aspect-video">
+                  <div className="rounded-2xl overflow-hidden shadow-sm border border-border bg-black aspect-video">
                     <iframe
                       className="w-full h-full"
                       src={`https://www.youtube.com/embed/${note.youtube_url.split('v=')[1] || note.youtube_url.split('/').pop()}`}
@@ -483,11 +485,11 @@ export default function NotePage() {
                 )}
 
                 {/* Markdown Content */}
-                <article className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-img:rounded-xl">
+                <article className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-img:rounded-xl dark:prose-invert">
                   <MarkdownPreview
                     source={note.content}
-                    className="!bg-transparent !text-gray-800"
-                    wrapperElement={{ "data-color-mode": "light" }}
+                    className="!bg-transparent"
+                    wrapperElement={{ "data-color-mode": resolvedTheme }}
                   />
                 </article>
               </div>
@@ -504,7 +506,7 @@ export default function NotePage() {
             animate={{ width: 400, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="border-l border-gray-200 bg-white h-full shrink-0 hidden lg:block shadow-xl z-20"
+            className="border-l border-border bg-card h-full shrink-0 hidden lg:block shadow-xl z-20"
           >
             {tool === "chat" && <ChatPanel note={note} />}
             {tool === "notes" && <SideNotesPanel note={note} />}
@@ -553,7 +555,7 @@ export default function NotePage() {
             classNames={{
               wrapper: "z-50 items-center",
               backdrop: "bg-black/30 backdrop-blur-sm backdrop-saturate-150",
-              base: "bg-white border border-gray-300 rounded-2xl w-[calc(100vw-2rem)] sm:w-full sm:max-w-[480px] my-0",
+              base: "bg-card border border-border rounded-2xl w-[calc(100vw-2rem)] sm:w-full sm:max-w-[480px] my-0",
               header: "p-0",
               body: "p-0",
               footer: "p-0"

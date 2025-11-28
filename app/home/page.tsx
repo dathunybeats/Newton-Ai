@@ -553,9 +553,9 @@ export default function HomePage() {
   };
 
   return (
-    <main className="flex-1 flex justify-center overflow-y-auto px-4 sm:px-8 md:px-10 lg:px-12 py-12 sm:py-20 bg-white w-full">
-      <div className="w-full max-w-6xl flex flex-col items-center sm:gap-3 text-black">
-        <h2 className="text-center font-medium sm:text-3xl 2xl:text-4xl text-xl mb-3 text-black">
+    <main className="flex-1 flex justify-center overflow-y-auto px-4 sm:px-8 md:px-10 lg:px-12 py-12 sm:py-20 bg-background w-full">
+      <div className="w-full max-w-6xl flex flex-col items-center sm:gap-3 text-foreground">
+        <h2 className="text-center font-medium sm:text-3xl 2xl:text-4xl text-xl mb-3 text-foreground">
           What do you want to learn?
         </h2>
         <div className="flex flex-col text-center 2xl:max-w-[672px] xl:max-w-[576px] md:max-w-[512px] w-full z-30">
@@ -570,7 +570,7 @@ export default function HomePage() {
                     setUploadModalOpen(true);
                   }
                 }}
-                className="border border-gray-200 text-card-foreground rounded-3xl group shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:dark:border-gray-300 bg-white dark:bg-white cursor-pointer transition-all duration-200 relative"
+                className="border border-border text-card-foreground rounded-3xl group shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:border-muted bg-card cursor-pointer transition-all duration-200 relative"
                 data-state="closed"
               >
                 <div className="p-4 px-5 sm:h-[112px] flex flex-col sm:flex-col items-start justify-center gap-y-1">
@@ -585,7 +585,7 @@ export default function HomePage() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="lucide lucide-upload h-6 w-6 text-black group-hover:text-black transition-colors sm:mb-2 flex-shrink-0"
+                      className="lucide lucide-upload h-6 w-6 text-foreground group-hover:text-foreground transition-colors sm:mb-2 flex-shrink-0"
                       aria-hidden="true"
                     >
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -594,11 +594,11 @@ export default function HomePage() {
                     </svg>
                     <div className="flex flex-col justify-center">
                       <div className="flex items-center gap-x-1">
-                        <h3 className="font-medium text-sm sm:text-base text-left text-black group-hover:text-black transition-colors">
+                        <h3 className="font-medium text-sm sm:text-base text-left text-foreground group-hover:text-foreground transition-colors">
                           Upload
                         </h3>
                       </div>
-                      <p className="text-xs sm:text-sm text-left text-black transition-colors">
+                      <p className="text-xs sm:text-sm text-left text-muted-foreground transition-colors">
                         File, audio, video
                       </p>
                     </div>
@@ -616,7 +616,7 @@ export default function HomePage() {
                     setYoutubeModalOpen(true);
                   }
                 }}
-                className="border border-gray-200 text-card-foreground rounded-3xl group shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:dark:border-gray-300 bg-white dark:bg-white cursor-pointer transition-all duration-200 relative"
+                className="border border-border text-card-foreground rounded-3xl group shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:border-muted bg-card cursor-pointer transition-all duration-200 relative"
                 data-state="closed"
               >
                 <div className="p-4 px-5 sm:h-[112px] flex flex-col sm:flex-col items-start justify-center gap-y-1">
@@ -631,7 +631,7 @@ export default function HomePage() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="lucide lucide-link2 lucide-link-2 h-6 w-6 text-black group-hover:text-black transition-colors sm:mb-2 flex-shrink-0"
+                      className="lucide lucide-link2 lucide-link-2 h-6 w-6 text-foreground group-hover:text-foreground transition-colors sm:mb-2 flex-shrink-0"
                       aria-hidden="true"
                     >
                       <path d="M9 17H7A5 5 0 0 1 7 7h2"></path>
@@ -640,11 +640,11 @@ export default function HomePage() {
                     </svg>
                     <div className="flex flex-col justify-center">
                       <div className="flex items-center gap-x-1">
-                        <h3 className="font-medium text-sm sm:text-base text-left text-black group-hover:text-black transition-colors">
+                        <h3 className="font-medium text-sm sm:text-base text-left text-foreground group-hover:text-foreground transition-colors">
                           YouTube
                         </h3>
                       </div>
-                      <p className="text-xs sm:text-sm text-left text-black transition-colors">
+                      <p className="text-xs sm:text-sm text-left text-muted-foreground transition-colors">
                         Paste YouTube link
                       </p>
                     </div>
@@ -662,7 +662,7 @@ export default function HomePage() {
                     setRecordModalOpen(true);
                   }
                 }}
-                className="border border-gray-200 text-card-foreground rounded-3xl group shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:dark:border-gray-300 bg-white dark:bg-white cursor-pointer transition-all duration-200 relative"
+                className="border border-border text-card-foreground rounded-3xl group shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:border-muted bg-card cursor-pointer transition-all duration-200 relative"
                 data-state="closed"
               >
                 <div className="p-4 px-5 sm:h-[112px] flex flex-col sm:flex-col items-start justify-center gap-y-1">
@@ -677,7 +677,7 @@ export default function HomePage() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="lucide lucide-mic h-6 w-6 text-black group-hover:text-black transition-colors sm:mb-2 flex-shrink-0"
+                      className="lucide lucide-mic h-6 w-6 text-foreground group-hover:text-foreground transition-colors sm:mb-2 flex-shrink-0"
                       aria-hidden="true"
                     >
                       <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
@@ -686,11 +686,11 @@ export default function HomePage() {
                     </svg>
                     <div className="flex flex-col justify-center">
                       <div className="flex items-center gap-x-1">
-                        <h3 className="font-medium text-sm sm:text-base text-left text-black group-hover:text-black transition-colors">
+                        <h3 className="font-medium text-sm sm:text-base text-left text-foreground group-hover:text-foreground transition-colors">
                           Record
                         </h3>
                       </div>
-                      <p className="text-[10px] md:text-xs lg:text-sm text-left text-black transition-colors">
+                      <p className="text-[10px] md:text-xs lg:text-sm text-left text-muted-foreground transition-colors">
                         Record class, video call
                       </p>
                     </div>
@@ -704,14 +704,14 @@ export default function HomePage() {
           <div className="w-full mt-6 2xl:max-w-[672px] xl:max-w-[576px] md:max-w-[512px]">
             {/* Processing Indicator */}
             {isProcessing && processingMessage && (
-              <div className="mb-3 flex items-center justify-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-2xl py-2 px-4">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
+              <div className="mb-3 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-secondary rounded-2xl py-2 px-4">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
                 <span>{processingMessage}</span>
               </div>
             )}
 
             <div
-              className="bg-white cursor-text overflow-hidden p-2 grid grid-cols-[auto_1fr_auto] gap-3 items-center border border-gray-200 hover:border-gray-300 focus-within:border-gray-400 focus-within:ring-1 focus-within:ring-gray-400 transition-all duration-200 ease-out"
+              className="bg-card cursor-text overflow-hidden p-2 grid grid-cols-[auto_1fr_auto] gap-3 items-center border border-border hover:border-muted focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all duration-200 ease-out"
               style={{ borderRadius: '24px' }}
             >
               {/* Leading - Plus Button */}
@@ -720,7 +720,7 @@ export default function HomePage() {
                   <DropdownTrigger>
                     <button
                       type="button"
-                      className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-all duration-200 active:scale-95"
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200 active:scale-95"
                       aria-label="Add content"
                     >
                       <Plus className="w-5 h-5" />
@@ -728,11 +728,11 @@ export default function HomePage() {
                   </DropdownTrigger>
                   <DropdownMenu
                     aria-label="Add content actions"
-                    className="p-2 bg-white rounded-xl border border-gray-100 shadow-xl w-[200px]"
+                    className="p-2 bg-card rounded-xl border border-border shadow-xl w-[200px]"
                     itemClasses={{
-                      base: "rounded-lg data-[hover=true]:bg-gray-50 data-[hover=true]:text-black text-gray-600 transition-colors duration-200",
+                      base: "rounded-lg data-[hover=true]:bg-secondary data-[hover=true]:text-foreground text-muted-foreground transition-colors duration-200",
                       title: "text-sm font-medium",
-                      description: "text-xs text-gray-400"
+                      description: "text-xs text-muted-foreground"
                     }}
                   >
                     <DropdownItem
@@ -796,7 +796,7 @@ export default function HomePage() {
                   placeholder="Learn anything"
                   disabled={isProcessing}
                   rows={1}
-                  className="w-full resize-none bg-transparent text-base text-gray-900 placeholder:text-gray-500 focus:outline-none py-3 overflow-hidden"
+                  className="w-full resize-none bg-transparent text-base text-foreground placeholder:text-muted-foreground focus:outline-none py-3 overflow-hidden"
                   style={{
                     maxHeight: '200px',
                     minHeight: '24px',
@@ -819,7 +819,7 @@ export default function HomePage() {
                       setRecordModalOpen(true);
                     }
                   }}
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors duration-200"
                   aria-label="Voice input"
                   title="Voice input"
                 >
@@ -832,8 +832,8 @@ export default function HomePage() {
                   onClick={handleSubmit}
                   disabled={!textInput.trim() || isProcessing}
                   className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 ${textInput.trim() && !isProcessing
-                    ? 'bg-gray-900 hover:bg-gray-800 text-white'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                    : 'bg-secondary text-muted-foreground cursor-not-allowed'
                     }`}
                   aria-label="Send prompt"
                   title="Send prompt"
@@ -857,10 +857,10 @@ export default function HomePage() {
           <div className="mb-11">
             <div className="text-left w-full flex justify-between items-center mb-4">
               <div className="flex flex-col">
-                <span className="text-base lg:text-lg font-bold text-gray-900">Notes</span>
+                <span className="text-base lg:text-lg font-bold text-foreground">Notes</span>
               </div>
               <Link href="/home" className="self-center">
-                <button className="inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 h-9 rounded-lg px-3 text-xs sm:text-sm font-medium text-gray-900 hover:text-gray-600">
+                <button className="inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 h-9 rounded-lg px-3 text-xs sm:text-sm font-medium text-foreground hover:text-muted-foreground">
                   <span>View all</span>
                 </button>
               </Link>
@@ -875,21 +875,21 @@ export default function HomePage() {
                   Array.from({ length: 4 }).map((_, index) => (
                     <div
                       key={index}
-                      className="flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.02)] border-gray-200 bg-white rounded-2xl border animate-pulse"
+                      className="flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.02)] border-border bg-card rounded-2xl border animate-pulse"
                     >
                       <div className="relative flex-col justify-center items-center rounded-lg w-full">
                         {/* Skeleton Thumbnail */}
-                        <div className="rounded-t-2xl overflow-hidden relative bg-gradient-to-br from-gray-50 to-gray-100">
-                          <div className="aspect-video w-full relative overflow-hidden flex items-center justify-center bg-gray-200">
+                        <div className="rounded-t-2xl overflow-hidden relative bg-gradient-to-br from-secondary to-muted">
+                          <div className="aspect-video w-full relative overflow-hidden flex items-center justify-center bg-secondary">
                           </div>
                         </div>
                         {/* Skeleton Content */}
                         <div className="w-full my-2.5 flex gap-2 px-3 py-1 relative items-center">
-                          <div className="w-4 h-4 bg-gray-200 rounded flex-shrink-0"></div>
+                          <div className="w-4 h-4 bg-secondary rounded flex-shrink-0"></div>
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-col gap-2">
-                              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                              <div className="h-4 bg-secondary rounded w-3/4"></div>
+                              <div className="h-3 bg-secondary rounded w-1/2"></div>
                             </div>
                           </div>
                         </div>
@@ -910,7 +910,7 @@ export default function HomePage() {
                         <Link
                           href={`/home/note/${note.id}`}
                           prefetch={true}
-                          className="flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.02)] border-gray-200 hover:border-gray-300 bg-white cursor-pointer transition-all duration-200 rounded-2xl border group"
+                          className="flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.02)] border-border hover:border-muted bg-card cursor-pointer transition-all duration-200 rounded-2xl border group"
                         >
                           <div className="relative cursor-pointer flex-col justify-center items-center rounded-lg transition duration-200 group hover:shadow-none w-full drop-shadow-none">
                             {/* Options Menu */}
@@ -922,7 +922,7 @@ export default function HomePage() {
                                       e.preventDefault();
                                       e.stopPropagation();
                                     }}
-                                    className="p-1.5 hover:scale-110 duration-200 cursor-pointer rounded-full lg:bg-transparent group-hover:bg-white transition-all"
+                                    className="p-1.5 hover:scale-110 duration-200 cursor-pointer rounded-full lg:bg-transparent group-hover:bg-card transition-all"
                                   >
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
@@ -934,7 +934,7 @@ export default function HomePage() {
                                       strokeWidth="2"
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
-                                      className="w-4 h-4 opacity-100 xl:opacity-0 group-hover:opacity-100 text-black"
+                                      className="w-4 h-4 opacity-100 xl:opacity-0 group-hover:opacity-100 text-foreground"
                                     >
                                       <circle cx="12" cy="12" r="1"></circle>
                                       <circle cx="12" cy="5" r="1"></circle>
@@ -944,10 +944,10 @@ export default function HomePage() {
                                 </DropdownTrigger>
                                 <DropdownMenu
                                   aria-label="Note actions"
-                                  className="bg-white min-w-[160px]"
+                                  className="bg-card min-w-[160px]"
                                   classNames={{
-                                    base: "bg-white shadow-lg border border-gray-200 rounded-lg min-w-[160px]",
-                                    list: "bg-white"
+                                    base: "bg-card shadow-lg border border-border rounded-lg min-w-[160px]",
+                                    list: "bg-card"
                                   }}
                                   onAction={(key) => {
                                     const action = String(key);
@@ -962,10 +962,10 @@ export default function HomePage() {
                                 >
                                   <DropdownItem
                                     key="folder"
-                                    className="text-black hover:bg-gray-100"
+                                    className="text-foreground hover:bg-secondary"
                                     classNames={{
-                                      base: "text-black",
-                                      title: "text-black"
+                                      base: "text-foreground",
+                                      title: "text-foreground"
                                     }}
                                     startContent={
                                       <svg
@@ -978,7 +978,7 @@ export default function HomePage() {
                                         strokeWidth="2"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
-                                        className="text-black"
+                                        className="text-foreground"
                                       >
                                         <path d="M3 19V6a2 2 0 0 1 2-2h3.6a2 2 0 0 1 1.6.8l1 1.2H19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
                                         <path d="M3 10h18" />
@@ -989,10 +989,10 @@ export default function HomePage() {
                                   </DropdownItem>
                                   <DropdownItem
                                     key="rename"
-                                    className="text-black hover:bg-gray-100"
+                                    className="text-foreground hover:bg-secondary"
                                     classNames={{
-                                      base: "text-black",
-                                      title: "text-black"
+                                      base: "text-foreground",
+                                      title: "text-foreground"
                                     }}
                                     startContent={
                                       <svg
@@ -1005,7 +1005,7 @@ export default function HomePage() {
                                         strokeWidth="2"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
-                                        className="text-black"
+                                        className="text-foreground"
                                       >
                                         <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
                                         <path d="m15 5 4 4"></path>
@@ -1050,7 +1050,7 @@ export default function HomePage() {
                             </div>
 
                             {/* Thumbnail */}
-                            <div className="rounded-t-2xl overflow-hidden relative bg-gradient-to-br from-gray-50 to-gray-100">
+                            <div className="rounded-t-2xl overflow-hidden relative bg-gradient-to-br from-secondary to-muted">
                               <div className="aspect-video w-full relative overflow-hidden flex items-center justify-center">
                                 {note.uploads?.file_type === "pdf" ? (
                                   // PDF Indicator with document preview style
@@ -1066,7 +1066,7 @@ export default function HomePage() {
                                         strokeWidth="1.5"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
-                                        className="text-gray-400"
+                                        className="text-muted-foreground"
                                       >
                                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                                         <polyline points="14 2 14 8 20 8" />
@@ -1104,7 +1104,7 @@ export default function HomePage() {
                                           strokeWidth="2"
                                           strokeLinecap="round"
                                           strokeLinejoin="round"
-                                          className="text-gray-400"
+                                          className="text-muted-foreground"
                                         >
                                           <polygon points="6 3 20 12 6 21 6 3"></polygon>
                                         </svg>
@@ -1157,7 +1157,7 @@ export default function HomePage() {
                                   strokeWidth="2"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
-                                  className="w-4 h-4 text-gray-500 flex-shrink-0 mr-1"
+                                  className="w-4 h-4 text-muted-foreground flex-shrink-0 mr-1"
                                 >
                                   <path d="M15 18H3"></path>
                                   <path d="M17 6H3"></path>
@@ -1174,7 +1174,7 @@ export default function HomePage() {
                                   strokeWidth="2"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
-                                  className="w-4 h-4 text-black flex-shrink-0 mr-1"
+                                  className="w-4 h-4 text-foreground flex-shrink-0 mr-1"
                                 >
                                   <polygon points="6 3 20 12 6 21 6 3"></polygon>
                                 </svg>
@@ -1182,7 +1182,7 @@ export default function HomePage() {
                               <div className="flex-1 min-w-0">
                                 <div className="flex flex-col gap-1">
                                   <div className="flex items-center gap-2 w-full">
-                                    <h5 className="text-sm font-semibold truncate tracking-wide flex-1 text-black group-hover:text-gray-900">
+                                    <h5 className="text-sm font-semibold truncate tracking-wide flex-1 text-foreground group-hover:text-foreground">
                                       {note.title}
                                     </h5>
                                     <button
@@ -1192,7 +1192,7 @@ export default function HomePage() {
                                         e.stopPropagation();
                                         openRenameModal(note.id, note.title);
                                       }}
-                                      className="p-1 rounded-full text-gray-400 opacity-100 xl:opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
+                                      className="p-1 rounded-full text-muted-foreground opacity-100 xl:opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                                       aria-label="Rename note"
                                     >
                                       <svg
@@ -1212,7 +1212,7 @@ export default function HomePage() {
                                       </svg>
                                     </button>
                                   </div>
-                                  <div className="text-xs text-gray-500 flex items-center justify-between gap-1.5">
+                                  <div className="text-xs text-muted-foreground flex items-center justify-between gap-1.5">
                                     <span>{new Date(note.created_at).toLocaleDateString()}</span>
                                     {note.youtube_url && (
                                       <YoutubeIcon
@@ -1235,7 +1235,7 @@ export default function HomePage() {
               </motion.div>
             )}
             {!isLoadingNotes && activeFolderId && filteredNotes.length === 0 && (
-              <div className="text-center text-sm text-gray-500 py-12">
+              <div className="text-center text-sm text-muted-foreground py-12">
                 No notes found in {activeFolderName ?? "this folder"} yet.
               </div>
             )}

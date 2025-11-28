@@ -230,7 +230,7 @@ const QuizPanel = ({ topic, initialQuestions }: QuizPanelProps) => {
           aria-valuemin={0}
           role="progressbar"
           data-state="active"
-          className="relative overflow-hidden rounded-full bg-[#F5F5F5] w-full h-2"
+          className="relative overflow-hidden rounded-full bg-secondary w-full h-2"
         >
           <div
             className="h-full transition-all bg-purple-500 dark:bg-purple-400"
@@ -242,7 +242,7 @@ const QuizPanel = ({ topic, initialQuestions }: QuizPanelProps) => {
       </div>
 
       {showSummary ? (
-        <div className="rounded-lg border border-[#E0E0E0] bg-card text-card-foreground shadow-sm p-6 space-y-4 flex-1 flex flex-col justify-center">
+        <div className="rounded-lg border border-border bg-card text-card-foreground shadow-sm p-6 space-y-4 flex-1 flex flex-col justify-center">
           <h3 className="text-xl font-semibold">Great job!</h3>
           <p className="text-muted-foreground">
             You answered {answeredCount} out of {totalQuestions} questions. Shuffle or reset the quiz
@@ -252,7 +252,7 @@ const QuizPanel = ({ topic, initialQuestions }: QuizPanelProps) => {
             <button
               type="button"
               onClick={handleResetQuiz}
-              className="px-4 py-2 rounded-md bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 cursor-pointer"
+              className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 cursor-pointer"
             >
               Try again
             </button>
@@ -267,7 +267,7 @@ const QuizPanel = ({ topic, initialQuestions }: QuizPanelProps) => {
         </div>
       ) : (
         <>
-          <div className="rounded-lg border border-[#E0E0E0] bg-card text-card-foreground shadow-sm flex-1 flex flex-col min-h-0">
+          <div className="rounded-lg border border-border bg-card text-card-foreground shadow-sm flex-1 flex flex-col min-h-0">
             <div className="flex flex-col space-y-1.5 p-6 flex-shrink-0">
               <p className="text-sm font-semibold text-muted-foreground">
                 Question {currentIndex + 1}
@@ -287,7 +287,7 @@ const QuizPanel = ({ topic, initialQuestions }: QuizPanelProps) => {
                     type="button"
                     onClick={() => handleOptionSelect(option.id)}
                     className={cn(
-                      "items-center text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-[#F5F5F5] hover:bg-[#EEEEEE] text-gray-900 min-h-11 rounded-md w-full flex justify-between gap-3 px-5 py-2.5 border border-transparent text-left",
+                      "items-center text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-secondary hover:bg-muted text-foreground min-h-11 rounded-md w-full flex justify-between gap-3 px-5 py-2.5 border border-transparent text-left",
                       showCorrectState && "border-green-500 dark:border-green-400",
                       showIncorrectState && "border-red-500 dark:border-red-400",
                       !isSelected &&
@@ -356,7 +356,7 @@ const QuizPanel = ({ topic, initialQuestions }: QuizPanelProps) => {
               type="button"
               onClick={handleNextQuestion}
               disabled={!selectedOption}
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gray-900 text-white hover:bg-gray-800 h-10 px-4 py-2 cursor-pointer disabled:cursor-not-allowed"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 cursor-pointer disabled:cursor-not-allowed"
             >
               {currentIndex === totalQuestions - 1 ? "Finish quiz" : "Next question"}
             </button>

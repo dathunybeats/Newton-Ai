@@ -27,11 +27,11 @@ export function FlashcardCard({ question, answer }: FlashcardCardProps) {
         >
           {/* Front Side - Question */}
           <div
-            className="absolute w-full h-full bg-white rounded-lg shadow-lg flex items-center justify-center p-6 border border-gray-200"
+            className="absolute w-full h-full bg-card rounded-lg shadow-lg flex items-center justify-center p-6 border border-border"
             style={{ backfaceVisibility: "hidden" }}
           >
             <div className="flex flex-col items-center">
-              <p className="text-lg font-semibold text-center text-gray-900">
+              <p className="text-lg font-semibold text-center text-foreground">
                 {question}
               </p>
               <div className="flex justify-center items-center gap-1 mt-2">
@@ -45,11 +45,11 @@ export function FlashcardCard({ question, answer }: FlashcardCardProps) {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-gray-600"
+                  className="text-muted-foreground"
                 >
                   <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                 </svg>
-                <small className="text-sm font-semibold text-gray-600">
+                <small className="text-sm font-semibold text-muted-foreground">
                   Press to flip
                 </small>
               </div>
@@ -58,14 +58,14 @@ export function FlashcardCard({ question, answer }: FlashcardCardProps) {
 
           {/* Back Side - Answer */}
           <div
-            className="absolute w-full h-full bg-white rounded-lg shadow-lg flex items-center justify-center p-6 border border-gray-200"
+            className="absolute w-full h-full bg-card rounded-lg shadow-lg flex items-center justify-center p-6 border border-border"
             style={{
               backfaceVisibility: "hidden",
               transform: "rotateY(180deg)",
             }}
           >
             <div className="flex flex-col items-center">
-              <p className="text-lg font-semibold text-center text-gray-900">
+              <p className="text-lg font-semibold text-center text-foreground">
                 {answer}
               </p>
             </div>

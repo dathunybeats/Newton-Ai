@@ -186,6 +186,7 @@ export default function StudyRoomPage() {
         setActiveChallenge(challengeData);
         // Cache the challenge data
         localStorage.setItem('newton_challenge_cache', JSON.stringify(challengeData));
+        localStorage.setItem('newton_challenge_cache_time', Date.now().toString());
       }
     } else {
       setActiveChallenge(null);
@@ -199,15 +200,22 @@ export default function StudyRoomPage() {
   useEffect(() => {
     // Load from cache first for instant display
     const cachedChallenge = localStorage.getItem('newton_challenge_cache');
-    if (cachedChallenge) {
+    const cacheTimestamp = localStorage.getItem('newton_challenge_cache_time');
+    const now = Date.now();
+    const cacheAge = cacheTimestamp ? now - parseInt(cacheTimestamp) : Infinity;
+
+    // Use cache if less than 5 minutes old
+    if (cachedChallenge && cacheAge < 5 * 60 * 1000) {
       try {
         setActiveChallenge(JSON.parse(cachedChallenge));
+        // Don't fetch again if cache is fresh
+        return;
       } catch (e) {
         console.error('Error parsing cached challenge:', e);
       }
     }
 
-    // Then fetch fresh data
+    // Fetch fresh data only if cache is stale or missing
     fetchActiveChallenge();
   }, [friends, stats]); // Re-run when friends load or stats change (session stopped)
 
@@ -310,11 +318,18 @@ export default function StudyRoomPage() {
 
   // Load tasks from Supabase on mount
   useEffect(() => {
-    // Load from cache first
+    // Load from cache first for instant display
     const cachedTasks = localStorage.getItem('newton_tasks_cache');
-    if (cachedTasks) {
+    const cacheTimestamp = localStorage.getItem('newton_tasks_cache_time');
+    const now = Date.now();
+    const cacheAge = cacheTimestamp ? now - parseInt(cacheTimestamp) : Infinity;
+
+    // Use cache if less than 5 minutes old
+    if (cachedTasks && cacheAge < 5 * 60 * 1000) {
       try {
         setTasks(JSON.parse(cachedTasks));
+        // Don't fetch again if cache is fresh
+        return;
       } catch (e) {
         console.error("Error parsing cached tasks:", e);
       }
@@ -341,6 +356,7 @@ export default function StudyRoomPage() {
         });
         setTasks(activeTasks);
         localStorage.setItem('newton_tasks_cache', JSON.stringify(activeTasks));
+        localStorage.setItem('newton_tasks_cache_time', Date.now().toString());
       }
     };
 
@@ -649,7 +665,7 @@ export default function StudyRoomPage() {
   };
 
   return (
-    <div className="h-[100dvh] bg-white text-black flex flex-col overflow-hidden">
+    <div className="h-[100dvh] bg-background text-foreground flex flex-col overflow-hidden">
       {activeRoom ? (
         // Active Room View (Light Mode)
         <div className="relative w-full h-full bg-gray-50 flex flex-col">
@@ -737,18 +753,18 @@ export default function StudyRoomPage() {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="hidden max-[872px]:flex items-center justify-center w-9 h-9 rounded-md bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors flex-shrink-0"
+                className="hidden max-[872px]:flex items-center justify-center w-9 h-9 rounded-md bg-card border border-border shadow-sm hover:bg-accent transition-colors flex-shrink-0"
                 aria-label="Open menu"
               >
-                <Menu className="w-5 h-5 text-gray-700" />
+                <Menu className="w-5 h-5 text-foreground" />
               </button>
 
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-                  <BookOpen className="w-6 h-6 text-gray-900" />
+                <h1 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+                  <BookOpen className="w-6 h-6 text-foreground" />
                   Study Room
                 </h1>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Focus on your goals and track your progress
                 </p>
               </div>
@@ -756,24 +772,24 @@ export default function StudyRoomPage() {
 
             <div className="flex items-center gap-4">
               {/* Tab Switcher */}
-              <div className="flex p-1 bg-gray-100 rounded-xl">
+              <div className="flex p-1 bg-secondary rounded-xl">
                 <button
                   onClick={() => setActiveTab("dashboard")}
-                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${activeTab === "dashboard" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${activeTab === "dashboard" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   Dashboard
                 </button>
                 <button
                   onClick={() => setActiveTab("live")}
-                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${activeTab === "live" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${activeTab === "live" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   Live Rooms
                 </button>
               </div>
 
-              <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
+              <div className="flex items-center gap-2 bg-secondary px-3 py-1.5 rounded-full border border-border">
                 <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-foreground">
                   {stats ? `${stats.current_streak} Day Streak` : 'No Streak'}
                 </span>
               </div>
@@ -795,23 +811,23 @@ export default function StudyRoomPage() {
                   {/* Column 1: Timer & Tasks - 5/12 */}
                   <div className="lg:col-span-5 h-fit lg:h-full flex flex-col gap-4 lg:gap-2 lg:min-h-0">
                     {/* Timer Card - Flexible on Desktop, Fixed on Mobile */}
-                    <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-gray-200 bg-white rounded-3xl shrink-0 lg:shrink lg:flex-[0.8] lg:min-h-0 overflow-visible lg:overflow-hidden">
+                    <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-border bg-card rounded-3xl shrink-0 lg:shrink lg:flex-[0.8] lg:min-h-0 overflow-visible lg:overflow-hidden">
                       <CardBody className="p-6 lg:p-4 flex flex-col items-center justify-center relative overflow-hidden h-full">
                         {/* Background decoration */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-transparent pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-secondary/50 to-transparent pointer-events-none" />
 
                         <div className="relative z-10 flex flex-col items-center w-full justify-between h-full py-2 lg:py-1">
                           <div className="relative flex flex-col items-center justify-center flex-1">
-                            <div className="absolute inset-0 rounded-full bg-gray-100 blur-3xl opacity-50 transform scale-150 pointer-events-none"></div>
+                            <div className="absolute inset-0 rounded-full bg-secondary blur-3xl opacity-50 transform scale-150 pointer-events-none"></div>
                             <div className="relative z-10 flex flex-col items-center">
                               <span
-                                className="font-bold text-gray-900 font-mono tracking-tighter tabular-nums select-none max-w-full leading-none"
+                                className="font-bold text-foreground font-mono tracking-tighter tabular-nums select-none max-w-full leading-none"
                                 style={{ fontSize: 'clamp(3rem, 5vw, 5rem)' }}
                               >
                                 {formatTime(seconds)}
                               </span>
-                              <div className="mt-4 lg:mt-2 flex items-center gap-2 text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
-                                <div className={`w-2 h-2 rounded-full ${isStudying ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                              <div className="mt-4 lg:mt-2 flex items-center gap-2 text-muted-foreground bg-secondary px-3 py-1 rounded-full border border-border">
+                                <div className={`w-2 h-2 rounded-full ${isStudying ? 'bg-green-500 animate-pulse' : 'bg-muted'}`}></div>
                                 <span className="text-xs lg:text-[10px] font-medium whitespace-nowrap">
                                   {isStudying ? `Focusing: ${selectedNote}` : seconds > 0 ? "Paused" : "Ready?"}
                                 </span>
@@ -822,7 +838,7 @@ export default function StudyRoomPage() {
                           <div className="flex items-center gap-4 lg:gap-3 shrink-0">
                             <button
                               onClick={toggleStudying}
-                              className="h-14 w-14 lg:h-10 lg:w-10 rounded-full flex items-center justify-center bg-black text-white cursor-pointer hover:scale-105 transition-transform"
+                              className="h-14 w-14 lg:h-10 lg:w-10 rounded-full flex items-center justify-center bg-primary text-primary-foreground cursor-pointer hover:scale-105 transition-transform"
                             >
                               {isStudying ? (
                                 <Pause size={24} strokeWidth={2.5} className="fill-current lg:w-4 lg:h-4" />
@@ -836,8 +852,8 @@ export default function StudyRoomPage() {
                             <button
                               disabled={seconds === 0}
                               className={`h-14 w-14 lg:h-10 lg:w-10 rounded-full flex items-center justify-center border transition-all ${seconds === 0
-                                ? "bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed"
-                                : "bg-white text-red-500 border-gray-200 cursor-pointer hover:bg-red-50 hover:border-red-100"
+                                ? "bg-secondary text-muted-foreground border-border cursor-not-allowed"
+                                : "bg-card text-red-500 border-border cursor-pointer hover:bg-red-50 hover:border-red-100"
                                 }`}
                               onClick={() => stopSession()}
                             >
@@ -849,10 +865,10 @@ export default function StudyRoomPage() {
                     </Card>
 
                     {/* Tasks Card - Flexible on Desktop, Fixed height on Mobile */}
-                    <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-gray-200 bg-white rounded-3xl h-[400px] lg:h-auto lg:flex-[1.2] lg:min-h-0 overflow-hidden shrink-0 lg:shrink">
+                    <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-border bg-card rounded-3xl h-[400px] lg:h-auto lg:flex-[1.2] lg:min-h-0 overflow-hidden shrink-0 lg:shrink">
                       <CardHeader className="pb-2 pt-6 lg:pt-4 px-6 lg:px-5 flex justify-between items-center shrink-0">
-                        <h3 className="text-lg lg:text-base font-semibold text-gray-900">Tasks</h3>
-                        <span className="text-sm lg:text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                        <h3 className="text-lg lg:text-base font-semibold text-foreground">Tasks</h3>
+                        <span className="text-sm lg:text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
                           {tasks.filter(t => t.completed).length}/{tasks.length}
                         </span>
                       </CardHeader>
@@ -863,9 +879,9 @@ export default function StudyRoomPage() {
                             value={newTask}
                             onValueChange={setNewTask}
                             onKeyDown={handleAddTask}
-                            startContent={<Plus className="w-5 h-5 lg:w-4 lg:h-4 text-gray-400" />}
+                            startContent={<Plus className="w-5 h-5 lg:w-4 lg:h-4 text-muted-foreground" />}
                             classNames={{
-                              inputWrapper: "bg-gray-50 border-none shadow-none h-12 lg:h-11 rounded-xl w-full min-h-0",
+                              inputWrapper: "bg-secondary border-none shadow-none h-12 lg:h-11 rounded-xl w-full min-h-0",
                               input: "outline-none text-base lg:text-sm",
                             }}
                             fullWidth
@@ -876,17 +892,17 @@ export default function StudyRoomPage() {
                           {tasks.map((task) => (
                             <div
                               key={task.id}
-                              className="group flex items-center gap-3 lg:gap-3 p-2 lg:p-2.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                              className="group flex items-center gap-3 lg:gap-3 p-2 lg:p-2.5 rounded-lg hover:bg-secondary transition-colors cursor-pointer"
                               onClick={() => toggleTask(task.id)}
                             >
-                              <div className={`shrink-0 transition-colors ${task.completed ? "text-green-500" : "text-gray-300 group-hover:text-gray-400"}`}>
+                              <div className={`shrink-0 transition-colors ${task.completed ? "text-green-500" : "text-muted group-hover:text-muted-foreground"}`}>
                                 {task.completed ? (
                                   <CheckCircle2 className="w-5 h-5 lg:w-5 lg:h-5" />
                                 ) : (
                                   <Circle className="w-5 h-5 lg:w-5 lg:h-5" />
                                 )}
                               </div>
-                              <span className={`flex-1 text-base lg:text-sm transition-all truncate ${task.completed ? "text-gray-400 line-through" : "text-gray-700"}`}>
+                              <span className={`flex-1 text-base lg:text-sm transition-all truncate ${task.completed ? "text-muted-foreground line-through" : "text-foreground"}`}>
                                 {task.text}
                               </span>
                               <button
@@ -894,14 +910,14 @@ export default function StudyRoomPage() {
                                   e.stopPropagation();
                                   deleteTask(task.id);
                                 }}
-                                className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all cursor-pointer"
+                                className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-red-500 transition-all cursor-pointer"
                               >
                                 <X className="w-4 h-4 lg:w-4 lg:h-4" />
                               </button>
                             </div>
                           ))}
                           {tasks.length === 0 && (
-                            <div className="text-center py-8 lg:py-4 text-gray-400 text-sm lg:text-xs">
+                            <div className="text-center py-8 lg:py-4 text-muted-foreground text-sm lg:text-xs">
                               No tasks yet.
                             </div>
                           )}
@@ -913,10 +929,10 @@ export default function StudyRoomPage() {
                   {/* Column 2: Social & Stats - 4/12 */}
                   <div className="lg:col-span-4 h-fit lg:h-full flex flex-col gap-6 lg:gap-4 lg:min-h-0">
                     {/* Stats - Flexible but with max height constraint preference */}
-                    <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-gray-200 bg-white rounded-3xl shrink-0 lg:shrink lg:flex-[0.3] lg:min-h-0">
+                    <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-border bg-card rounded-3xl shrink-0 lg:shrink lg:flex-[0.3] lg:min-h-0">
                       <CardHeader className="pb-2 pt-6 lg:pt-4 px-6 lg:px-5">
-                        <h3 className="text-base lg:text-sm font-semibold text-gray-900 flex items-center gap-2">
-                          <Activity className="w-4 h-4 lg:w-3.5 lg:h-3.5 text-gray-500" />
+                        <h3 className="text-base lg:text-sm font-semibold text-foreground flex items-center gap-2">
+                          <Activity className="w-4 h-4 lg:w-3.5 lg:h-3.5 text-muted-foreground" />
                           Stats
                         </h3>
                       </CardHeader>
@@ -924,8 +940,8 @@ export default function StudyRoomPage() {
                         <div className="flex flex-col h-full gap-4 lg:gap-2">
                           <div className="flex-1 flex flex-col justify-center min-h-0">
                             <div className="flex justify-between mb-2 lg:mb-1">
-                              <span className="text-sm lg:text-xs text-gray-500">Weekly Goal</span>
-                              <span className="text-sm lg:text-xs font-semibold text-gray-900">
+                              <span className="text-sm lg:text-xs text-muted-foreground">Weekly Goal</span>
+                              <span className="text-sm lg:text-xs font-semibold text-foreground">
                                 {stats
                                   ? `${((stats.weekly_time + seconds) / 3600).toFixed(1)}h / ${(stats.weekly_goal / 3600).toFixed(0)}h`
                                   : '0h / 20h'}
@@ -935,23 +951,23 @@ export default function StudyRoomPage() {
                               value={stats ? Math.min(((stats.weekly_time + seconds) / stats.weekly_goal) * 100, 100) : 0}
                               aria-label="Weekly study goal progress"
                               classNames={{
-                                indicator: "bg-gray-900",
-                                track: "bg-gray-100",
+                                indicator: "bg-primary",
+                                track: "bg-secondary",
                               }}
                               className="h-2 lg:h-1.5"
                             />
                           </div>
 
                           <div className="flex-[1.2] grid grid-cols-2 gap-4 lg:gap-3 min-h-0">
-                            <div className="p-3 lg:p-2.5 bg-gray-50 rounded-2xl lg:rounded-xl flex flex-col justify-center h-full">
-                              <p className="text-[10px] lg:text-[9px] uppercase tracking-wider text-gray-500 mb-1 lg:mb-0.5">Total Time</p>
-                              <p className="text-lg lg:text-base font-bold text-gray-900 leading-none">
+                            <div className="p-3 lg:p-2.5 bg-secondary rounded-2xl lg:rounded-xl flex flex-col justify-center h-full">
+                              <p className="text-[10px] lg:text-[9px] uppercase tracking-wider text-muted-foreground mb-1 lg:mb-0.5">Total Time</p>
+                              <p className="text-lg lg:text-base font-bold text-foreground leading-none">
                                 {stats ? `${((stats.total_time + seconds) / 3600).toFixed(1)}h` : '0h'}
                               </p>
                             </div>
-                            <div className="p-3 lg:p-2.5 bg-gray-50 rounded-2xl lg:rounded-xl flex flex-col justify-center h-full">
-                              <p className="text-[10px] lg:text-[9px] uppercase tracking-wider text-gray-500 mb-1 lg:mb-0.5">Sessions</p>
-                              <p className="text-lg lg:text-base font-bold text-gray-900 leading-none">
+                            <div className="p-3 lg:p-2.5 bg-secondary rounded-2xl lg:rounded-xl flex flex-col justify-center h-full">
+                              <p className="text-[10px] lg:text-[9px] uppercase tracking-wider text-muted-foreground mb-1 lg:mb-0.5">Sessions</p>
+                              <p className="text-lg lg:text-base font-bold text-foreground leading-none">
                                 {stats ? stats.total_sessions : 0}
                               </p>
                             </div>
@@ -961,10 +977,10 @@ export default function StudyRoomPage() {
                     </Card>
 
                     {/* Friends - Takes remaining space */}
-                    <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-gray-200 bg-white rounded-3xl h-[300px] lg:h-auto lg:flex-[0.7] lg:min-h-0 overflow-hidden shrink-0 lg:shrink">
+                    <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-border bg-card rounded-3xl h-[300px] lg:h-auto lg:flex-[0.7] lg:min-h-0 overflow-hidden shrink-0 lg:shrink">
                       <CardHeader className="pb-2 pt-6 lg:pt-4 px-6 lg:px-5 flex justify-between items-center shrink-0">
-                        <h3 className="text-lg lg:text-base font-semibold text-gray-900 flex items-center gap-2">
-                          <Users className="w-5 h-5 lg:w-4 lg:h-4 text-gray-500" />
+                        <h3 className="text-lg lg:text-base font-semibold text-foreground flex items-center gap-2">
+                          <Users className="w-5 h-5 lg:w-4 lg:h-4 text-muted-foreground" />
                           Friends
                         </h3>
                         <div className="flex items-center gap-2">
@@ -978,7 +994,7 @@ export default function StudyRoomPage() {
                           </Chip>
                           <button
                             onClick={() => setShowFriendModal(true)}
-                            className="w-7 h-7 lg:w-6 lg:h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors cursor-pointer"
+                            className="w-7 h-7 lg:w-6 lg:h-6 flex items-center justify-center rounded-full bg-secondary hover:bg-muted text-foreground transition-colors cursor-pointer"
                           >
                             <Plus className="w-4 h-4 lg:w-3.5 lg:h-3.5" />
                           </button>
@@ -1004,10 +1020,10 @@ export default function StudyRoomPage() {
                                   }}
                                 />
                                 <div className="min-w-0 flex-1">
-                                  <p className="font-medium text-sm lg:text-xs text-gray-900 truncate">
+                                  <p className="font-medium text-sm lg:text-xs text-foreground truncate">
                                     {request.name}
                                   </p>
-                                  <p className="text-xs lg:text-[10px] text-gray-500">Friend request</p>
+                                  <p className="text-xs lg:text-[10px] text-muted-foreground">Friend request</p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-1 flex-shrink-0">
@@ -1033,7 +1049,7 @@ export default function StudyRoomPage() {
                           {friends.map((friend: any) => (
                             <div
                               key={friend.id}
-                              className="flex items-center justify-between group p-3 lg:p-2.5 hover:bg-gray-50 rounded-xl transition-colors -mx-2 lg:-mx-1.5"
+                              className="flex items-center justify-between group p-3 lg:p-2.5 hover:bg-secondary rounded-xl transition-colors -mx-2 lg:-mx-1.5"
                             >
                               <div className="flex items-center gap-3 lg:gap-3">
                                 <div className="relative">
@@ -1041,25 +1057,25 @@ export default function StudyRoomPage() {
                                     src={friend.avatar || undefined}
                                     name={friend.name[0]}
                                     size="sm"
-                                    className="bg-gray-100 text-gray-600 font-semibold w-10 h-10 lg:w-9 lg:h-9 text-sm lg:text-xs"
+                                    className="bg-secondary text-foreground font-semibold w-10 h-10 lg:w-9 lg:h-9 text-sm lg:text-xs"
                                     classNames={{
                                       img: "opacity-100"
                                     }}
                                   />
-                                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 lg:w-2.5 lg:h-2.5 bg-gray-300 rounded-full border-2 border-white"></div>
+                                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 lg:w-2.5 lg:h-2.5 bg-muted rounded-full border-2 border-card"></div>
                                 </div>
                                 <div>
-                                  <p className="font-medium text-base lg:text-sm text-gray-900">
+                                  <p className="font-medium text-base lg:text-sm text-foreground">
                                     {friend.name}
                                   </p>
-                                  <p className="text-sm lg:text-xs text-gray-500">Offline</p>
+                                  <p className="text-sm lg:text-xs text-muted-foreground">Offline</p>
                                 </div>
                               </div>
                             </div>
                           ))}
 
                           {friends.length === 0 && pendingRequests.length === 0 && (
-                            <div className="text-center py-6 text-gray-400">
+                            <div className="text-center py-6 text-muted-foreground">
                               <p className="text-sm lg:text-xs">No friends yet</p>
                               <p className="text-xs lg:text-[10px] mt-1">Add friends to study together!</p>
                             </div>
@@ -1072,14 +1088,14 @@ export default function StudyRoomPage() {
                   {/* Column 3: Challenge & Sounds - 3/12 */}
                   <div className="lg:col-span-3 h-fit lg:h-full flex flex-col gap-6 lg:gap-4 lg:min-h-0">
                     {/* Challenge Card */}
-                    <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-gray-200 bg-white rounded-3xl h-[400px] lg:h-auto lg:flex-[3] lg:min-h-0 flex flex-col relative overflow-hidden shrink-0 lg:shrink">
+                    <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-border bg-card rounded-3xl h-[400px] lg:h-auto lg:flex-[3] lg:min-h-0 flex flex-col relative overflow-hidden shrink-0 lg:shrink">
                       {!activeChallenge ? (
                         <CardBody className="flex flex-col items-center justify-center p-6 lg:p-4 text-center h-full">
                           <div className="w-14 h-14 lg:w-12 lg:h-12 bg-orange-50 rounded-full flex items-center justify-center mb-4 lg:mb-3">
                             <Trophy className="w-7 h-7 lg:w-6 lg:h-6 text-orange-500" />
                           </div>
-                          <h3 className="text-base lg:text-sm font-bold text-gray-900 mb-2 lg:mb-1">No Active Challenge</h3>
-                          <p className="text-xs lg:text-[10px] text-gray-500 mb-6 lg:mb-4 max-w-[200px] lg:max-w-[150px]">
+                          <h3 className="text-base lg:text-sm font-bold text-foreground mb-2 lg:mb-1">No Active Challenge</h3>
+                          <p className="text-xs lg:text-[10px] text-muted-foreground mb-6 lg:mb-4 max-w-[200px] lg:max-w-[150px]">
                             Push your limits. Set a goal.
                           </p>
                           <Button
@@ -1089,7 +1105,7 @@ export default function StudyRoomPage() {
                               setNewChallenge({ goal: "40h", duration: "8 days" });
                               setShowChallengeModal(true);
                             }}
-                            className="bg-gray-900 text-white font-medium rounded-xl lg:rounded-lg px-6 lg:px-4 h-10 lg:h-8 text-sm lg:text-xs"
+                            className="bg-primary text-primary-foreground font-medium rounded-xl lg:rounded-lg px-6 lg:px-4 h-10 lg:h-8 text-sm lg:text-xs"
                           >
                             Create Challenge
                           </Button>
@@ -1106,15 +1122,15 @@ export default function StudyRoomPage() {
                               </div>
                               <button
                                 onClick={handleEndChallenge}
-                                className="text-sm lg:text-xs text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+                                className="text-sm lg:text-xs text-muted-foreground hover:text-red-500 transition-colors cursor-pointer"
                               >
                                 End
                               </button>
                             </div>
-                            <h3 className="text-xl lg:text-lg font-bold text-gray-900 leading-tight">
+                            <h3 className="text-xl lg:text-lg font-bold text-foreground leading-tight">
                               {activeChallenge.title}
                             </h3>
-                            <p className="text-sm lg:text-xs font-medium text-gray-400">
+                            <p className="text-sm lg:text-xs font-medium text-muted-foreground">
                               {activeChallenge.dateRange}
                             </p>
                           </CardHeader>
@@ -1125,16 +1141,16 @@ export default function StudyRoomPage() {
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                       <div className={`w-7 h-7 lg:w-6 lg:h-6 rounded-full ${participant.color} shadow-sm`} />
-                                      <span className={`text-base lg:text-sm font-medium ${participant.isCurrentUser ? "text-gray-900" : "text-gray-600"}`}>
+                                      <span className={`text-base lg:text-sm font-medium ${participant.isCurrentUser ? "text-foreground" : "text-muted-foreground"}`}>
                                         {participant.name}
                                       </span>
                                     </div>
                                     <div className="flex items-baseline gap-1">
-                                      <span className="text-base lg:text-sm font-bold text-gray-900">{participant.time}</span>
-                                      <span className="text-sm lg:text-xs text-gray-400">/ {participant.goal}</span>
+                                      <span className="text-base lg:text-sm font-bold text-foreground">{participant.time}</span>
+                                      <span className="text-sm lg:text-xs text-muted-foreground">/ {participant.goal}</span>
                                     </div>
                                   </div>
-                                  <div className="h-2.5 lg:h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                                  <div className="h-2.5 lg:h-2 w-full bg-secondary rounded-full overflow-hidden">
                                     <motion.div
                                       initial={{ width: 0 }}
                                       animate={{ width: `${participant.progress}%` }}
@@ -1151,18 +1167,18 @@ export default function StudyRoomPage() {
                     </Card>
 
                     {/* Focus Sounds Card - Takes remaining space */}
-                    <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-gray-200 bg-white rounded-3xl h-[200px] lg:h-auto lg:flex-[1] lg:min-h-0 overflow-hidden shrink-0 lg:shrink flex flex-col">
+                    <Card className="shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-border bg-card rounded-3xl h-[200px] lg:h-auto lg:flex-[1] lg:min-h-0 overflow-hidden shrink-0 lg:shrink flex flex-col">
                       <CardHeader className="pb-2 pt-6 lg:pt-4 px-6 lg:px-5 shrink-0 flex justify-between items-center">
-                        <h3 className="text-base lg:text-sm font-semibold text-gray-900 flex items-center gap-2">
+                        <h3 className="text-base lg:text-sm font-semibold text-foreground flex items-center gap-2">
                           <Headphones className="w-4 h-4 lg:w-3.5 lg:h-3.5 text-violet-500" />
                           Focus Sounds
                         </h3>
                         {activeSound && (
                           <button
                             onClick={stopSound}
-                            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+                            className="p-1.5 hover:bg-secondary rounded-full transition-colors cursor-pointer"
                           >
-                            <X className="w-4 h-4 text-gray-500" />
+                            <X className="w-4 h-4 text-muted-foreground" />
                           </button>
                         )}
                       </CardHeader>
@@ -1178,23 +1194,23 @@ export default function StudyRoomPage() {
                             >
                               <button
                                 onClick={() => playSound('rain')}
-                                className="flex flex-col items-center justify-center gap-2 lg:gap-1.5 p-3 lg:p-2 rounded-2xl lg:rounded-xl bg-gray-50 hover:bg-blue-50 hover:text-blue-600 transition-all group cursor-pointer h-full"
+                                className="flex flex-col items-center justify-center gap-2 lg:gap-1.5 p-3 lg:p-2 rounded-2xl lg:rounded-xl bg-secondary hover:bg-muted hover:text-blue-600 transition-all group cursor-pointer h-full"
                               >
-                                <CloudRain className="w-5 h-5 lg:w-7 lg:h-7 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                                <CloudRain className="w-5 h-5 lg:w-7 lg:h-7 text-muted-foreground group-hover:text-blue-500 transition-colors" />
                                 <span className="text-sm lg:text-xs font-medium">Rain</span>
                               </button>
                               <button
                                 onClick={() => playSound('lofi')}
-                                className="flex flex-col items-center justify-center gap-2 lg:gap-1.5 p-3 lg:p-2 rounded-2xl lg:rounded-xl bg-gray-50 hover:bg-purple-50 hover:text-purple-600 transition-all group cursor-pointer h-full"
+                                className="flex flex-col items-center justify-center gap-2 lg:gap-1.5 p-3 lg:p-2 rounded-2xl lg:rounded-xl bg-secondary hover:bg-muted hover:text-purple-600 transition-all group cursor-pointer h-full"
                               >
-                                <Music className="w-5 h-5 lg:w-7 lg:h-7 text-gray-400 group-hover:text-purple-500 transition-colors" />
+                                <Music className="w-5 h-5 lg:w-7 lg:h-7 text-muted-foreground group-hover:text-purple-500 transition-colors" />
                                 <span className="text-sm lg:text-xs font-medium">Lo-Fi</span>
                               </button>
                               <button
                                 onClick={() => playSound('cafe')}
-                                className="flex flex-col items-center justify-center gap-2 lg:gap-1.5 p-3 lg:p-2 rounded-2xl lg:rounded-xl bg-gray-50 hover:bg-orange-50 hover:text-orange-600 transition-all group cursor-pointer h-full"
+                                className="flex flex-col items-center justify-center gap-2 lg:gap-1.5 p-3 lg:p-2 rounded-2xl lg:rounded-xl bg-secondary hover:bg-muted hover:text-orange-600 transition-all group cursor-pointer h-full"
                               >
-                                <Coffee className="w-5 h-5 lg:w-7 lg:h-7 text-gray-400 group-hover:text-orange-500 transition-colors" />
+                                <Coffee className="w-5 h-5 lg:w-7 lg:h-7 text-muted-foreground group-hover:text-orange-500 transition-colors" />
                                 <span className="text-sm lg:text-xs font-medium">Cafe</span>
                               </button>
                             </motion.div>
@@ -1213,11 +1229,11 @@ export default function StudyRoomPage() {
                                 step={1}
                                 className="relative flex items-center select-none touch-none w-full h-5"
                               >
-                                <Slider.Track className="bg-gray-200 relative grow rounded-full h-2">
-                                  <Slider.Range className="absolute bg-gray-900 rounded-full h-full" />
+                                <Slider.Track className="bg-secondary relative grow rounded-full h-2">
+                                  <Slider.Range className="absolute bg-primary rounded-full h-full" />
                                 </Slider.Track>
                                 <Slider.Thumb
-                                  className="block w-4 h-4 bg-gray-900 rounded-full hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-transform cursor-pointer"
+                                  className="block w-4 h-4 bg-primary rounded-full hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-transform cursor-pointer"
                                   aria-label="Volume"
                                 />
                               </Slider.Root>
@@ -1366,22 +1382,22 @@ export default function StudyRoomPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-white rounded-3xl shadow-2xl z-50 p-6 overflow-hidden"
+              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-card rounded-3xl shadow-2xl z-50 p-6 overflow-hidden border border-border"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Add Friend</h3>
+                <h3 className="text-xl font-bold text-foreground">Add Friend</h3>
                 <button onClick={() => {
                   setShowFriendModal(false);
                   setFriendEmail("");
                   setFriendError("");
-                }} className="p-1 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
-                  <X className="w-5 h-5 text-gray-500" />
+                }} className="p-1 hover:bg-secondary rounded-full transition-colors cursor-pointer">
+                  <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 block">
                     Enter Friend's Email
                   </label>
                   <Input
@@ -1394,9 +1410,9 @@ export default function StudyRoomPage() {
                         handleSendFriendRequest();
                       }
                     }}
-                    startContent={<Users className="w-4 h-4 text-gray-400" />}
+                    startContent={<Users className="w-4 h-4 text-muted-foreground" />}
                     classNames={{
-                      inputWrapper: "bg-gray-50 border-none shadow-none h-12 rounded-xl w-full",
+                      inputWrapper: "bg-secondary border-none shadow-none h-12 rounded-xl w-full",
                       input: "outline-none",
                     }}
                     fullWidth
@@ -1409,13 +1425,13 @@ export default function StudyRoomPage() {
                 <Button
                   onPress={handleSendFriendRequest}
                   isDisabled={!friendEmail.trim() || isSendingRequest}
-                  className="w-full bg-gray-900 text-white font-medium rounded-xl py-6 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full bg-primary text-primary-foreground font-medium rounded-xl py-6 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {isSendingRequest ? "Sending..." : "Send Friend Request"}
                 </Button>
 
                 <div className="text-center">
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Your friend will receive a friend request that they can accept or decline.
                   </p>
                 </div>
@@ -1445,17 +1461,17 @@ export default function StudyRoomPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-white rounded-3xl shadow-2xl z-50 p-6 overflow-hidden"
+              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-card rounded-3xl shadow-2xl z-50 p-6 overflow-hidden border border-border"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900">New Challenge</h3>
+                <h3 className="text-xl font-bold text-foreground">New Challenge</h3>
                 <button onClick={() => {
                   setShowChallengeModal(false);
                   setChallengeStep(1);
                   setSelectedFriends([]);
                   setNewChallenge({ goal: "40h", duration: "8 days" });
-                }} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
-                  <X className="w-5 h-5 text-gray-500" />
+                }} className="p-1 hover:bg-secondary rounded-full transition-colors">
+                  <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>
 
@@ -1464,30 +1480,30 @@ export default function StudyRoomPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       onClick={() => setNewChallenge({ ...newChallenge, goal: "40h" })}
-                      className={`p-4 rounded-2xl border text-left transition-all ${newChallenge.goal === "40h" ? "border-gray-900 bg-gray-50 ring-1 ring-gray-900" : "border-gray-200 hover:border-gray-300"}`}
+                      className={`p-4 rounded-2xl border text-left transition-all ${newChallenge.goal === "40h" ? "border-primary bg-secondary ring-1 ring-primary" : "border-border hover:border-muted"}`}
                     >
-                      <Target className="w-5 h-5 mb-3 text-gray-900" />
-                      <p className="font-semibold text-gray-900">40 Hours</p>
-                      <p className="text-xs text-gray-500 mt-1">Intense focus</p>
+                      <Target className="w-5 h-5 mb-3 text-foreground" />
+                      <p className="font-semibold text-foreground">40 Hours</p>
+                      <p className="text-xs text-muted-foreground mt-1">Intense focus</p>
                     </button>
                     <button
                       onClick={() => setNewChallenge({ ...newChallenge, goal: "20h" })}
-                      className={`p-4 rounded-2xl border text-left transition-all ${newChallenge.goal === "20h" ? "border-gray-900 bg-gray-50 ring-1 ring-gray-900" : "border-gray-200 hover:border-gray-300"}`}
+                      className={`p-4 rounded-2xl border text-left transition-all ${newChallenge.goal === "20h" ? "border-primary bg-secondary ring-1 ring-primary" : "border-border hover:border-muted"}`}
                     >
-                      <Target className="w-5 h-5 mb-3 text-gray-900" />
-                      <p className="font-semibold text-gray-900">20 Hours</p>
-                      <p className="text-xs text-gray-500 mt-1">Balanced week</p>
+                      <Target className="w-5 h-5 mb-3 text-foreground" />
+                      <p className="font-semibold text-foreground">20 Hours</p>
+                      <p className="text-xs text-muted-foreground mt-1">Balanced week</p>
                     </button>
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 block">Duration</label>
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 block">Duration</label>
                     <div className="flex gap-2">
                       {["3 days", "5 days", "8 days"].map((d) => (
                         <button
                           key={d}
                           onClick={() => setNewChallenge({ ...newChallenge, duration: d })}
-                          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${newChallenge.duration === d ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-600 hover:bg-gray-100"}`}
+                          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${newChallenge.duration === d ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground hover:bg-muted"}`}
                         >
                           {d}
                         </button>
@@ -1497,7 +1513,7 @@ export default function StudyRoomPage() {
 
                   <Button
                     onPress={() => setChallengeStep(2)}
-                    className="w-full bg-gray-900 text-white font-medium rounded-xl py-6"
+                    className="w-full bg-primary text-primary-foreground font-medium rounded-xl py-6"
                     endContent={<ChevronRight className="w-4 h-4" />}
                   >
                     Next Step
@@ -1507,21 +1523,21 @@ export default function StudyRoomPage() {
                 <div className="space-y-6">
                   <div className="bg-orange-50 rounded-2xl p-6 text-center">
                     <Trophy className="w-12 h-12 text-orange-500 mx-auto mb-3" />
-                    <h4 className="text-lg font-bold text-gray-900">Ready to start?</h4>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <h4 className="text-lg font-bold text-foreground">Ready to start?</h4>
+                    <p className="text-sm text-muted-foreground mt-1">
                       Goal: {newChallenge.goal} in {newChallenge.duration}
                     </p>
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 block">Invite Friends</label>
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 block">Invite Friends</label>
                     <div className="space-y-2">
                       {friends.length > 0 ? (
                         friends.map((friend: any) => (
-                          <div key={friend.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-50">
+                          <div key={friend.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary">
                             <div className="flex items-center gap-3">
                               <Avatar name={friend.name} size="sm" className="w-8 h-8 text-xs" />
-                              <span className="text-sm font-medium text-gray-900">{friend.name}</span>
+                              <span className="text-sm font-medium text-foreground">{friend.name}</span>
                             </div>
                             <Checkbox
                               isSelected={selectedFriends.includes(friend.friendId)}
@@ -1538,14 +1554,14 @@ export default function StudyRoomPage() {
                           </div>
                         ))
                       ) : (
-                        <p className="text-sm text-gray-500 italic">No friends found. Add friends to challenge them!</p>
+                        <p className="text-sm text-muted-foreground italic">No friends found. Add friends to challenge them!</p>
                       )}
                     </div>
                   </div>
 
                   <Button
                     onPress={handleCreateChallenge}
-                    className="w-full bg-gray-900 text-white font-medium rounded-xl py-6"
+                    className="w-full bg-primary text-primary-foreground font-medium rounded-xl py-6"
                   >
                     Start Challenge
                   </Button>
@@ -1566,29 +1582,29 @@ export default function StudyRoomPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden"
+              className="bg-card rounded-3xl shadow-xl w-full max-w-md overflow-hidden border border-border"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">Create Live Room</h2>
+                  <h2 className="text-xl font-bold text-foreground">Create Live Room</h2>
                   <button
                     onClick={() => setShowCreateRoomModal(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+                    className="p-2 hover:bg-secondary rounded-full transition-colors cursor-pointer"
                   >
-                    <X className="w-5 h-5 text-gray-500" />
+                    <X className="w-5 h-5 text-muted-foreground" />
                   </button>
                 </div>
 
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Room Name</label>
+                    <label className="text-sm font-medium text-foreground">Room Name</label>
                     <Input
                       placeholder="e.g., Late Night Grind 🌙"
                       value={newRoomName}
                       onValueChange={setNewRoomName}
                       classNames={{
-                        inputWrapper: "bg-gray-50 border-none shadow-none h-12 rounded-xl w-full",
+                        inputWrapper: "bg-secondary border-none shadow-none h-12 rounded-xl w-full",
                         input: "outline-none",
                       }}
                       fullWidth
@@ -1596,18 +1612,18 @@ export default function StudyRoomPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Privacy</label>
-                    <div className="flex gap-4 p-1 bg-gray-50 rounded-xl">
+                    <label className="text-sm font-medium text-foreground">Privacy</label>
+                    <div className="flex gap-4 p-1 bg-secondary rounded-xl">
                       <button
                         onClick={() => setNewRoomPrivacy("public")}
-                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${newRoomPrivacy === "public" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"
+                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${newRoomPrivacy === "public" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
                           }`}
                       >
                         Public
                       </button>
                       <button
                         onClick={() => setNewRoomPrivacy("private")}
-                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${newRoomPrivacy === "private" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"
+                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${newRoomPrivacy === "private" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
                           }`}
                       >
                         Private
@@ -1616,11 +1632,11 @@ export default function StudyRoomPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Invite Link</label>
+                    <label className="text-sm font-medium text-foreground">Invite Link</label>
                     <div className="flex gap-2 mb-3">
                       <button
                         onClick={copyRoomLink}
-                        className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium transition-colors cursor-pointer"
+                        className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-secondary hover:bg-muted text-foreground text-sm font-medium transition-colors cursor-pointer"
                       >
                         {copiedLink ? (
                           <>
@@ -1638,7 +1654,7 @@ export default function StudyRoomPage() {
                   </div>
 
                   <Button
-                    className="w-full bg-gray-900 text-white font-bold h-12 rounded-xl mt-4"
+                    className="w-full bg-primary text-primary-foreground font-bold h-12 rounded-xl mt-4"
                     onPress={handleCreateRoom}
                     isDisabled={!newRoomName.trim()}
                   >
