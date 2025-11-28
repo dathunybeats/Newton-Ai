@@ -47,6 +47,14 @@ export default function RootLayout({
           src="https://datafa.st/js/script.js"
           strategy="afterInteractive"
         />
+        <Script
+          src="https://cdn.visitors.now/v.js"
+          data-token="07e5116f-05ad-44a0-8d42-4f050fd30786"
+        />
+
+
+
+
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
