@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,6 +14,7 @@ import NoteQuiz from "@/components/quiz/NoteQuiz";
 import { FlashcardViewer } from "@/components/flashcards/FlashcardViewer";
 import { Modal, ModalContent } from "@heroui/modal";
 import { motion, AnimatePresence } from "framer-motion";
+import { TiptapEditor } from "@/components/editor/TiptapEditor";
 import {
   MessageSquare,
   PenTool,
@@ -215,6 +216,10 @@ export default function NotePage() {
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  // Auto-save State
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+
   // Quiz & Flashcard State
   const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
   const [loadingQuiz, setLoadingQuiz] = useState(false);
@@ -303,6 +308,63 @@ export default function NotePage() {
     }
   };
 
+  // Auto-save handler with debouncing
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleContentChange = useCallback((newContent: string) => {
+    if (!note?.id || newContent === note.content) return;
+
+    // Clear existing timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+
+    // Set saving state immediately for better UX
+    setIsSaving(true);
+
+    // Debounce the actual save
+    autoSaveTimeoutRef.current = setTimeout(async () => {
+      try {
+        const supabase = createClient();
+        const { error } = await supabase
+          .from("notes")
+          .update({ content: newContent })
+          .eq("id", note.id);
+
+        if (!error) {
+          setNote(prev => prev ? { ...prev, content: newContent } : prev);
+          setLastSaved(new Date());
+        } else {
+          console.error("Auto-save error:", error);
+        }
+      } catch (err) {
+        console.error("Auto-save error:", err);
+      } finally {
+        setIsSaving(false);
+      }
+    }, 1000); // 1 second debounce
+  }, [note?.id, note?.content]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Format last saved time
+  const formatLastSaved = (date: Date) => {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    if (seconds < 10) return "Saved just now";
+    if (seconds < 60) return `Saved ${seconds}s ago`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `Saved ${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    return `Saved ${hours}h ago`;
+  };
+
   const generateQuizQuestions = async () => {
     if (!note?.content || !note?.id) return;
     setLoadingQuiz(true);
@@ -359,6 +421,28 @@ export default function NotePage() {
     }
   };
 
+  // Helper function to extract YouTube video ID from various URL formats
+  const getYouTubeVideoId = (url: string): string | null => {
+    try {
+      // Handle different YouTube URL formats
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+        /^([a-zA-Z0-9_-]{11})$/ // Direct video ID
+      ];
+
+      for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match && match[1]) {
+          return match[1];
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error("Error extracting YouTube video ID:", error);
+      return null;
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-secondary">
@@ -397,15 +481,11 @@ export default function NotePage() {
         </header>
 
         <div className="flex-1 overflow-y-auto scrollbar-hide">
-          <div className={`max-w-4xl mx-auto p-4 sm:p-6 lg:p-10 ${isFullPageTool ? 'h-full' : ''}`}>
-
-            {/* Dynamic Content Based on Tool */}
-            {tool === "quiz" ? (
+          {/* Dynamic Content Based on Tool */}
+          {tool === "quiz" ? (
+            <div className={`max-w-4xl mx-auto p-4 sm:p-6 lg:p-10 h-full`}>
               <div className="h-full flex flex-col">
-                <div className="mb-6">
-                  <h1 className="text-2xl font-bold text-foreground">Quiz</h1>
-                  <p className="text-muted-foreground">Test your knowledge on {note.title}</p>
-                </div>
+
                 {loadingQuiz ? (
                   <div className="flex-1 flex items-center justify-center">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-gray-900"></div>
@@ -414,87 +494,101 @@ export default function NotePage() {
                   <NoteQuiz topic={note.title} questions={quizQuestions} />
                 )}
               </div>
-            ) : tool === "flashcards" ? (
-              <div className="h-full flex flex-col">
-                <div className="mb-6">
-                  <h1 className="text-2xl font-bold text-foreground">Flashcards</h1>
-                  <p className="text-muted-foreground">Master concepts from {note.title}</p>
-                </div>
+            </div>
+          ) : tool === "flashcards" ? (
+            <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8 h-auto sm:h-full">
+              <div className="flex flex-col h-auto sm:h-full">
                 {loadingFlashcards ? (
-                  <div className="flex-1 flex items-center justify-center">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-gray-900"></div>
+                  <div className="flex-1 flex flex-col items-center justify-center gap-4">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-foreground"></div>
+                    <p className="text-muted-foreground animate-pulse">Generating flashcards...</p>
                   </div>
                 ) : (
                   <FlashcardViewer flashcards={flashcards} title={`${note.title} Flashcards`} />
                 )}
               </div>
-            ) : (
-              /* Default Note View */
-              <div className="space-y-8 pb-20">
-                {/* Header */}
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight leading-tight">
-                      {note.title}
-                    </h1>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setIsFolderModalOpen(true)}
-                        className="text-muted-foreground hover:text-foreground"
-                        title="Move to folder"
-                      >
-                        <FolderInput className="w-5 h-5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setIsDeleteModalOpen(true)}
-                        className="text-muted-foreground hover:text-red-600"
-                        title="Delete note"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </Button>
+            </div>
+          ) : (
+            /* Default Note View */
+            <>
+              {/* Header Section - Constrained Width */}
+              <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-10 pb-0">
+                <div className="space-y-2">
+                  {/* Header */}
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight leading-tight">
+                          {note.title}
+                        </h1>
+                        {/* Save Status Indicator */}
+                        <div className="mt-2">
+                          {isSaving ? (
+                            <span className="text-sm text-muted-foreground">Saving...</span>
+                          ) : lastSaved ? (
+                            <span className="text-sm text-muted-foreground">
+                              {formatLastSaved(lastSaved)}
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setIsFolderModalOpen(true)}
+                          className="text-muted-foreground hover:text-foreground"
+                          title="Move to folder"
+                        >
+                          <FolderInput className="w-5 h-5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setIsDeleteModalOpen(true)}
+                          className="text-muted-foreground hover:text-red-600"
+                          title="Delete note"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <span>{new Date(note.created_at).toLocaleDateString(undefined, { dateStyle: 'medium' })}</span>
-                    {note.youtube_url && (
-                      <>
-                        <span>•</span>
-                        <span className="flex items-center gap-1 text-red-600 font-medium">
-                          <Play className="w-3 h-3 fill-current" /> YouTube Source
-                        </span>
-                      </>
-                    )}
-                  </div>
+
+                  {/* YouTube Embed */}
+                  {note.youtube_url && (() => {
+                    const videoId = getYouTubeVideoId(note.youtube_url);
+                    if (!videoId) return null;
+
+                    return (
+                      <div className="max-w-3xl mx-auto mb-0">
+                        <div className="rounded-2xl overflow-hidden shadow-sm border border-border bg-black aspect-video">
+                          <iframe
+                            className="w-full h-full"
+                            src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+                            title="YouTube video player"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                            referrerPolicy="strict-origin-when-cross-origin"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
-
-                {/* YouTube Embed */}
-                {note.youtube_url && (
-                  <div className="rounded-2xl overflow-hidden shadow-sm border border-border bg-black aspect-video">
-                    <iframe
-                      className="w-full h-full"
-                      src={`https://www.youtube.com/embed/${note.youtube_url.split('v=')[1] || note.youtube_url.split('/').pop()}`}
-                      title="YouTube video player"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                )}
-
-                {/* Markdown Content */}
-                <article className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-img:rounded-xl dark:prose-invert">
-                  <MarkdownPreview
-                    source={note.content}
-                    className="!bg-transparent"
-                    wrapperElement={{ "data-color-mode": resolvedTheme }}
-                  />
-                </article>
               </div>
-            )}
-          </div>
+
+              {/* Editor Section - Full Width */}
+              <div className="pb-20 -mt-2">
+                <TiptapEditor
+                  content={note.content}
+                  onChange={handleContentChange}
+                  editable={true}
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
 
