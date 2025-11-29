@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { FlashcardCard } from "./FlashcardCard";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft, ArrowRight, RotateCcw, Shuffle, Layers } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Flashcard {
   id: string;
@@ -53,139 +55,129 @@ export function FlashcardViewer({ flashcards, title }: FlashcardViewerProps) {
 
   if (displayedCards.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        No flashcards available.
+      <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8">
+        <Layers className="w-12 h-12 mb-4 opacity-20" />
+        <p>No flashcards available.</p>
       </div>
     );
   }
 
   const currentCard = displayedCards[currentIndex];
+  const progress = ((currentIndex + 1) / displayedCards.length) * 100;
 
   return (
-    <div className="flex flex-col w-full space-y-3">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-        <h2 className="text-2xl font-bold text-foreground flex-1">{title}</h2>
+    <div className="flex flex-col w-full h-auto sm:h-full max-w-4xl mx-auto justify-center py-4 sm:py-2">
+      {/* Header & Controls */}
+      {/* Header & Controls */}
+      <div className="flex flex-col gap-4 sm:gap-6 mb-2 sm:mb-8 shrink-0">
+        {/* Title */}
+        <h2 className="text-xl sm:text-3xl font-bold tracking-tight text-foreground leading-tight text-center line-clamp-2 px-2">
+          {title.replace(/ Flashcards$/i, "")}
+        </h2>
 
-        {/* Reset and Shuffle Buttons */}
-        <div className="flex gap-2 flex-shrink-0 self-end sm:self-auto">
-          <Button
-            onClick={handleReset}
-            variant="outline"
-            className="h-9 px-3 text-sm"
-            disabled={!isShuffled}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mr-1.5"
+        {/* Progress Section */}
+        <div className="space-y-1.5 sm:space-y-3">
+          <div className="flex justify-between items-end px-1">
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">Card</span>
+              <span className="text-sm font-medium text-foreground tabular-nums">
+                {currentIndex + 1} <span className="text-muted-foreground">/</span> {displayedCards.length}
+              </span>
+            </div>
+            <div className="flex flex-col items-end">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">Completed</span>
+              <span className="text-sm font-medium text-foreground tabular-nums">
+                {Math.round(progress)}%
+              </span>
+            </div>
+          </div>
+
+          <div className="w-full h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-700">
+            <motion.div
+              className="h-full bg-zinc-900 dark:bg-zinc-50 rounded-full relative"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.5, ease: "circOut" }}
             >
-              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-              <path d="M21 3v5h-5"></path>
-              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-              <path d="M3 21v-5h5"></path>
-            </svg>
-            Reset
-          </Button>
-          <Button
-            onClick={handleShuffle}
-            variant="outline"
-            className="h-9 px-3 text-sm"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mr-1.5"
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent w-full -translate-x-full animate-[shimmer_2s_infinite]" />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="flex justify-center">
+          <div className="flex items-center gap-1 bg-secondary/50 p-1 rounded-full border border-border/50">
+            <Button
+              onClick={handleReset}
+              variant="ghost"
+              size="sm"
+              className="h-8 px-3 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all"
+              disabled={!isShuffled}
             >
-              <path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"></path>
-              <path d="m18 2 4 4-4 4"></path>
-              <path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"></path>
-              <path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"></path>
-              <path d="m18 14 4 4-4 4"></path>
-            </svg>
-            Shuffle
-          </Button>
+              <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+              Reset
+            </Button>
+            <div className="w-px h-4 bg-border/50" />
+            <Button
+              onClick={handleShuffle}
+              variant="ghost"
+              size="sm"
+              className={`h-8 px-3 text-xs font-medium rounded-full transition-all ${isShuffled
+                ? "text-primary bg-background shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-background"
+                }`}
+            >
+              <Shuffle className="w-3.5 h-3.5 mr-1.5" />
+              Shuffle
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Flashcard Display */}
-      <FlashcardCard
-        key={currentCard.id}
-        question={currentCard.question}
-        answer={currentCard.answer}
-      />
-
-      <div className="h-4"></div>
+      {/* Main Card Area */}
+      <div className="flex-1 flex flex-col items-center justify-center min-h-0">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentCard.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="w-full"
+          >
+            <FlashcardCard
+              question={currentCard.question}
+              answer={currentCard.answer}
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       {/* Navigation Controls */}
-      <div className="flex justify-center relative items-center">
-        {/* Previous Button */}
-        {currentIndex > 0 && (
-          <Button
-            onClick={handlePrevious}
-            className="absolute left-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 animate-fade-up duration-200"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-4 h-4 mr-2"
-            >
-              <path d="M19 12H5"></path>
-              <path d="m12 19-7-7 7-7"></path>
-            </svg>
-            Previous
-          </Button>
-        )}
+      <div className="mt-4 sm:mt-8 flex items-center justify-center gap-6 shrink-0">
+        <Button
+          onClick={handlePrevious}
+          disabled={currentIndex === 0}
+          variant="outline"
+          size="icon"
+          className="h-14 w-14 rounded-full border-border hover:bg-secondary hover:scale-105 transition-all disabled:opacity-30 disabled:hover:scale-100"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </Button>
 
-        {/* Card Counter */}
-        <small className="text-sm font-semibold text-muted-foreground">
-          Card {currentIndex + 1} of {displayedCards.length}
-        </small>
+        <div className="text-sm font-medium text-muted-foreground tabular-nums">
+          {currentIndex + 1} / {displayedCards.length}
+        </div>
 
-        {/* Next Button */}
-        {currentIndex < displayedCards.length - 1 && (
-          <Button
-            onClick={handleNext}
-            className="absolute right-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 animate-fade-up duration-200"
-          >
-            Next
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-4 h-4 ml-2"
-            >
-              <path d="M5 12h14"></path>
-              <path d="m12 5 7 7-7 7"></path>
-            </svg>
-          </Button>
-        )}
+        <Button
+          onClick={handleNext}
+          disabled={currentIndex === displayedCards.length - 1}
+          variant="default"
+          size="icon"
+          className="h-14 w-14 rounded-full bg-foreground text-background hover:bg-foreground/90 hover:scale-105 transition-all shadow-lg disabled:opacity-30 disabled:hover:scale-100"
+        >
+          <ArrowRight className="w-6 h-6" />
+        </Button>
       </div>
     </div>
   );
