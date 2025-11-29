@@ -66,17 +66,16 @@ export function FlashcardViewer({ flashcards, title }: FlashcardViewerProps) {
   const progress = ((currentIndex + 1) / displayedCards.length) * 100;
 
   return (
-    <div className="flex flex-col w-full h-auto sm:h-full max-w-4xl mx-auto justify-center py-4 sm:py-2">
+    <div className="flex flex-col w-full h-auto sm:h-full max-w-4xl mx-auto justify-center py-4 sm:py-2 lg:py-0 lg:h-full">
       {/* Header & Controls */}
-      {/* Header & Controls */}
-      <div className="flex flex-col gap-4 sm:gap-6 mb-2 sm:mb-8 shrink-0">
+      <div className="flex flex-col gap-4 sm:gap-6 lg:gap-3 mb-2 sm:mb-8 lg:mb-3 shrink-0">
         {/* Title */}
-        <h2 className="text-xl sm:text-3xl font-bold tracking-tight text-foreground leading-tight text-center line-clamp-2 px-2">
+        <h2 className="text-xl sm:text-3xl lg:text-2xl font-bold tracking-tight text-foreground leading-tight text-center line-clamp-2 px-2">
           {title.replace(/ Flashcards$/i, "")}
         </h2>
 
         {/* Progress Section */}
-        <div className="space-y-1.5 sm:space-y-3">
+        <div className="space-y-1.5 sm:space-y-3 lg:space-y-1.5">
           <div className="flex justify-between items-end px-1">
             <div className="flex flex-col">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">Card</span>
@@ -154,7 +153,7 @@ export function FlashcardViewer({ flashcards, title }: FlashcardViewerProps) {
       </div>
 
       {/* Navigation Controls */}
-      <div className="mt-4 sm:mt-8 flex items-center justify-center gap-6 shrink-0">
+      <div className="mt-4 sm:mt-8 lg:mt-3 flex items-center justify-center gap-6 shrink-0">
         <Button
           onClick={handlePrevious}
           disabled={currentIndex === 0}
