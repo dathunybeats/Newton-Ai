@@ -412,10 +412,6 @@ export default function NotePage() {
               </div>
             ) : tool === "flashcards" ? (
               <div className="h-full flex flex-col">
-                <div className="mb-6">
-                  <h1 className="text-2xl font-bold text-foreground">Flashcards</h1>
-                  <p className="text-muted-foreground">Master concepts from {note.title}</p>
-                </div>
                 {loadingFlashcards ? (
                   <div className="flex-1 flex items-center justify-center">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-gray-900"></div>
