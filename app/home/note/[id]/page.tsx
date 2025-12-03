@@ -303,6 +303,33 @@ export default function NotePage() {
     }
   };
 
+  // Helper function to extract YouTube video ID from various URL formats
+  const getYouTubeVideoId = (url: string): string | null => {
+    try {
+      const urlObj = new URL(url);
+
+      // Handle different YouTube URL formats
+      if (urlObj.hostname.includes('youtube.com')) {
+        // Standard watch URL: https://www.youtube.com/watch?v=VIDEO_ID
+        const videoId = urlObj.searchParams.get('v');
+        if (videoId) return videoId;
+      } else if (urlObj.hostname.includes('youtu.be')) {
+        // Short URL: https://youtu.be/VIDEO_ID
+        const pathParts = urlObj.pathname.split('/');
+        return pathParts[1] || null;
+      }
+
+      // Try extracting from path for embed URLs
+      const embedMatch = urlObj.pathname.match(/\/embed\/([^/?]+)/);
+      if (embedMatch) return embedMatch[1];
+
+      return null;
+    } catch (error) {
+      console.error("Error extracting YouTube video ID:", error);
+      return null;
+    }
+  };
+
   const generateQuizQuestions = async () => {
     if (!note?.content || !note?.id) return;
     setLoadingQuiz(true);
@@ -464,20 +491,25 @@ export default function NotePage() {
                 </div>
 
                 {/* YouTube Embed */}
-                {note.youtube_url && (
-                  <div className="rounded-2xl overflow-hidden shadow-sm border border-border bg-black aspect-video">
-                    <iframe
-                      className="w-full h-full"
-                      src={`https://www.youtube.com/embed/${note.youtube_url.split('v=')[1] || note.youtube_url.split('/').pop()}`}
-                      title="YouTube video player"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                )}
+                {note.youtube_url && (() => {
+                  const videoId = getYouTubeVideoId(note.youtube_url);
+                  if (!videoId) return null;
+
+                  return (
+                    <div className="rounded-2xl overflow-hidden shadow-sm border border-border bg-black aspect-video">
+                      <iframe
+                        className="w-full h-full"
+                        src={`https://www.youtube.com/embed/${videoId}`}
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  );
+                })()}
 
                 {/* Markdown Content */}
-                <article className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-img:rounded-xl dark:prose-invert">
+                <article className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-img:rounded-xl dark:prose-invert [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:ml-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:ml-4 [&_li]:my-1">
                   <MarkdownPreview
                     source={note.content}
                     className="!bg-transparent"

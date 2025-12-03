@@ -66,9 +66,9 @@ export function FlashcardViewer({ flashcards, title }: FlashcardViewerProps) {
   const progress = ((currentIndex + 1) / displayedCards.length) * 100;
 
   return (
-    <div className="flex flex-col w-full h-auto sm:h-full max-w-4xl mx-auto justify-center py-4 sm:py-2 lg:py-0 lg:h-full">
+    <div className="flex flex-col w-full h-auto sm:h-full max-w-4xl mx-auto justify-center lg:justify-start py-4 sm:py-2 lg:py-0 lg:h-full">
       {/* Header & Controls */}
-      <div className="flex flex-col gap-4 sm:gap-6 lg:gap-3 mb-2 sm:mb-8 lg:mb-3 shrink-0">
+      <div className="flex flex-col gap-4 sm:gap-6 lg:gap-3 mb-2 sm:mb-8 lg:mb-0 shrink-0">
         {/* Title */}
         <h2 className="text-xl sm:text-3xl lg:text-2xl font-bold tracking-tight text-foreground leading-tight text-center line-clamp-2 px-2">
           {title.replace(/ Flashcards$/i, "")}
@@ -153,7 +153,7 @@ export function FlashcardViewer({ flashcards, title }: FlashcardViewerProps) {
       </div>
 
       {/* Navigation Controls */}
-      <div className="mt-4 sm:mt-8 lg:mt-3 flex items-center justify-center gap-6 shrink-0">
+      <div className="mt-4 sm:mt-8 lg:mt-0 flex items-center justify-center gap-6 shrink-0">
         <Button
           onClick={handlePrevious}
           disabled={currentIndex === 0}
